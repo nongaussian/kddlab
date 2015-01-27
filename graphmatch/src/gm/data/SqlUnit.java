@@ -1,4 +1,4 @@
-package gm.sql;
+package gm.data;
 
 import gm.main.GraphMatching;
 
@@ -12,8 +12,11 @@ public class SqlUnit {
 	public static Connection con = null;
 	private static Statement st = null;
 	
+	public String dbname;
+	
 	public SqlUnit(String dbname){
 		try {
+			this.dbname = dbname;
 			connect(dbname);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

@@ -1,6 +1,9 @@
 package gm.graph;
 
-public abstract class Vertex implements Comparable<Vertex>{
+import java.io.Serializable;
+import java.util.ArrayList;
+
+public abstract class Vertex implements Comparable<Vertex>, Serializable{
 	private int original_id;
 	private int id;
 	
@@ -30,6 +33,15 @@ public abstract class Vertex implements Comparable<Vertex>{
 	}
 	public Vertex getKnownLink(){
 		return knownLink;
+	}
+	
+	
+	public static String getVeticesIdString(ArrayList<Vertex> vertices){
+		String out = "";
+		for(Vertex v : vertices){
+			out += String.format("<%d,%d> ",v.getId(),v.getOriginalId());
+		}
+		return out;
 	}
 	
 }

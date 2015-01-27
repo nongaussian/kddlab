@@ -1,8 +1,9 @@
 package gm.graph;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Movie extends Vertex{
+public class Movie extends Vertex implements Serializable{
 	private String title;
 	private int year;
 	
@@ -39,4 +40,12 @@ public class Movie extends Vertex{
 	public String getTitle(){return title;}
 	public ArrayList<Vertex> getActors(){return actors;}
 	public ArrayList<Vertex> getDirectors(){return directors;}
+	
+	
+	public String getActorsIdString(){
+		return getVeticesIdString(getActors());
+	}
+	public String getDirectorsIdString(){
+		return getVeticesIdString(getDirectors());
+	}
 }

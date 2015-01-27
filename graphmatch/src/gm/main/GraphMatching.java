@@ -4,10 +4,10 @@ import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
+import gm.data.SqlUnit;
 import gm.graph.Graph;
 import gm.graph.Movie;
 import gm.graph.Vertex;
-import gm.sql.SqlUnit;
 
 public class GraphMatching {
 	Graph g,gp;
@@ -49,7 +49,7 @@ public class GraphMatching {
 		simtype 				= setSimType(nes.getString("st"));
 		
 		g = new Graph(sqlunit, maxMovies);
-		gp = new Graph(g,movie_pruning_ratio, relation_pruning_ratio, link_ratio);
+		gp = new Graph(g,sqlunit, movie_pruning_ratio, relation_pruning_ratio, link_ratio);
 		
 		sr = new SimRank(g,gp, simtype, simweight_type, nIter,th_convergence);
 		

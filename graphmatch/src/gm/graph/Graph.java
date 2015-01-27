@@ -1,7 +1,18 @@
 package gm.graph;
 
-import gm.sql.SqlUnit;
+import gm.data.SqlUnit;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -9,35 +20,41 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
 
-public class Graph {
+public class Graph implements Serializable{
 	public static final int VERTEX_TYPE_MOVIE = 0;
 	public static final int VERTEX_TYPE_ACTOR = 1;
 	public static final int VERTEX_TYPE_DIRECTOR = 2;
 	
 	public static Random r = new Random();
+	
+	
 	HashMap<Integer,Integer> movieIDs = new HashMap<Integer, Integer>();
 	HashMap<Integer,Integer> actorIDs = new HashMap<Integer, Integer>();
 	HashMap<Integer,Integer> directorIDs = new HashMap<Integer, Integer>();
-	SqlUnit sqlunit;
+	//SqlUnit sqlunit;
 	
 	private Movie[] movies;
 	private Actor[] actors;
 	private Director[] directors;
 	
+	
+	private String graphname;
+	
 	public Graph(SqlUnit sqlunit, int maxMovies){
-		this.sqlunit = sqlunit;
-		movies = loadMovies(maxMovies);
-		actors = loadActors();
-		directors = loadDirectors();
+		//this.sqlunit = sqlunit;
+		movies = loadMovies(sqlunit, maxMovies);
+		actors = loadActors(sqlunit);
+		directors = loadDirectors(sqlunit);
 		
-		loadActings();
-		loadDirectings();
+		loadActings(sqlunit);
+		loadDirectings(sqlunit);
 		removeSingletonVertices();
 		
+		graphname = String.format("g_%s_nm%d", sqlunit.dbname, movies.length);
 	}
 	
-	public Graph(Graph g, double movie_pruning_ratio, double relation_pruning_ratio, double link_ratio){
-		sqlunit = g.sqlunit;
+	public Graph(Graph g, SqlUnit sqlunit, double movie_pruning_ratio, double relation_pruning_ratio, double link_ratio){
+		//sqlunit = g.sqlunit;
 		double MOVIE_PRUNING_RATIO = movie_pruning_ratio;
 		double RELATION_PRUNING_RATIO = relation_pruning_ratio;
 		
@@ -52,8 +69,6 @@ public class Graph {
 			movieIDs.put(movies[m].getOriginalId(), m);
 			movies[m].setId(m);
 		}
-		
-		
 		
 		System.out.printf("#ofMovies g: %d g': %d\n",g.getMovies().length, getMovies().length);
 		ArrayList<Actor> actor_list = new ArrayList<Actor>(); 
@@ -81,12 +96,16 @@ public class Graph {
 		}
 		System.out.printf("#ofDirectors g: %d g': %d\n",g.getDirectors().length,getDirectors().length);
 		
-		loadDirectings(RELATION_PRUNING_RATIO);
-		loadActings(RELATION_PRUNING_RATIO);
+		loadDirectings(sqlunit, RELATION_PRUNING_RATIO);
+		loadActings(sqlunit, RELATION_PRUNING_RATIO);
 		removeSingletonVertices();
 		setKnownLinksRandom(g, this, link_ratio);
+		
+		this.graphname = g.graphName() +String.format("mpr%srpr%slr%s", Double.toString(movie_pruning_ratio).replace(".", "_"), Double.toString(relation_pruning_ratio).replace(".", "_"), Double.toString(link_ratio).replace(".", "_"));
+		
 	}
-	public static void setKnownLinksRandom(Graph g0, Graph g1, double ratio){
+	
+	private static void setKnownLinksRandom(Graph g0, Graph g1, double ratio){
 		if (ratio>1.0){
 			System.out.println("Ratio should be less than 1.0");
 			System.exit(0);
@@ -146,22 +165,10 @@ public class Graph {
 			}
 		}
 	}
-	public static void setKnownLinkesTest(Graph g0, Graph g1){
-		Movie m0 = g0.movies[g0.movieIDs.get(1)];
-		Movie m1 = g1.movies[g1.movieIDs.get(1)];
-		m0.setKnownLink(m1);
-		m1.setKnownLink(m0);
-		
-		int count_links = 0;
-		int TH_LINKES = 1;
-		while(count_links<TH_LINKES){
-			count_links++;
-		}
-	}
-
-
 	
-	public Movie[] loadMovies(int maxMovies){
+	
+	
+	public Movie[] loadMovies(SqlUnit sqlunit, int maxMovies){
 		ResultSet rs = sqlunit.executeQuery("select movies.id,movies.name, movies.year, movies.rank, count(*) as count " +
 				"from movies, roles	where movies.id = roles.movie_id group by movies.id;");
 		ArrayList<Movie> m_list = new ArrayList<Movie>();
@@ -188,7 +195,8 @@ public class Graph {
 		}
 		return movies;
 	}
-	public Actor[] loadActors(){
+	
+	public Actor[] loadActors(SqlUnit sqlunit){
 		ResultSet rs = sqlunit.executeQuery("select * from actors;");
 		ArrayList<Actor> a_list = new ArrayList<Actor>();
 		try {
@@ -207,7 +215,8 @@ public class Graph {
 		}
 		return actors;
 	}
-	public Director[] loadDirectors(){
+	
+	public Director[] loadDirectors(SqlUnit sqlunit){
 		ResultSet rs = sqlunit.executeQuery("select * from directors;");
 		ArrayList<Director> d_list = new ArrayList<Director>();
 		try {
@@ -229,10 +238,12 @@ public class Graph {
 		return directors;
 	}
 	
-	public void loadActings(){
-		loadActings(0.0);
+	
+	public void loadActings(SqlUnit sqlunit){
+		loadActings(sqlunit, 0.0);
 	}
-	public void loadActings(double pruning_ratio){
+	
+	public void loadActings(SqlUnit sqlunit, double pruning_ratio){
 		ResultSet rs = sqlunit.executeQuery("select * from roles;");
 		try {
 			rs.beforeFirst();
@@ -261,10 +272,11 @@ public class Graph {
 	}
 	
 	
-	public void loadDirectings(){
-		loadDirectings(0.0);
+	public void loadDirectings(SqlUnit sqlunit){
+		loadDirectings(sqlunit, 0.0);
 	}
-	public void loadDirectings(double pruning_ratio){
+	
+	public void loadDirectings(SqlUnit sqlunit, double pruning_ratio){
 		ResultSet rs = sqlunit.executeQuery("select * from movies_directors;");
 		try {
 			rs.beforeFirst();
@@ -291,6 +303,7 @@ public class Graph {
 			Collections.sort(movies[m].getDirectors());
 		}*/
 	}
+	
 	
 	public void removeSingletonVertices(){
 		System.out.println("remove singletons");
@@ -363,6 +376,7 @@ public class Graph {
 		}
 		return null;
 	}
+	
 	public Vertex get(int id, int type){
 		switch(type){
 		case VERTEX_TYPE_MOVIE:
@@ -374,6 +388,81 @@ public class Graph {
 		}
 		return null;
 	}
+	
+	
+	
+	
+	public static Graph readGraph(String graphname){
+		try {
+			ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(getObjPath(graphname))));
+			Graph g = (Graph)in.readObject();
+			in.close();
+			return g;
+		} catch ( IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+			System.exit(0);
+		}
+		return null;
+	}
+	public void writeGraph(String graphname){
+		try {
+			ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(getObjPath(graphname))));
+			out.writeObject(this);
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(0);
+		}
+		
+	}
+	public void writeGraphText(String graphname){
+		try {
+			BufferedWriter br = new BufferedWriter(new FileWriter(getTextPath(graphname)));
+			br.write("Graph "+graphname);
+			br.newLine();
+			
+			br.write("Movies");
+			br.newLine();
+			for(Movie m: movies){
+				br.write(m.toString()+" directors: "+m.getDirectorsIdString()+" actors: "+m.getActorsIdString() );
+				br.newLine();
+			}
+			
+			br.newLine();
+			br.write("Actors");
+			br.newLine();
+			for(Actor a: actors){
+				br.write(a.toString()+" movies: "+a.getMoviesIdString() );
+				br.newLine();
+			}
+			br.newLine();
+			br.write("Directors");
+			br.newLine();
+			for(Director d: directors){
+				br.write(d.toString()+" movies: "+d.getMoviesIdString() );
+				br.newLine();
+			}
+			
+			
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(0);
+		}
+		
+	}
+	
+	public String graphName(){
+		return graphname;
+	}
+	
+	public static String getObjPath(String graphname){
+		return "graph/"+graphname+".obj";
+	}
+	public static String getTextPath(String graphname){
+		return "graph/"+graphname+".txt";
+	}
+	
 	
 	
 }
