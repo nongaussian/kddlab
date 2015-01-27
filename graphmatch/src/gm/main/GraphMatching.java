@@ -27,48 +27,64 @@ public class GraphMatching {
 	
 	int nIter;
 	int gid;
-	SimRank sr;
 	String dbname;
+
+	String algorithm;
+	SimRank sr;
+
 	
 	public boolean LOGGING = false;
 	
 	public static void main(String[] args){
 		Namespace nes = parseArguments(args);
 		GraphMatching gm = new GraphMatching(nes);
-		gm.runSimrank();
-		gm.close();
 		
+		double[][][] sim=null;
+		
+		//Compute similarity
+		String algorithm = nes.getString("algo");
+		if(algorithm.equals("simrank")){
+			gm.initializeSimrank();
+			sim = gm.computeSimrank();
+		}
+		
+		
+		gm.matching_n_test(sim);
+		gm.close();
 	}
 	
 	
 	public GraphMatching(Namespace nes){
+		//Data parameters
 		dbname 						= nes.getString("dbname");
-		
 		if(LOGGING&&dbname.length()>0){
 			sqlunit = new SqlUnit(dbname);
 		}else{
 			LOGGING = false;
 		}
-		
-		
-		System.out.println(dbname);
-		
 		maxMovies 			= nes.getInt("maxMovies");
-		
 		movie_pruning_ratio 	= nes.getDouble("mpr");
 		relation_pruning_ratio 	= nes.getDouble("epr");
 		link_ratio 				= nes.getDouble("lr");
-		simweight_type 			= setWeightType(nes.getString("wt"));
-		nIter 					= nes.getInt("nIter");
-		th_convergence			= nes.getDouble("thcvg");
-		simtype 				= setSimType(nes.getString("st"));
-		gid						= nes.getInt("gid");
 		
+		//algorithm parameters
+		algorithm				= nes.getString("algo");
+		
+		//Simrank parameters
+		if(algorithm.equals("simrank")){
+			simweight_type 			= setWeightType(nes.getString("wt"));
+			nIter 					= nes.getInt("nIter");
+			th_convergence			= nes.getDouble("thcvg");
+			simtype 				= setSimType(nes.getString("st"));
+			gid						= nes.getInt("gid");
+		}
+		
+		//Data loading
 		g = Graph.readGraph(getGname());
 		gp = Graph.readGraph(getGPname());
 		loadKnownLinks();
 		
-		sr = new SimRank(g,gp, simtype, simweight_type, nIter,th_convergence);
+		
 		
 	}
 	
@@ -98,6 +114,9 @@ public class GraphMatching {
 	        		.type(Double.class)
 	        		.setDefault(0.1)
 	        		.help("known link ratio");
+	        parser.addArgument("-algo")
+	            .type(String.class)
+	            .help("Algorithm [simrank,]");
 	        parser.addArgument("-thcvg")
 			        .type(Double.class)
 			        .setDefault(1E-7)
@@ -241,25 +260,34 @@ public class GraphMatching {
 			System.exit(0);
 		}
 	}
+	
 	public void runSimrank(){
 		long ct = System.currentTimeMillis();
 
 		double[][][] sim = computeSimrank();
-		//printMat(sim);
-		int t_sim = (int)(System.currentTimeMillis()-ct);
-		exp_id = registerExperiment(t_sim);
-		System.out.println("t_sim: "+t_sim+"ms");
 		
-		ct = System.currentTimeMillis();
-		computeAccuracy(sim);
+		if(LOGGING){
+			//printMat(sim);
+			int t_sim = (int)(System.currentTimeMillis()-ct);
+			exp_id = registerExperiment(t_sim);
+			System.out.println("t_sim: "+t_sim+"ms");
+			
+			ct = System.currentTimeMillis();
+		}
+		matching_n_test(sim);
 		
-		int t_matching = (int)(System.currentTimeMillis()-ct);
-		registerTmatching(t_matching);
-		System.out.println("t_matching: "+t_matching+"ms");
-		
+		if(LOGGING){
+			int t_matching = (int)(System.currentTimeMillis()-ct);
+			registerTmatching(t_matching);
+			System.out.println("t_matching: "+t_matching+"ms");
+		}
+	}
+	
+	
+	public void initializeSimrank(){
+		sr = new SimRank(g,gp, simtype, simweight_type, nIter,th_convergence);
 	}
 	public double[][][] computeSimrank(){
-		
 		sr.computeSimRank();
 		return  sr.getSimRank();
 		
@@ -276,6 +304,13 @@ public class GraphMatching {
 		sqlunit.executeUpdate(String.format("update experiments set t_match = %d where id=%d", t_matching,exp_id));
 	}
 	
+	
+	/**
+	 * 
+	 * @param matching  output of hungarian algorithm
+	 * @param t			vertex type
+	 * @return
+	 */
 	public int[] matching_test(int [] matching, int t){
 		int[] count = new int[3];
 		for(int id = 0; id <matching.length; id++){
@@ -299,18 +334,19 @@ public class GraphMatching {
 		return count;
 	}
 	
-	public int[] hungarian(double[][] sim){
-		Hungarian hungarian = new Hungarian(sim);
-		return hungarian.execute();
-	}
 	
 	
-	public void computeAccuracy(double[][][] sim){
+	
+	/**
+	 * Run hungarian algorithm and compute precision
+	 * @param sim
+	 */
+	public void matching_n_test(double[][][] sim){
 		
 		int[] count_acc = new int[3];	//[vertex type][true:1/false:0/nomatch:2]
 		int[][] count = new int[3][3];
 		for(int t = 0; t< 3; t++){
-			int[] matching = hungarian(sim[t]);
+			int[] matching = Hungarian.match(sim[t]);
 			count[t] = matching_test(matching, t);
 			System.out.printf("Type: %d  (correct: %d, incorrect: %d, nomatch: %d) precision: %f\n",t,count[t][1],count[t][0],count[t][2],((double)count[t][1])/(count[t][1]+count[t][0]));
 			if(LOGGING){
@@ -326,6 +362,7 @@ public class GraphMatching {
 			sqlunit.executeUpdate(result_qry);
 		}
 	}
+	
 	public static void printMat(double[][][]in){
 		for(int i = 0; i< in.length; i ++){
 			System.out.println(i+" -----------------------------------------------------------");

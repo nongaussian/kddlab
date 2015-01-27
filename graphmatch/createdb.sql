@@ -1,30 +1,4 @@
 use imdb;
-SELECT count(*) FROM actors where film_count>1;
-SELECT count(*) FROM movies where year>2000/*rank is not null*/;
-SELECT count(*) FROM movies where year>=2000 and rank is not null;
-SELECT count(*) FROM movies where year>=2005;
-
-select count(*) from roles;
-
-select * from movies, roles 
-where movies.id  = roles.movie_id
-	and year >=2006;
-
-
-select count(distinct(movie_id)) from movies_directors,movies 
-	where movies.id = movies_directors.movie_id 
-	and year>=2005;
-
-
-select count(*) from movies, roles 
-where movies.id  = roles.movie_id
-	and year >=2005;
-select count(distinct(actor_id)) from movies, roles 
-where movies.id  = roles.movie_id
-	and year >=2005;
-select count(distinct(movie_id)) from movies, roles 
-where movies.id  = roles.movie_id
-	and year >=2005;
 
 
 drop database imdb_2005_a;

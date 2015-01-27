@@ -48,19 +48,14 @@ public class DataLoader {
 		Graph gp = new Graph(g, sqlunit, movie_pruning_ratio, relation_pruning_ratio, link_ratio);
 		return gp;
 	}
-		
-	
-	
-	
 	
 	
 	public static Namespace parseArguments(String[] args){
 		 ArgumentParser parser = ArgumentParsers.newArgumentParser("GraphMatching")
 	                .description("Graph matching.");
-	        parser.addArgument("dbname")
-	                //.metavar("-d")
-	                .type(String.class)
-	                .help("Database name");
+			 parser.addArgument("-dbname")
+	         .type(String.class)
+	         .help("Database name");
 	        parser.addArgument("-mpr")
 	        		.type(Double.class)
 	        		.required(true)

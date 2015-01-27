@@ -34,16 +34,16 @@ public class GraphMatchingCrowdsourcing {
 			int n_newlinks = 0;
 			double[][][] sim = gm.computeSimrank();
 			
-			int[] matching = gm.hungarian(sim[Graph.VERTEX_TYPE_MOVIE]);
+			int[] matching = Hungarian.match(sim[Graph.VERTEX_TYPE_MOVIE]);
 			int[] count = gm.matching_test(matching, Graph.VERTEX_TYPE_MOVIE);
 			double precision = ((double)count[1])/(count[1]+count[0]);
 			System.out.printf("Precision:  %f  true:%d false:%d\n",precision,count[1],count[0]);
 			n_newlinks+=gm.setKnownLinks(matching,Graph.VERTEX_TYPE_MOVIE);
 			
-			matching = gm.hungarian(sim[Graph.VERTEX_TYPE_ACTOR]);
+			matching = Hungarian.match(sim[Graph.VERTEX_TYPE_ACTOR]);
 			n_newlinks+=gm.setKnownLinks(matching,Graph.VERTEX_TYPE_ACTOR);
 			
-			matching = gm.hungarian(sim[Graph.VERTEX_TYPE_DIRECTOR]);
+			matching = Hungarian.match(sim[Graph.VERTEX_TYPE_DIRECTOR]);
 			n_newlinks+=gm.setKnownLinks(matching, Graph.VERTEX_TYPE_DIRECTOR);
 			
 			
