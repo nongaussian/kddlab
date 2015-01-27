@@ -1,21 +1,24 @@
 package gm.data;
 
+import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import gm.graph.Graph;
 
 public class DataLoader {
+	public static void main(String[] args){
+		Namespace nes = parseArguments(args);
 	
-	
-	public void main(String[] args){
-		//Namespace nes = GraphMatching.parseArguments(args);
+		String databasename 			= nes.getString("dbname");
+		double movie_pruning_ratio 		= nes.getDouble("mpr");
+		double relation_pruning_ratio 	= nes.getDouble("epr");
+		double link_ratio 				= nes.getDouble("lr");
 		
-		String databasename = "imdb_small";
-		int[] maxMovies_list = {100, 250, 500, 1000};
-		int nPrunedGraphs = 5;
+		int maxMovies 					= nes.getInt("maxMovies");
+		int nPrunedGraphs 				= nes.getInt("npg");
 		
-		for(int maxMovies: maxMovies_list){
-			//makeGraphsfromRDB(databasename, maxMovies, nPrunedGraphs);
-		}
+		makeGraphsfromRDB(databasename, maxMovies, nPrunedGraphs, movie_pruning_ratio, relation_pruning_ratio, link_ratio);
 	}
 	
 	public static void makeGraphsfromRDB(String databasename, int maxMovies, int nPrunedGraphs, double movie_pruning_ratio, double relation_pruning_ratio, double link_ratio){
@@ -24,10 +27,14 @@ public class DataLoader {
 		Graph g = loadRDBdata(sqlunit, maxMovies);
 		
 		g.writeGraph(g.graphName());
-		g.writeGraphText(g.graphName());
+		//g.writeGraphText(g.graphName());
 		
-		for(int gid = 0; gid <= nPrunedGraphs; gid++){
+		for(int gid = 0; gid < nPrunedGraphs; gid++){
 			Graph gp = makePrunedGraph(g, sqlunit, movie_pruning_ratio, relation_pruning_ratio, link_ratio);
+			gp.writeGraph(gp.graphName()+"_"+gid);
+			gp.writeKnownLinks(gid);
+			g.clearKnownLink();
+			//gp.writeGraphText(gp.graphName()+"_"+gid);
 		}
 		
 	}
@@ -42,10 +49,47 @@ public class DataLoader {
 		return gp;
 	}
 		
-	public static void saveGraph(){
-		
-	}
 	
+	
+	
+	
+	
+	public static Namespace parseArguments(String[] args){
+		 ArgumentParser parser = ArgumentParsers.newArgumentParser("GraphMatching")
+	                .description("Graph matching.");
+	        parser.addArgument("dbname")
+	                //.metavar("-d")
+	                .type(String.class)
+	                .help("Database name");
+	        parser.addArgument("-mpr")
+	        		.type(Double.class)
+	        		.required(true)
+	        		.help("movie prunining ratio");
+	        parser.addArgument("-epr")
+	        		.type(Double.class)
+	        		.required(true)
+	        		.help("edge prunining ratio");
+	        parser.addArgument("-lr")
+	        		.type(Double.class)
+	        		.setDefault(0.1)
+	        		.help("known link ratio");
+	        parser.addArgument("-mm","--maxMovies")
+	        		.type(Integer.class)
+	        		.nargs("?")
+	        		.setDefault(-1)
+	        		.help("Maximum number of movies");
+	        parser.addArgument("-npg")
+	        .type(Integer.class)
+	        .help("Number of pruned graphs");
+	        try {
+	            Namespace res = parser.parseArgs(args);
+	            //System.out.println(res);
+	            return res; 
+	        } catch (ArgumentParserException e) {
+	            parser.handleError(e);
+	        }
+	    return null;   
+	}
 	
 
 }

@@ -11,16 +11,19 @@ th_converge_list = [1.0*10E-6]
 wtypes = ['npairs','uniform']
 repetition = 5
 matching_th_list = [0.8, 0.9, 0.95]
+stypes = ['sr','srkl']
+
 
 dbname = 'imdb_2005_a'
-nMovies_list = [200, 500, 1000]
-mpr_list = [0.1]
+nMovies_list = [1000]
+mpr_list = [0.2]
 epr_list = [0.05]
-link_ratio_list = [0.03]
-stypes = ['sr','srkl']
+link_ratio_list = [0.05]
+stypes = ['srkl']
 wtype = 'npairs'
 #nIter_list = [10]
 repetition = 1
+
 
 
 
@@ -34,7 +37,7 @@ for nMovies in nMovies_list:
                     for th_converge in th_converge_list:
                         for matching_th in matching_th_list:
                             for r in range(repetition):
-                                cmd_str = 'java -jar graphmatching_crowdsourcing_simulation.jar '
+                                cmd_str = 'java -jar graphmatching.jar graphmatching_crowdsourcing'
                                 cmd_str += (dbname+' -mm '+str(nMovies))
                                 cmd_str += (' -mpr '+str(mpr)+' -epr '+str(epr)+' -lr '+str(lr)+' -wt '+wtype+ ' -st '+stype)
                                 cmd_str += (' -niter '+str(nIter)+' -thcvg '+ str(th_converge)+' -thm '+str(matching_th))

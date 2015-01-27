@@ -19,7 +19,16 @@ public class Actor extends Vertex implements Serializable{
 		this.last_name = last_name;
 		this.gender = gender;
 	}
-
+	public Actor(String str){
+		String[] args = str.split("\t");
+		String[] ids = args[0].split("/");
+		setId(Integer.parseInt(ids[0]));
+		setOriginalId(Integer.parseInt(ids[1]));
+		this.first_name = args[1];
+		this.last_name = args[2];
+		this.gender = args[3].charAt(0);
+	}
+	
 	
 	public Actor(Actor actor) {
 		super(actor.getOriginalId());
@@ -34,7 +43,7 @@ public class Actor extends Vertex implements Serializable{
 	}
 	
 	public String toString(){
-		return String.format("<%d,%d> %s %s (%c)",getId(), getOriginalId(), first_name, last_name, gender); 
+		return String.format("%d/%d\t%s\t%s\t%c",getId(), getOriginalId(), first_name, last_name, gender); 
 	}
 
 	

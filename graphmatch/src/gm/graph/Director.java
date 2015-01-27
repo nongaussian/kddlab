@@ -20,7 +20,14 @@ public class Director extends Vertex implements Serializable{
 
 	}
 
-
+	public Director(String str){
+		String[] args = str.split("\t");
+		String[] ids = args[0].split("/");
+		setId(Integer.parseInt(ids[0]));
+		setOriginalId(Integer.parseInt(ids[1]));
+		this.first_name = args[1];
+		this.last_name = args[2];
+	}
 	
 	
 	public Director(Director director) {
@@ -37,7 +44,7 @@ public class Director extends Vertex implements Serializable{
 	}
 	
 	public String toString(){
-		return String.format("<%d,%d> %s %s",getId(), getOriginalId(), first_name, last_name); 
+		return String.format("%d/%d\t%s\t%s",getId(), getOriginalId(), first_name, last_name); 
 	}
 
 	@Override

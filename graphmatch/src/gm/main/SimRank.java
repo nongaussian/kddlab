@@ -48,23 +48,23 @@ public class SimRank {
 		sim[2] = new double[g0.getDirectors().length][g1.getDirectors().length];
 	}
 	public double[][][] getSimRank(){
-		if(!GraphMatching.LOGGING){
-			int n0 = 0;
-			int n1 = 0;
-			for(int i = 0; i< sim.length; i++){
-				for(int j = 0; j<sim[i].length; j++){
-					for(int k = 0; k<sim[i][j].length; k++){
-						if(sim[i][j][k]>0){
-							n1++;
-						}else{
-							n0++;
-						}
-					}
-				}
-			}
-			
-			System.out.println("0: "+n0+" 1:"+n1);
-		}
+//		if(!GraphMatching.LOGGING){
+//			int n0 = 0;
+//			int n1 = 0;
+//			for(int i = 0; i< sim.length; i++){
+//				for(int j = 0; j<sim[i].length; j++){
+//					for(int k = 0; k<sim[i][j].length; k++){
+//						if(sim[i][j][k]>0){
+//							n1++;
+//						}else{
+//							n0++;
+//						}
+//					}
+//				}
+//			}
+//			
+//			System.out.println("0: "+n0+" 1:"+n1);
+//		}
 		return sim;
 	}
 	

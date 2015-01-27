@@ -9,13 +9,16 @@ public abstract class Vertex implements Comparable<Vertex>, Serializable{
 	
 	private Vertex knownLink;
 	
+	protected Vertex(){}
 	public Vertex(int original_id){
-		this.original_id = original_id;
+		setOriginalId(original_id);
 	}
 	public int getId() {
 		return id;
 	}
-
+	protected void setOriginalId(int original_id){
+		this.original_id = original_id;
+	}
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -39,9 +42,10 @@ public abstract class Vertex implements Comparable<Vertex>, Serializable{
 	public static String getVeticesIdString(ArrayList<Vertex> vertices){
 		String out = "";
 		for(Vertex v : vertices){
-			out += String.format("<%d,%d> ",v.getId(),v.getOriginalId());
+			out += String.format("%d/%d\t",v.getId(),v.getOriginalId());
 		}
 		return out;
 	}
+	
 	
 }

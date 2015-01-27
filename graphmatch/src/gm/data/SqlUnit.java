@@ -60,9 +60,9 @@ public class SqlUnit {
 	}
 	public int executeUpdate(String query){
 		try {
-			if(GraphMatching.LOGGING){
-				return st.executeUpdate(query);
-			}
+			
+			return st.executeUpdate(query);
+			
 		} catch (SQLException e) {
 			System.out.println(query);
 			handlingSQLException(e);
@@ -71,14 +71,14 @@ public class SqlUnit {
 	}
 	public int executeUpdateGetAutoKey(String query){
 		try {
-			if(GraphMatching.LOGGING){
-				st.executeUpdate(query,Statement.RETURN_GENERATED_KEYS);
-				ResultSet rs = st.getGeneratedKeys();
-				
-				if(rs.next()){
-					return rs.getInt(1);
-				}
+			
+			st.executeUpdate(query,Statement.RETURN_GENERATED_KEYS);
+			ResultSet rs = st.getGeneratedKeys();
+			
+			if(rs.next()){
+				return rs.getInt(1);
 			}
+		
 		} catch (SQLException e) {
 			handlingSQLException(e);
 			System.exit(0);
@@ -86,7 +86,10 @@ public class SqlUnit {
 		return 0;
 	} 
 	private static void disconnect(){
+		if(con==null)
+			return;
 		try {
+			
 			con.close();
 		} catch (SQLException e) {
 			handlingSQLException(e);

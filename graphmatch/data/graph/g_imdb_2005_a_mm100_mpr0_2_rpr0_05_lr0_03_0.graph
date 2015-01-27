@@ -1,0 +1,1244 @@
+Graph	g_imdb_2005_a_mm100_mpr0_2_rpr0_05_lr0_03_0	82	1073	83
+Movies=82
+0/33578	Belle image, La	2005
+1/59306	Chaos (2005/I)	2005
+2/35605	Bewitched	2005
+3/32532	Beds & Breakfast	2005
+4/30959	Batman Begins	2005
+5/49430	Bulto para presidente, El	2005
+6/31503	Baz ghasht	2005
+7/6210	Adams bler	2005
+8/31439	Baxter, The	2005
+9/47163	Bristol Boys	2005
+10/17226	Animals with Clothes On	2005
+11/34515	Besame mucho	2005
+12/18258	Antidote, L'	2005
+13/2086	3 Day Test	2005
+14/44940	Boudu	2005
+15/22849	At Last	2005
+16/47386	Broadway: The Next Generation	2005
+17/10663	Alibi, The	2005
+18/17654	Annapolis	2005
+19/2837	5up 2down	2005
+20/37489	Big White, The	2005
+21/27145	Bad Blood	2005
+22/2324	35/40	2005
+23/396	...en fin, el mar	2005
+24/60913	Chevaliers du ciel, Les	2005
+25/32585	Bee Season	2005
+26/6170	Adam Meets Eve	2005
+27/954	11:11	2005
+28/33367	Belhorizon	2005
+29/10156	Alchemy	2005
+30/15002	Amour aux trousses, L'	2005
+31/57717	Celestine Prophecy, The	2005
+32/59578	Charlie and the Chocolate Factory	2005
+33/45698	Boystown	2005
+34/913	11 Minutes Ago	2005
+35/43873	Boogeyman	2005
+36/34190	Beowulf & Grendel	2005
+37/51739	Cach	2005
+38/43379	BombShell	2005
+39/22044	Ask the Dust	2005
+40/3315	[E]vangelion	2005
+41/545	06-05 de film	2005
+42/968	12 and Holding	2005
+43/42607	Bocce Balls	2005
+44/36565	Bickford Schmeckler's Cool Ideas	2005
+45/45409	Boy Eats Girl	2005
+46/18206	Anthony Zimmer	2005
+47/21187	Arthur, the Movie	2006
+48/10835	Alien Abduction	2005
+49/32355	Because of Winn-Dixie	2005
+50/30240	Barnyard, The	2005
+51/3392	A fny svnyei	2005
+52/2131	3 Needles	2005
+53/1616	20 centmetros	2005
+54/35388	Between	2005
+55/29046	Bandidas	2005
+56/51500	C.R.A.Z.Y.	2005
+57/1705	2001 Maniacs	2005
+58/39004	Bittersweet Place	2005
+59/30059	Barfuss	2005
+60/2997	7 Seconds	2005
+61/46413	Breaking the Rules	2005
+62/10842	Alien Apocalypse	2005
+63/17371	Anjas Engel	2005
+64/62422	Chloe's Prayer	2005
+65/43012	Boj s tenju	2005
+66/61282	Chicken Little	2005
+67/42391	Bob the Butler	2005
+68/33173	Being Cyrus	2005
+69/7288	Aeon Flux	2005
+70/9173	Aitraaz	2005
+71/54806	Carambole	2005
+72/59307	Chaos (2005/III)	2005
+73/52969	Camino del diablo, El (2005/II)	2005
+74/32243	Beauty Shop	2005
+75/52210	Calentito, El	2005
+76/21392	Aryan Couple, The	2005
+77/33376	Believe in Me	2005
+78/33394	Believers Among Us	2005
+79/60107	Che	2005
+80/31573	Be Cool	2005
+81/52093	Cake	2005
+
+Actors=1073
+0/315604	Mickey	Mello	M movies: 27/954	
+1/498926	Donnie	Wahlberg	M movies: 18/17654	
+2/333689	William	Mtakati	M movies: 52/2131	
+3/785433	Annabella	Sciorra	F movies: 42/968	
+4/778422	Ludivine	Sagnier	F movies: 0/33578	
+5/16925	Denis	Arndt	M movies: 55/29046	
+6/617585	Tovah	Feldshuh	F movies: 16/47386	
+7/527920	Jos? (I)	Z??iga	M movies: 17/10663	
+8/67175	Maurice	B?nichou	M movies: 37/51739	
+9/696825	Jennifer	Lindsley	F movies: 15/22849	
+10/659553	Paige	Hurd	F movies: 74/32243	
+11/435952	Arron	Shiver	M movies: 77/33376	
+12/58295	Nicolas	Bro	M movies: 7/6210	
+13/341794	Blake	Neitzel	M movies: 64/62422	
+14/751405	Diane	Perella	F movies: 77/33376	
+15/565477	Carla	Brunner	F movies: 63/17371	
+16/493884	Jordi	Vilches	M movies: 75/52210	
+17/160988	Jordan	Fry	M movies: 32/59578	
+18/815388	Mageina	Tovah	F movies: 44/36565	
+19/556160	Audra	Blaser	F movies: 55/29046	
+20/648525	Kim	Haskel	F movies: 78/33394	
+21/633998	Joanna	Gleason	F movies: 16/47386	
+22/751944	Claude	Perron	F movies: 28/33367	
+23/27522	Javier	Bardem	M movies: 79/60107	
+24/706221	Robyn	Malcolm	F movies: 35/43873	
+25/54620	Zach	Braff	M movies: 66/61282	
+26/431677	Brendan	Sexton III	M movies: 9/47163	
+27/729521	Mari	Morrow	F movies: 74/32243	
+28/786255	Amy	Sedaris	F movies: 2/35605	66/61282	
+29/818542	Anita	T?th	F movies: 51/3392	
+30/127354	Kenny	Doughty	M movies: 76/21392	
+31/436889	John	Sialiano	M movies: 43/42607	
+32/70953	Kevin 'Pondo'	Canady	M movies: 57/1705	
+33/197656	Woody	Harrelson	M movies: 20/37489	
+34/675927	Nicole	Kidman	F movies: 2/35605	
+35/138982	James	Embree	M movies: 4/30959	
+36/599369	Yasmine	Delawari	F movies: 17/10663	
+37/165255	James	Gandolfini	M movies: 80/31573	
+38/444175	Lance (V)	Smith	M movies: 32/59578	
+39/423653	Will	Schierhorn	M movies: 15/22849	
+40/154559	Peter (I)	Fonda	M movies: 61/46413	
+41/354005	Karl	Oliver Mayer	M movies: 26/6170	
+42/766555	Jodie	Resther	F movies: 47/21187	
+43/286857	Paul	Lukather	M movies: 64/62422	
+44/806746	Enik?	Szil?gyi	F movies: 51/3392	
+45/518001	Michael Townsend	Wright	M movies: 58/39004	
+46/625791	Catherine	Frot	F movies: 14/44940	
+47/76293	Max	Casella	M movies: 9/47163	
+48/20633	Daniel	Auteuil	M movies: 37/51739	
+49/127368	Aaron (I)	Douglas	M movies: 1/59306	
+50/572959	Ellode	Carpenter	F movies: 64/62422	
+51/384935	Bruno	Putzulu	M movies: 28/33367	
+52/354768	Ty	Olsson	M movies: 1/59306	
+53/513881	Ben	Windsor	M movies: 21/27145	
+54/22591	Kevin	Bacon	M movies: 74/32243	
+55/449410	Scott	Spiegel	M movies: 57/1705	
+56/418672	William (II)	Sanford	M movies: 19/2837	
+57/643064	Macarena	G?mez	F movies: 75/52210	
+58/450548	Marco	St. John	M movies: 15/22849	
+59/317957	Chris	Messina	M movies: 58/39004	
+60/471684	Patrick (V)	Thomas	M movies: 48/10835	
+61/549673	Katie (II)	Bell	F movies: 21/27145	
+62/291605	Vivek	Madan	M movies: 68/33173	
+63/384957	Pablo	Puyol	M movies: 53/1616	
+64/127881	Barry	Dowden	M movies: 4/30959	
+65/55579	Josh	Braslin	M movies: 27/954	
+66/441842	Kevin	Skousen	M movies: 77/33376	
+67/554559	Juliette	Binoche	F movies: 25/32585	37/51739	
+68/382487	Nick (II)	Price	M movies: 49/32355	
+69/626917	Est?baliz	Gabilondo	F movies: 75/52210	
+70/708289	Sophie	Marceau	F movies: 46/18206	
+71/318718	Rusty	Meyers	M movies: 38/43379	
+72/224333	Lil	J	M movies: 74/32243	
+73/801765	Alana	Stewart	F movies: 54/35388	
+74/754971	Christina	Pinheiro	F movies: 22/2324	
+75/414403	Michael	Saccente	M movies: 35/43873	
+76/524765	David	Zayas	M movies: 9/47163	
+77/792574	Lorca	Simons	F movies: 19/2837	
+78/34511	Mahmoud	Behraznia	M movies: 6/31503	
+79/768102	Olivia	Richardson	F movies: 19/2837	
+80/95213	Kevin (I)	Cooney	M movies: 17/10663	
+81/13553	Joey	Ansah	M movies: 4/30959	
+82/427350	Coltin	Scott	M movies: 13/2086	
+83/486785	Jean-Marc	Vall?e	M movies: 56/51500	
+84/277476	Thierry	Lhermitte	M movies: 12/18258	
+85/246150	Saif Ali	Khan	M movies: 68/33173	
+86/117841	Fran?ois-Xavier	Demaison	M movies: 22/2324	
+87/485830	Wilmer	Valderrama	M movies: 74/32243	
+88/836965	Nicole	Windsor	F movies: 21/27145	
+89/67447	Oliver	B?rgin	M movies: 63/17371	
+90/122043	Ty	Dickson	M movies: 32/59578	
+91/715712	Skye	McCole Bartusiak	F movies: 35/43873	
+92/161462	Patrick	Fugit	M movies: 44/36565	
+93/628185	Concha	Gal?n	F movies: 53/1616	
+94/38	Andr?	3000	M movies: 80/31573	
+95/135628	Charles (VI)	Edwards	M movies: 4/30959	
+96/477770	Luis Felipe	Tovar	M movies: 5/49430	
+97/741412	Afarin	Obeisi	F movies: 6/31503	
+98/702784	Ver?nica	Lynn	F movies: 23/396	
+99/259016	Alex	Kubik	M movies: 80/31573	
+100/15193	Michael	Arata	M movies: 15/22849	
+101/206099	Juan Carlos	Hern?ndez	M movies: 23/396	
+102/403133	The	Rock	M movies: 80/31573	
+103/648999	Jamie	Hauser	F movies: 43/42607	
+104/78844	Rafael	Cedres	M movies: 80/31573	
+105/204057	A.J.	Henderson	M movies: 47/21187	
+106/404417	Michael	Roemer	M movies: 64/62422	
+107/1585	Kirk	Acevedo	M movies: 19/2837	
+108/633751	Adele	Givens	F movies: 74/32243	
+109/196293	Thomas	Hanzon	M movies: 71/54806	
+110/234285	Jaroslav	Josef	M movies: 11/34515	
+111/595191	Turiya	Dawn	F movies: 34/913	
+112/46649	Kurtis	Blow	M movies: 61/46413	
+113/588006	Courteney	Cox	F movies: 50/30240	
+114/522074	Jacob (II)	Young	M movies: 13/2086	
+115/111569	Isaach	De Bankol?	M movies: 19/2837	
+116/645491	Rachel	Hammond	F movies: 4/30959	
+117/321731	Matt (II)	Miller	M movies: 4/30959	
+118/297373	Ray	Manzarek	M movies: 61/46413	
+119/66125	Gerard	Butler	M movies: 36/34190	
+120/123254	Peter	Dinklage	M movies: 8/31439	
+121/157844	James	Franco	M movies: 18/17654	
+122/463222	Borys	Szyc	M movies: 72/59307	
+123/427747	Reid	Scott	M movies: 44/36565	
+124/757919	Nicole	Potvin	F movies: 67/42391	
+125/454844	Wass M.	Stevens	M movies: 19/2837	
+126/6990	Dean	Alexandrou	M movies: 4/30959	
+127/426530	Jason	Schwartzman	M movies: 2/35605	
+128/838620	Alfre	Woodard	F movies: 74/32243	
+129/410155	Andre	Royo	M movies: 19/2837	
+130/665378	Martina	Jenickova	F movies: 11/34515	
+131/199843	Tamer	Hassan	M movies: 60/2997	4/30959	
+132/770436	Jennifer (III)	Robertson	F movies: 25/32585	
+133/185968	Marc-Andr?	Grondin	M movies: 56/51500	
+134/85668	Brian	Christensen	M movies: 80/31573	
+135/102355	S?ndor	Cs?nyi	M movies: 51/3392	
+136/541889	Candy	Azzara	F movies: 43/42607	
+137/651926	Cassandra	Hepburn	F movies: 57/1705	
+138/719899	Idina	Menzel	F movies: 39/22044	
+139/430641	Rade	Serbedzija	M movies: 4/30959	
+140/544402	Elizabeth (II)	Banks	F movies: 8/31439	
+141/215052	Djimon	Hounsou	M movies: 74/32243	
+142/43141	Velizar	Binev	M movies: 62/10842	
+143/716486	Anika C.	McFall	F movies: 74/32243	
+144/765067	Della	Reese	F movies: 74/32243	
+145/46626	S?bastien	Blouin	M movies: 56/51500	
+146/531881	Jennifer	Albano	F movies: 58/39004	
+147/382297	Luigi (II)	Prezioso	M movies: 63/17371	
+148/732894	Doro	M?ggler	F movies: 63/17371	
+149/607209	Carol	Duboc	F movies: 80/31573	
+150/96792	Alex	Corrado	M movies: 43/42607	
+151/807121	Ver?nica	S?nchez	F movies: 75/52210	
+152/540472	Eileen	Atkins	F movies: 39/22044	
+153/68850	Michael (I)	Caldwell	M movies: 64/62422	
+154/474283	Levi	Tinker	M movies: 80/31573	
+155/318062	Charles	Mesure	M movies: 35/43873	
+156/682281	Wendy	Kremer	F movies: 57/1705	
+157/423143	Oliver	Scheffel	M movies: 26/6170	
+158/472278	Kenan	Thompson	M movies: 18/17654	
+159/633517	Annie	Girardot	F movies: 37/51739	
+160/230238	Tomas	Jirka	M movies: 11/34515	
+161/639768	Lara	Grice	F movies: 15/22849	49/32355	
+162/794801	Bianca	Smith	F movies: 57/1705	
+163/776683	Lucy	Russell	F movies: 4/30959	
+164/554262	Mariv?	Bilbao	F movies: 75/52210	
+165/766215	Taryn	Reneau	F movies: 34/913	
+166/702518	Kelly (I)	Lynch	F movies: 15/22849	
+167/204999	Marcel	Hensema	M movies: 41/545	
+168/502880	Jaerin	Washington	M movies: 74/32243	
+169/651878	Jae	Henson	F movies: 43/42607	
+170/65798	Reinout	Bussemaker	M movies: 41/545	
+171/746911	Nicole	Pano	F movies: 74/32243	
+172/403435	Nile	Rodgers	M movies: 61/46413	
+173/450960	Cordell	Stahl	M movies: 3/32532	
+174/396182	Anthony	Reynolds	M movies: 17/10663	
+175/529605	Diane	Achivantti	F movies: 43/42607	
+176/411809	Tait	Ruppert	M movies: 10/17226	
+177/756684	Sarah	Polley	F movies: 36/34190	
+178/747546	Anne	Parillaud	F movies: 22/2324	
+179/478953	Maxime	Tremblay	M movies: 56/51500	
+180/58773	James	Brolin	M movies: 17/10663	
+181/744884	Tamzin	Outhwaite	F movies: 60/2997	
+182/390135	Fernando	Ransanz	M movies: 75/52210	
+183/188463	Tom	Guiry	M movies: 9/47163	
+184/488323	Melvin	Van Peebles	M movies: 61/46413	
+185/709880	Shyla	Marlin	F movies: 17/10663	
+186/460854	David (I)	Sutcliffe	M movies: 81/52093	
+187/108596	Sami	Darr	M movies: 40/3315	
+188/19676	Yvan	Attal	M movies: 46/18206	
+189/259766	Akshay (I)	Kumar	M movies: 70/9173	
+190/119017	Johnny	Depp	M movies: 32/59578	
+191/350571	Adrian	O'Donnell	M movies: 76/21392	
+192/353656	Gary	Oldman	M movies: 4/30959	
+193/262677	Michael John	LaChiusa	M movies: 16/47386	
+194/576675	Sarah	Chalke	F movies: 29/10156	81/52093	
+195/509119	Dondre	Whitfield	M movies: 74/32243	
+196/716830	Melisa	McGregor	F movies: 8/31439	
+197/703092	Margrit	L?ubli	F movies: 63/17371	
+198/401767	Tony (I)	Roberts	M movies: 42/968	
+199/390848	Dimitri	Rataud	M movies: 46/18206	
+200/272657	Adam	LeFevre	M movies: 42/968	
+201/84320	Frank	Chiesurin	M movies: 81/52093	
+202/68692	Luis	Caldeira	M movies: 78/33394	
+203/375502	Enrique	Pinti	M movies: 23/396	
+204/169282	Bob	Gebert	M movies: 34/913	
+205/579130	Caroline	Chikezie	F movies: 69/7288	
+206/812916	Uma	Thurman	F movies: 80/31573	
+207/104620	Michel	C?t?	M movies: 56/51500	
+208/709610	Jodie	Markell	F movies: 42/968	
+209/457325	Mark (I)	Strange	M movies: 4/30959	
+210/566328	Genevieve	Buechner	F movies: 67/42391	
+211/264995	Martin	Landau	M movies: 76/21392	
+212/243853	Ivan	Kemp	M movies: 35/43873	
+213/137364	Pascal	Elb?	M movies: 22/2324	30/15002	
+214/389362	David (I)	Ramsey	M movies: 74/32243	
+215/152992	Noah	Fleiss	M movies: 27/954	
+216/478676	John	Travolta	M movies: 80/31573	
+217/373053	Ryan	Phillippe	M movies: 1/59306	
+218/609585	Miriam	D?vila	F movies: 23/396	
+219/241116	Adam (II)	Kaufman	M movies: 54/35388	
+220/706797	Natassia	Malthe	F movies: 1/59306	
+221/470789	Justin	Theroux	M movies: 8/31439	
+222/216654	Mark	Huberman	M movies: 45/45409	
+223/325023	Mathias	Mlekuz	M movies: 22/2324	
+224/278226	Riton	Liebman	M movies: 22/2324	
+225/280052	Mark	Linn-Baker	M movies: 42/968	
+226/68424	Michael (I)	Caine	M movies: 4/30959	2/35605	
+227/788047	Chlo?	Sevigny	F movies: 52/2131	
+228/170101	John D.	Genovese	M movies: 33/45698	
+229/69638	Jesse	Camacho	M movies: 42/968	
+230/146014	Gerard	Fasel	M movies: 10/17226	
+231/441374	Stellan	Skarsg?rd	M movies: 36/34190	
+232/513927	Chris (III)	Winfield	M movies: 10/17226	
+233/601540	Carroll	Devine	F movies: 15/22849	
+234/211883	Patrick	Holland	M movies: 31/57717	
+235/16377	Matthew	Arkin	M movies: 58/39004	
+236/779961	Marilyn	Sanabria	F movies: 54/35388	
+237/831742	Kristina	Wegscheider	F movies: 25/32585	
+238/224353	Little	J.J.	M movies: 74/32243	
+239/801999	Tara (I)	Stewart	F movies: 64/62422	
+240/445423	Eric (II)	Snyder	M movies: 27/954	
+241/804127	Lydia	St?ubli	F movies: 63/17371	
+242/476388	Kevin	Toolen	M movies: 9/47163	
+243/677861	Kodi	Kitchen	F movies: 57/1705	
+244/312154	Bill	McKinney	M movies: 57/1705	
+245/684390	Kathryn	Kyr	F movies: 21/27145	
+246/600942	Emily	Deschanel	F movies: 35/43873	
+247/397745	Kenny (III)	Richards	M movies: 21/27145	
+248/621779	Deena	Foley	F movies: 25/32585	
+249/276920	Gus	Lewis	M movies: 4/30959	
+250/107698	Jeff (I)	Daniels	M movies: 49/32355	
+251/441398	Jus	Ske	M movies: 19/2837	
+252/567412	Catherine Lloyd	Burns	F movies: 8/31439	
+253/827995	Justine	Waddell	F movies: 1/59306	
+254/605742	Illeana	Douglas	F movies: 29/10156	
+255/446592	Anile	Solwandle	M movies: 52/2131	
+256/72210	Dick	Capri	M movies: 58/39004	
+257/218454	J.	Hunter	M movies: 33/45698	
+258/467307	Anatole	Taubman	M movies: 63/17371	
+259/801975	Sara	Stewart	F movies: 4/30959	
+260/523561	Steve	Zahn	M movies: 55/29046	66/61282	
+261/600347	Melany	Denise	F movies: 40/3315	
+262/510316	Pawel	Wilczak	M movies: 72/59307	
+263/151776	Tom	Fish	M movies: 33/45698	
+264/310970	Tom (II)	McGowan	M movies: 42/968	
+265/589799	Annam?ria	Cseh	F movies: 51/3392	
+266/300843	Logan	Marshall-Green	M movies: 29/10156	
+267/543807	Sonja	Ball	F movies: 47/21187	
+268/767589	Barbara	Ricci	F movies: 43/42607	
+269/160022	Cedric	Fricke	M movies: 15/22849	
+270/308437	Rory	McCann	M movies: 36/34190	
+271/118951	G?rard	Depardieu	M movies: 14/44940	
+272/55667	Benjamin (I)	Bratt	M movies: 79/60107	
+273/731149	Samantha	Mumba	F movies: 45/45409	
+274/660346	Eva	H?cherl	F movies: 26/6170	
+275/797045	Agn?s	Soral	F movies: 12/18258	
+276/545823	Julia	Barr	F movies: 13/2086	
+277/507124	Adam (I)	West	M movies: 38/43379	
+278/270454	Nicholas	Lea	M movies: 1/59306	
+279/689756	Lucy	Lawless	F movies: 35/43873	
+280/10726	John (I)	Amos	M movies: 65/43012	
+281/196005	Peter Josef	Hansen	M movies: 40/3315	
+282/686742	Alexandra	Lamy	F movies: 12/18258	
+283/227924	Peter	Jason	M movies: 62/10842	
+284/702044	Patti	LuPone	F movies: 16/47386	
+285/521334	Dwight	Yoakam	M movies: 55/29046	
+286/336302	Ken	Murton	M movies: 81/52093	
+287/412036	Reggie	Russel	M movies: 21/27145	
+288/280079	Juuso	Linnoila	M movies: 34/913	
+289/207918	John (I)	Higgins	M movies: 81/52093	
+290/534176	Melissa	Altro	F movies: 47/21187	
+291/681681	Tamar	Kozlov	F movies: 47/21187	
+292/9480	Ever	Alvarez	M movies: 23/396	
+293/780038	Manuela	Sanchez	F movies: 28/33367	
+294/700863	Florencia	Lozano	F movies: 58/39004	
+295/635440	Yazmin	Gomez	F movies: 23/396	
+296/44737	Abdul	Blackmanwest	M movies: 4/30959	
+297/667784	Cherry	Jones	F movies: 16/47386	
+298/569724	Monica	Calhoun	F movies: 74/32243	
+299/330864	Pat	Morita	M movies: 38/43379	
+300/105883	Evan Lee	Dahl	M movies: 34/913	
+301/639911	Michelle	Griffin	F movies: 74/32243	
+302/696026	Bev	Lillywhite	F movies: 4/30959	
+303/830172	Amelia	Warner	F movies: 69/7288	
+304/278630	Matthew	Lillard	M movies: 44/36565	
+305/607579	Lola	Due?as	F movies: 53/1616	
+306/468102	Noah	Taylor	M movies: 32/59578	
+307/187792	Samir	Guesmi	M movies: 46/18206	
+308/549574	Anna	Belknap	F movies: 29/10156	
+309/158895	Joe	Frazier	M movies: 43/42607	
+310/654237	Cheryl	Hines	F movies: 44/36565	
+311/126271	Conor	Donovan	M movies: 42/968	
+312/578585	Kristin	Chenoweth	F movies: 2/35605	
+313/756024	Joan	Plowright	F movies: 2/35605	
+314/805445	Mena	Suvari	F movies: 74/32243	
+315/624832	Terri J.	Freedman	F movies: 25/32585	
+316/776132	Angie	Ruiz	F movies: 25/32585	
+317/69328	Simon	Callow	M movies: 67/42391	
+318/451898	Craig	Stark	M movies: 57/1705	
+319/689979	Jessica	Lawson	F movies: 3/32532	
+320/844051	Karen	Ziemba	F movies: 16/47386	
+321/626043	Heidemarie	Fuentes	F movies: 80/31573	
+322/233583	Simon (I)	Jones	M movies: 16/47386	
+323/611839	Amanda	Elizabeth	F movies: 21/27145	
+324/795555	J.	Smith-Cameron	F movies: 58/39004	
+325/82186	Dan	Chase	M movies: 74/32243	
+326/408812	Eli	Roth	M movies: 57/1705	
+327/512980	Bryce	Wilson	M movies: 74/32243	
+328/419459	Manuel	Santos 'Santos'	M movies: 58/39004	
+329/639017	Renata	Green-Gaber	F movies: 34/913	
+330/676918	Jaime	King	F movies: 17/10663	
+331/68342	August	Caimi	M movies: 58/39004	
+332/730952	Alisha	Mullally	F movies: 25/32585	
+333/587233	Ali	Costello	F movies: 78/33394	
+334/130766	Jean	Dujardin	M movies: 30/15002	
+335/378616	Ra?l	Pomares	M movies: 23/396	
+336/835902	Michelle (I)	Williams	F movies: 8/31439	
+337/547500	Vanessa	Bauche	F movies: 5/49430	
+338/629555	Crystal S.	Garrett	F movies: 74/32243	
+339/262357	Rob	LaBelle	M movies: 67/42391	1/59306	
+340/673367	Arielle	Kebbel	F movies: 80/31573	
+341/154923	Jon	Foo	M movies: 4/30959	
+342/51496	Jackson	Bostwick	M movies: 38/43379	
+343/555665	Selma	Blair	F movies: 17/10663	
+344/634605	Judith	Godr?che	F movies: 22/2324	
+345/359643	Manoj	Pahwa	M movies: 68/33173	
+346/698673	Alison	Lohman	F movies: 20/37489	
+347/309192	John	McCook	M movies: 13/2086	
+348/416389	Emmanuel	Salinger	M movies: 28/33367	
+349/409527	Jean-Louis	Roux	M movies: 56/51500	
+350/443316	Benjamin B.	Smith	M movies: 67/42391	
+351/825597	Estelle	Vincent	F movies: 0/33578	
+352/120364	Danny	DeVito	M movies: 80/31573	
+353/346763	Tom	Noga	M movies: 10/17226	
+354/170483	Timothy	George	M movies: 43/42607	
+355/789242	Lin	Shaye	F movies: 57/1705	
+356/135487	Dylan	Edrington	M movies: 57/1705	
+357/460895	Donald (I)	Sutherland	M movies: 39/22044	
+358/72974	Matthew (II)	Carey	M movies: 57/1705	
+359/224338	¨­orsteinn	J	M movies: 38/43379	
+360/463174	Helena	Sztyber	M movies: 72/59307	
+361/833470	Merritt	Wever	F movies: 42/968	
+362/32842	Lightning	Bear	M movies: 21/27145	
+363/432272	Marc	Shaiman	M movies: 16/47386	
+364/368572	Ed	Pennybacker	M movies: 77/33376	
+365/700763	Marcella	Lowery	F movies: 42/968	
+366/139826	Robert	Englund	M movies: 57/1705	
+367/659368	Holly	Hunter	F movies: 20/37489	
+368/516643	Ty	Wood	M movies: 20/37489	
+369/485483	David	Vadim	M movies: 19/2837	
+370/598910	Ilona	Del Marle	F movies: 28/33367	
+371/173397	Jay (II)	Gillespie	M movies: 57/1705	
+372/476539	Joe	Toppe	M movies: 57/1705	
+373/777173	Julia (II)	Ryan	F movies: 42/968	
+374/252047	Don	Knotts	M movies: 66/61282	
+375/508458	Damon	White	M movies: 19/2837	
+376/515807	Sven	Wollter	M movies: 71/54806	
+377/609845	Daisy	Eagan	F movies: 16/47386	
+378/401140	Michael	Roberds	M movies: 67/42391	
+379/456757	Larry	Storch	M movies: 58/39004	
+380/693471	Caro	Lenssen	F movies: 41/545	
+381/242760	Harvey	Keitel	M movies: 80/31573	
+382/463731	Josef	S?terhagen	M movies: 71/54806	
+383/248836	Laurence	Kinlan	M movies: 45/45409	
+384/392211	Lee Roy	Reams	M movies: 16/47386	
+385/120247	Luis	Deveze	M movies: 10/17226	
+386/102277	Gy?rgy	Cserhalmi	M movies: 51/3392	
+387/336854	Alexander	Mu?oz	M movies: 23/396	
+388/528514	Cahit	?lmez	M movies: 41/545	
+389/490038	Paul (I)	Vasquez	M movies: 79/60107	
+390/515526	George C.	Wolfe	M movies: 16/47386	
+391/200362	Rutger	Hauer	M movies: 4/30959	
+392/776158	Dakota	Ruiz	F movies: 64/62422	
+393/162314	Griff	Furst	M movies: 48/10835	
+394/116864	Martin	Delaney	M movies: 36/34190	
+395/646886	Doris	Hargrave	F movies: 77/33376	
+396/320475	Mads	Mikkelsen	M movies: 7/6210	
+397/241906	John	Kazek	M movies: 4/30959	
+398/63813	Cliff	Bura	M movies: 4/30959	
+399/100627	Terry (I)	Crews	M movies: 17/10663	
+400/437765	Robert	Sikorski	M movies: 72/59307	
+401/818590	Mari	T?r?csik	F movies: 51/3392	
+402/44569	Michael Ian	Black	M movies: 8/31439	
+403/589300	Flora	Cross	F movies: 25/32585	
+404/158335	Remington	Franklin	M movies: 62/10842	
+405/229150	Erik (II)	Jensen	M movies: 19/2837	
+406/302215	Steve (II)	Martinez	M movies: 13/2086	
+407/637544	Heather (I)	Graham	F movies: 81/52093	
+408/138186	Sam	Elliott	M movies: 17/10663	50/30240	
+409/65892	Humberto	Busto	M movies: 73/52969	
+410/32248	Wayne (II)	Baxter	M movies: 21/27145	
+411/513063	De'Angelo	Wilson	M movies: 74/32243	
+412/527572	Samuel	Zumb?hl	M movies: 63/17371	
+413/520254	Derek	Yardley	M movies: 4/30959	
+414/622701	Lola	Forsberg	F movies: 48/10835	
+415/392335	Roland	Reber	M movies: 26/6170	
+416/517619	Jack	Wouterse	M movies: 41/545	
+417/179527	Philip (III)	Gordon	M movies: 35/43873	
+418/126508	Mike	Dopud	M movies: 1/59306	
+419/617477	Monika	Fejglova	F movies: 11/34515	
+420/338742	Fouad	Nahas	M movies: 6/31503	
+421/690911	Johanne	Lebrun	F movies: 56/51500	
+422/70657	Martin	Campetta	M movies: 42/968	
+423/590719	Joan	Cusack	F movies: 66/61282	
+424/508326	Philip	Whitchurch	M movies: 36/34190	
+425/298555	Noah	Margetts	M movies: 4/30959	
+426/324211	James (I)	Mitchell	M movies: 13/2086	
+427/638694	Sabrina	Grdevich	F movies: 81/52093	
+428/316253	Michael	Mendl	M movies: 59/30059	
+429/4027	John	Ahlin	M movies: 19/2837	
+430/178094	Nicholas	Gonzalez	M movies: 73/52969	
+431/786715	Mathilde	Seigner	F movies: 22/2324	
+432/659259	Marsha (I)	Hunt	F movies: 64/62422	
+433/689909	Sharon	Lawrence	F movies: 17/10663	
+434/6762	Jason (I)	Alexander	M movies: 43/42607	16/47386	
+435/817813	Amelia	Turner	F movies: 15/22849	
+436/727966	Laura	Moras	F movies: 23/396	
+437/524957	Michael	Zegen	M movies: 58/39004	
+438/548612	Troi	Bechet	F movies: 15/22849	
+439/564696	Kimberly J.	Brown	F movies: 80/31573	
+440/49922	Mark	Boone Junior	M movies: 4/30959	
+441/98008	Miguel	Costilliano	M movies: 74/32243	
+442/658609	Cady	Huffman	F movies: 16/47386	
+443/104393	Henry	Czerny	M movies: 1/59306	
+444/650340	Gina Marie	Heekin	F movies: 57/1705	
+445/653339	Taral	Hicks	F movies: 74/32243	
+446/234022	John Patrick	Jordan	M movies: 78/33394	
+447/698718	Florence	Loiret	F movies: 0/33578	
+448/227204	Will	Janowitz	M movies: 9/47163	
+449/102958	Alan	Cumming	M movies: 16/47386	
+450/3250	Walid	Afkir	M movies: 37/51739	
+451/190667	Octavio (I)	G?mez	M movies: 73/52969	
+452/413765	Thijs	R?mer	M movies: 41/545	
+453/49440	H?ctor	Bonilla	M movies: 5/49430	
+454/308508	Brendan (III)	McCarthy	M movies: 57/1705	
+455/810466	Christopher	Templeton	F movies: 10/17226	
+456/616878	Farah	Fath	F movies: 13/2086	
+457/198747	Fulani	Hart	M movies: 19/2837	
+458/759208	Sara	Prikryl	F movies: 34/913	
+459/616201	Elle	Fanning	F movies: 49/32355	
+460/99653	Edwin	Craig	M movies: 48/10835	
+461/574084	Caroline	Carver	F movies: 76/21392	
+462/691655	Kimora	Lee	F movies: 74/32243	
+463/791992	Edi	Silverman	F movies: 23/396	
+464/44293	Ulf	Bj?rlin Jr.	M movies: 48/10835	
+465/297823	Craig	March	M movies: 20/37489	
+466/548540	Cristen	Beavers	F movies: 57/1705	
+467/335617	Cillian	Murphy	M movies: 4/30959	
+468/132978	Nicolas	Duvauchelle	M movies: 0/33578	
+469/54814	Richard	Brake	M movies: 4/30959	
+470/412380	Daniel	Russo	M movies: 12/18258	
+471/624261	Bonnie	Franklin	F movies: 16/47386	
+472/811435	Charlize	Theron	F movies: 69/7288	
+473/341480	Liam	Neeson	M movies: 4/30959	
+474/91006	Jared	Cohn	M movies: 48/10835	
+475/18908	Ward	Asquith	M movies: 19/2837	
+476/198642	David E.	Harshbarger	M movies: 31/57717	
+477/641011	Annie	Gr?gorio	F movies: 12/18258	
+478/559970	Natane	Boudreau	F movies: 19/2837	
+479/838017	Mariloup	Wolfe	F movies: 56/51500	
+480/274479	David (I)	Leon	M movies: 45/45409	
+481/741977	Sandra	Oh	F movies: 52/2131	81/52093	
+482/248104	Richard	Kind	M movies: 2/35605	
+483/303275	Leander	Marxer	M movies: 26/6170	
+484/190668	Octavio (II)	G?mez	M movies: 73/52969	
+485/241822	Artel	Kay?ru	M movies: 17/10663	
+486/208016	Freddie	Highmore	M movies: 32/59578	
+487/292520	Beno?t	Magimel	M movies: 24/60913	
+488/322994	Max	Minghella	M movies: 25/32585	
+489/331654	Matthew	Morrison	M movies: 16/47386	
+490/804709	Nicole	Sullivan	F movies: 3/32532	
+491/761657	Brenna	Radding	F movies: 78/33394	
+492/134784	Freedom	Eche	M movies: 4/30959	
+493/627575	Lorena	Gale	F movies: 67/42391	
+494/76872	John	Cassini	M movies: 1/59306	
+495/289448	Gyrd	L©ªfqvist	M movies: 7/6210	
+496/104435	Bal?zs	Czukor	M movies: 51/3392	
+497/450427	Caden	St. Clair	M movies: 35/43873	
+498/529965	Brooke (I)	Adams	F movies: 15/22849	
+499/299076	Nicholas	Marino	M movies: 4/30959	
+500/576317	M?nica	Cervera	F movies: 53/1616	
+501/581152	Kristi	Clainos	F movies: 2/35605	
+502/746371	Rossy de	Palma	F movies: 53/1616	
+503/26773	Amiri	Baraka	M movies: 61/46413	
+504/148124	Lawrence	Ferlinghetti	M movies: 61/46413	
+505/272466	Pete	Lee-Wilson	M movies: 60/2997	
+506/95757	Vincent	Coppey	M movies: 63/17371	
+507/317183	Javier	Merida	M movies: 29/10156	
+508/666318	Courtney	Jines	F movies: 49/32355	
+509/757806	Franka	Potente	F movies: 79/60107	
+510/159346	Morgan (I)	Freeman	M movies: 4/30959	
+511/463036	R?musz	Szikszai	M movies: 51/3392	
+512/60612	W. Earl	Brown	M movies: 20/37489	
+513/148789	Tom	Ferrante	M movies: 38/43379	
+514/664030	Sara	James	F movies: 45/45409	
+515/558975	Larissa	Bordere	F movies: 74/32243	
+516/239038	Annu	Kapoor	M movies: 70/9173	
+517/364471	Robert	Pastorelli	M movies: 80/31573	
+518/94639	Denis	Conway	M movies: 45/45409	
+519/141600	Michael	Esper	M movies: 58/39004	
+520/137749	Hector	Elizondo	M movies: 31/57717	
+521/566161	Betty	Buckley	F movies: 16/47386	
+522/503427	Barry (I)	Watson	M movies: 35/43873	
+523/509846	Philip	Wiegratz	M movies: 32/59578	
+524/58423	Daniel	Brochu	M movies: 47/21187	
+525/88671	Benedikt	Clausen	M movies: 36/34190	
+526/110530	Michael Cory	Davis	M movies: 62/10842	
+527/111393	Joaquim	de Almeida	M movies: 31/57717	
+528/105687	Cameron	Daddo	M movies: 64/62422	
+529/29498	John	Barrowman	M movies: 16/47386	
+530/44163	Tyler	Bizzell	M movies: 76/21392	
+531/133454	Jorge	Dyszel	M movies: 23/396	
+532/589849	Judit	Csoma	F movies: 51/3392	
+533/171515	Jilon	Ghai	M movies: 48/10835	
+534/51200	Mario	Bosco	M movies: 43/42607	
+535/381561	Eric	Prat	M movies: 12/18258	
+536/832207	Zoe	Weizenbaum	F movies: 42/968	
+537/704357	Maura	Mackey	F movies: 64/62422	
+538/140245	Eric	Epstein	M movies: 20/37489	
+539/215331	Keith	How	M movies: 4/30959	
+540/713248	Samantha	Mathis	F movies: 77/33376	
+541/111132	Jared	Day	M movies: 49/32355	
+542/235169	G?rard	Jugnot	M movies: 14/44940	
+543/396279	James (I)	Reynolds	M movies: 13/2086	
+544/76736	Seymour	Cassel	M movies: 58/39004	
+545/691123	Iva	Lednejova	F movies: 11/34515	
+546/317202	Aitor	Merino	M movies: 75/52210	
+547/585822	Jeanne	Cooper	F movies: 13/2086	
+548/584065	Keila	Collins	F movies: 80/31573	
+549/419918	Lawrence	Sara	M movies: 48/10835	
+550/283904	Nick	Lopez	M movies: 15/22849	
+551/25103	Christian	Bale	M movies: 4/30959	
+552/413475	Sh?	Ry?zanji	M movies: 61/46413	
+553/503088	Ken (I)	Watanabe	M movies: 4/30959	
+554/594301	Eileen (I)	Davidson	F movies: 13/2086	
+555/305750	Dave (I)	Matthews	M movies: 49/32355	
+556/611619	Tara	Elders	F movies: 41/545	
+557/506523	Craig	Welzbacher	M movies: 34/913	
+558/55611	Claude (I)	Brasseur	M movies: 30/15002	
+559/9246	Bruce	Altman	M movies: 42/968	
+560/91695	Michael (XIII)	Coleman	M movies: 4/30959	
+561/457224	Mark	Straker	M movies: 4/30959	
+562/520961	Bernard	Yerl?s	M movies: 22/2324	
+563/244795	Kimo	Keoke	M movies: 80/31573	
+564/468503	Jaimie	Teate	M movies: 25/32585	
+565/163602	M.C.	Gainey	M movies: 15/22849	
+566/672671	Gaayatri	Kaundinya	F movies: 25/32585	
+567/494425	Jacques	Villeret	M movies: 12/18258	
+568/45981	Herschel	Bleefeld	M movies: 17/10663	
+569/239522	R?bert	Kardos	M movies: 51/3392	
+570/383160	J?rgen	Prochnow	M movies: 31/57717	
+571/273478	Herbert	Leiser	M movies: 63/17371	
+572/405634	Freddie	Roman	M movies: 58/39004	
+573/115396	Antonio	Dechent	M movies: 75/52210	
+574/702674	Jennifer (II)	Lynn	F movies: 21/27145	
+575/192139	Garrick	Hagon	M movies: 32/59578	
+576/250306	Brad	Klamer	M movies: 15/22849	
+577/57736	Pierre-Luc	Brillant	M movies: 56/51500	
+578/211557	Larry (I)	Holden	M movies: 4/30959	
+579/760650	Noem?	P?rez	F movies: 75/52210	
+580/832973	Amy	Wesson	F movies: 19/2837	
+581/705285	Judith	Magre	F movies: 12/18258	
+582/129962	Andre	Dubroc	M movies: 49/32355	
+583/391525	Dorsey	Ray	M movies: 77/33376	
+584/818429	Cicely	Tyson	F movies: 49/32355	
+585/342280	Tim Blake	Nelson	M movies: 20/37489	
+586/580796	Magdalena	Cielecka	F movies: 72/59307	
+587/400872	Linus	Roache	M movies: 42/968	4/30959	
+588/621519	Shannon	Floyd	F movies: 15/22849	
+589/370640	George	Pesce	M movies: 43/42607	
+590/508111	Martin (III)	Wheeler	M movies: 60/2997	
+591/170827	Richard	Gere	M movies: 25/32585	
+592/476758	John	Tormey	M movies: 58/39004	
+593/274334	Darrell	Lenormand	M movies: 15/22849	
+594/511752	Jim Cody	Williams	M movies: 17/10663	
+595/830773	Abby	Wathen	F movies: 8/31439	
+596/298315	Steven (I)	Marcus	M movies: 9/47163	
+597/308127	Jamie	McBride	M movies: 74/32243	
+598/779849	Gerre	Samuels	F movies: 58/39004	
+599/429995	Matt	Semino	M movies: 29/10156	
+600/169238	Anthony	Geary	M movies: 13/2086	
+601/12538	Giuseppe	Andrews	M movies: 57/1705	
+602/192510	Jan	Hajek	M movies: 11/34515	
+603/579753	Priyanka	Chopra	F movies: 70/9173	
+604/215312	Michael	Hovinga	M movies: 4/30959	
+605/800425	Paprika	Steen	F movies: 7/6210	
+606/561137	Jane (II)	Bradbury	F movies: 19/2837	
+607/433146	Bobby	Sharpe	M movies: 25/32585	
+608/159986	Ulf	Friberg	M movies: 71/54806	
+609/786113	Alisha	Seaton	F movies: 48/10835	
+610/57717	Eddie	Brill	M movies: 43/42607	
+611/138258	Chris (I)	Ellis	M movies: 77/33376	
+612/583184	Robyn (I)	Cohen	F movies: 31/57717	
+613/213809	B.J.	Hopper	M movies: 49/32355	
+614/31424	Bryan	Batt	M movies: 16/47386	
+615/422451	Adam	Scarimbolo	M movies: 58/39004	
+616/51588	Morne	Botes	M movies: 4/30959	
+617/222544	Boman	Irani	M movies: 68/33173	
+618/514058	Steffen	Wink	M movies: 59/30059	
+619/280303	Jeff	Lipman	M movies: 4/30959	
+620/612079	Jodi Scott	Elliott	F movies: 27/954	
+621/48458	Sigoni	Bole	M movies: 72/59307	
+622/78358	Thomas	Cavanagh	M movies: 29/10156	
+623/807046	Herminia	S?nchez	F movies: 23/396	
+624/573294	Tia	Carrere	F movies: 3/32532	
+625/633633	Annabeth	Gish	F movies: 31/57717	
+626/58890	Arnaud	Bronsart	M movies: 28/33367	
+627/716188	Audra	McDonald	F movies: 16/47386	
+628/38284	Erik J.	Berg	M movies: 20/37489	
+629/726721	Poppy	Montgomery	F movies: 54/35388	
+630/693331	Vanessa	Lengies	F movies: 47/21187	
+631/510058	Kevin	Wiggins	M movies: 77/33376	
+632/546811	Siri	Baruc	F movies: 15/22849	
+633/806367	Wanda	Sykes	F movies: 50/30240	
+634/440442	Isaac C.	Singleton Jr.	M movies: 57/1705	
+635/514423	Dean	Winters	M movies: 9/47163	
+636/714002	Barbara	Maurer	F movies: 63/17371	
+637/784934	Marguerita	Schumacher	F movies: 26/6170	
+638/831789	Pia	Weibel	F movies: 63/17371	
+639/797243	Jessica	Sorto	F movies: 42/968	
+640/604429	Constance	Doll?	F movies: 14/44940	
+641/68759	Wilmer	Calderon	M movies: 18/17654	
+642/87504	Marc	Citti	M movies: 22/2324	
+643/621281	Alba	Flores	F movies: 75/52210	
+644/37907	Luke	Benward	M movies: 49/32355	
+645/720712	Diana	Mestre	F movies: 23/396	
+646/426660	Til	Schweiger	M movies: 59/30059	
+647/535802	Diane	Anderson-Minshall	F movies: 25/32585	
+648/157023	James (I)	Fox	M movies: 32/59578	
+649/772967	Rebecca	Romijn-Stamos	F movies: 17/10663	
+650/716706	Marta	McGonagle	F movies: 77/33376	
+651/180049	Ryan (I)	Gosling	M movies: 79/60107	
+652/706214	Marla	Malcolm	F movies: 57/1705	
+653/838658	Jordan	Wooden	F movies: 64/62422	
+654/257605	Thomas	Kretschmann	M movies: 31/57717	
+655/190146	Michael	Gwisdek	M movies: 59/30059	
+656/592135	Nadia	Dajani	F movies: 29/10156	
+657/510918	Tom (I)	Wilkinson	M movies: 4/30959	
+658/276228	Martin	Levinas	M movies: 23/396	
+659/284125	Nick	Loren	M movies: 80/31573	
+660/353563	Daniel	Olbrychski	M movies: 46/18206	
+661/249347	Justin	Kirk	M movies: 39/22044	
+662/80327	Clay	Chamberlin	M movies: 15/22849	
+663/759626	Danielle	Proulx	F movies: 56/51500	
+664/596455	Paz	de la Huerta	F movies: 19/2837	
+665/178812	Brian (I)	Goodman	M movies: 18/17654	
+666/809935	Roya	Taymourian	F movies: 6/31503	
+667/456885	Peter	Stormare	M movies: 57/1705	
+668/539428	Linda	Artuso	F movies: 43/42607	
+669/431401	Matthew	Settle	M movies: 31/57717	
+670/452242	Jason	Statham	M movies: 1/59306	
+671/6072	Dami?n	Alc?zar	M movies: 73/52969	
+672/779908	Antonia	San Juan	F movies: 53/1616	
+673/837321	Julia	Winter	F movies: 32/59578	
+674/272109	Mushond	Lee	M movies: 57/1705	
+675/559700	Kate	Bosworth	F movies: 25/32585	
+676/130944	Arnaud	Dul?ry	M movies: 46/18206	
+677/272844	Johnny	Legend	M movies: 57/1705	
+678/495804	Jiri (II)	Vlasak	M movies: 11/34515	
+679/292397	Shane	MaGee	M movies: 15/22849	
+680/655891	Celeste	Holm	F movies: 29/10156	
+681/540522	Jayne	Atkinson	F movies: 42/968	
+682/834307	Kym	Whitley	F movies: 74/32243	
+683/397039	Giovanni	Ribisi	M movies: 20/37489	
+684/114520	Vinny	De Vingo	M movies: 43/42607	
+685/751862	Martina	Perret	F movies: 23/396	
+686/191131	Brandon	Haas	M movies: 25/32585	
+687/479672	Travis	Tritt	M movies: 57/1705	
+688/396812	Serge	Riaboukine	M movies: 14/44940	
+689/394024	Ricky	Reidling	M movies: 33/45698	
+690/198880	Wayne	Hart	M movies: 19/2837	
+691/228105	Richard	Jay Alexander	M movies: 16/47386	
+692/361607	Nick	Paonessa	M movies: 17/10663	
+693/55272	Carlo	Brandt	M movies: 28/33367	
+694/278112	Nikolaj	Lie Kaas	M movies: 7/6210	
+695/356462	Zak	Orth	M movies: 8/31439	
+696/209006	Scott	Hinds	M movies: 4/30959	
+697/714065	Christina	Mauro	F movies: 34/913	
+698/740481	Ren?e	O'Connor	F movies: 62/10842	
+699/547122	Alexandra	Bastedo	F movies: 4/30959	
+700/390376	Martin	Rapold	M movies: 63/17371	
+701/475071	Bruno	Todeschini	M movies: 0/33578	
+702/830586	Wendy	Wasserstein	F movies: 16/47386	
+703/813009	Valerie	Tian	F movies: 67/42391	
+704/300667	Garry	Marshall	M movies: 66/61282	
+705/362126	Parvis	Parastui	M movies: 6/31503	
+706/351222	Roderick	O'Mullane	M movies: 21/27145	
+707/718747	Dee	Mehmet	F movies: 21/27145	
+708/423912	Gaetano	Schiralli	M movies: 33/45698	
+709/657691	Anne Marie	Howard	F movies: 64/62422	
+710/520880	Jose	Yenque	M movies: 54/35388	
+711/391380	Paresh	Rawal	M movies: 70/9173	
+712/81729	Antonio D.	Charity	M movies: 74/32243	
+713/102313	Marton	Csokas	M movies: 69/7288	
+714/790197	Brooke	Shields	F movies: 67/42391	
+715/707913	Jerri	Manthey	F movies: 64/62422	
+716/335689	Gerard (II)	Murphy	M movies: 4/30959	
+717/837857	Johanna	Wokalek	F movies: 59/30059	
+718/150255	David	Figlioli	M movies: 17/10663	
+719/694127	Susan (I)	Leslie	F movies: 74/32243	
+720/321631	Jonny Lee	Miller	M movies: 69/7288	
+721/688722	Julia	LaShae	F movies: 49/32355	
+722/766783	Eva	Rexed	F movies: 71/54806	
+723/730899	Saskia	Mulder	F movies: 28/33367	
+724/331295	Garrett	Morris	M movies: 74/32243	
+725/732087	Charlotte	Musengwa	F movies: 25/32585	
+726/802560	Zoe	Stone Molloy	F movies: 64/62422	
+727/75243	Will	Cart	M movies: 15/22849	
+728/445279	Wesley	Snipes	M movies: 60/2997	1/59306	
+729/558382	Helena	Bonham Carter	F movies: 32/59578	
+730/343063	Thierry	Neuvic	M movies: 22/2324	37/51739	
+731/671218	Dimple	Kapadia	F movies: 68/33173	
+732/765823	Ann	Reinking	F movies: 16/47386	
+733/408528	Tony Ray	Rossi	M movies: 43/42607	
+734/730157	Soria	Moufakkir	F movies: 22/2324	
+735/147179	Erwin	Felber	M movies: 63/17371	
+736/307837	Siv	Mbelu	M movies: 52/2131	
+737/746127	Xiomara	Palacios	F movies: 23/396	
+738/25002	Alec	Baldwin	M movies: 16/47386	
+739/594560	Anissa (II)	Davis	F movies: 64/62422	
+740/33449	Alex	Beck	M movies: 15/22849	
+741/206010	Armando	Hern?ndez	M movies: 73/52969	
+742/218136	Mike	Hungerford	M movies: 10/17226	
+743/793090	Simone	Singh	F movies: 68/33173	
+744/10568	Christian	Ammerm?ller	M movies: 26/6170	
+745/144936	Matthias	Fankhauser	M movies: 63/17371	
+746/145763	Colin (I)	Farrell	M movies: 39/22044	
+747/442248	Mark (II)	Slater	M movies: 64/62422	
+748/570513	Christa	Campbell	F movies: 57/1705	
+749/290765	Andy	Maciver	M movies: 21/27145	
+750/505675	Darian	Weiss	M movies: 27/954	
+751/681972	Sabine	Krappweis	F movies: 26/6170	
+752/291060	Aidan	Mackey	M movies: 64/62422	
+753/459963	Tim (IX)	Sullivan	M movies: 57/1705	
+754/372502	Mariano	Pe?a	M movies: 75/52210	
+755/332190	Manuel	Mor?n	M movies: 28/33367	
+756/372499	Luis Fernando	Pe?a	M movies: 73/52969	
+757/96350	Nick	Corirossi	M movies: 44/36565	
+758/487807	Maik	van Epple	M movies: 26/6170	
+759/778576	Eva Marie	Saint	F movies: 49/32355	
+760/602562	Debbie	Dickinson	F movies: 19/2837	
+761/467802	Drew (II)	Taylor	M movies: 21/27145	
+762/415373	Hubert	Saint-Macary	M movies: 14/44940	
+763/511960	Michael K.	Williams	M movies: 19/2837	
+764/126086	Ray	Donn	M movies: 4/30959	
+765/622475	Lee	Foreman	F movies: 35/43873	
+766/64434	Will (I)	Burke	M movies: 44/36565	
+767/704416	Shirley	MacLaine	F movies: 2/35605	
+768/799494	Jana	Stankova	F movies: 11/34515	
+769/262672	Nick	Lachey	M movies: 2/35605	
+770/405511	Henry	Rollins	M movies: 17/10663	
+771/731625	Caterina	Murino	F movies: 30/15002	
+772/436378	Michael	Showalter	M movies: 8/31439	
+773/757495	Catherine	Porter	F movies: 4/30959	
+774/742246	Sophie	Okonedo	F movies: 69/7288	
+775/185864	Justin	Groetsch	M movies: 15/22849	
+776/214973	Andrew	Houghton	M movies: 4/30959	
+777/745943	G?raldine	Pailhas	F movies: 24/60913	
+778/47969	Rob	Bogue	M movies: 19/2837	
+779/256442	Ireneusz	Koziol	M movies: 72/59307	
+780/762863	Arcelia	Ram?rez	F movies: 5/49430	
+781/3133	Scott	Adsit	M movies: 80/31573	
+782/308184	Dan (III)	McCabe	M movies: 58/39004	
+783/273017	John	Leguizamo	M movies: 17/10663	
+784/772334	Lluvia	Rojo	F movies: 75/52210	
+785/272956	L?o	Legrand	M movies: 22/2324	
+786/425498	Liev	Schreiber	M movies: 16/47386	
+787/181270	G?ran	Graffman	M movies: 71/54806	
+788/837186	Marissa Jaret	Winokur	F movies: 16/47386	
+789/477210	Philippe	Torreton	M movies: 24/60913	
+790/186102	Brian	Gross	M movies: 57/1705	
+791/294593	Keram	Malicki-S?nchez	M movies: 81/52093	
+792/151229	Billy	Finnigan	M movies: 18/17654	
+793/200072	Theron	Hatch	M movies: 33/45698	
+794/132903	Daniel	Duval	M movies: 37/51739	
+795/771488	Carmen Daysi	Rodriguez	F movies: 23/396	
+796/389777	Eric	Randell	M movies: 38/43379	
+797/642420	Estela	Gutierrez Guerra	F movies: 23/396	
+798/75491	Philip (II)	Carter	M movies: 15/22849	
+799/1724	J. Hunter	Ackerman	M movies: 33/45698	
+800/50085	Tim (I)	Booth	M movies: 4/30959	
+801/62025	Marcin	Brzozowski	M movies: 72/59307	
+802/498835	Tom	Wagner	M movies: 33/45698	
+803/137750	Humberto	Elizondo	M movies: 55/29046	
+804/635826	Nuria	Gonz?lez	F movies: 75/52210	
+805/506073	Peter	Welkin	M movies: 33/45698	
+806/72855	Steve	Carell	M movies: 2/35605	
+807/300468	James (I)	Marsden	M movies: 17/10663	
+808/447584	Roberto (I)	Sosa	M movies: 73/52969	
+809/235913	Jeremy	Juuso	M movies: 34/913	
+810/799007	Irma	St. Paule	F movies: 58/39004	
+811/581474	Katelyn Ann	Clark	F movies: 27/954	
+812/27318	James	Barbour	M movies: 29/10156	
+813/696125	Paula	Lima	F movies: 23/396	
+814/258795	Olaf	Kr?tke	M movies: 26/6170	
+815/452976	Pascal	Steffan	M movies: 40/3315	
+816/374836	Mark-Allan	Pilgrim	M movies: 21/27145	
+817/231017	Ryan	Johnsen	M movies: 27/954	
+818/529746	Kathleen	Acres	F movies: 21/27145	
+819/364821	Jim	Patneaude	M movies: 33/45698	
+820/703887	Andie	MacDowell	F movies: 74/32243	
+821/103548	Phill	Curr	M movies: 4/30959	
+822/84990	John	Cho	M movies: 44/36565	
+823/486793	?mile	Vall?e	M movies: 56/51500	
+824/816817	Tammy	Trull	F movies: 9/47163	
+825/1521	Jim	Accomando	M movies: 31/57717	
+826/160202	David F.	Friedman	M movies: 57/1705	
+827/575138	Magi	Castro	F movies: 23/396	
+828/291140	Steven	Mackintosh	M movies: 76/21392	
+829/466643	Bonnafet	Tarbouriech	M movies: 14/44940	
+830/347736	Fred (I)	Norris	M movies: 19/2837	
+831/361242	Andrei	Panin	M movies: 65/43012	
+832/613550	Rachel	Erickson	F movies: 31/57717	
+833/800846	Ivana	Stejskalova	F movies: 11/34515	
+834/27768	Ike	Barinholtz	M movies: 3/32532	
+835/829032	Louise	Wallace	F movies: 35/43873	
+836/607819	Olympia	Dukakis	F movies: 52/2131	
+837/766872	Patricia	Reyes Sp?ndola	F movies: 54/35388	
+838/719201	Be?ta	Melkvi	F movies: 51/3392	
+839/120453	Tony	Devon	M movies: 43/42607	
+840/371688	Rich	Petrelli	M movies: 31/57717	
+841/122485	Taye	Diggs	M movies: 81/52093	
+842/688921	Queen	Latifah	F movies: 74/32243	
+843/325229	Leander	Modersohn	M movies: 26/6170	
+844/104413	J?zsef	Czintos	M movies: 51/3392	
+845/213643	Trip	Hope	M movies: 34/913	
+846/241923	Ali	Kazim	M movies: 7/6210	
+847/720214	Isaily	Merino Bernal	F movies: 23/396	
+848/84084	Dominic	Chianese Jr.	M movies: 19/2837	
+849/674245	Taryn (II)	Kelly	F movies: 64/62422	
+850/335972	Bryan	Murray	M movies: 45/45409	
+851/384690	Amrish	Puri	M movies: 70/9173	
+852/237059	C?sar	Kaiser	M movies: 63/17371	
+853/649455	Salma	Hayek	F movies: 39/22044	55/29046	
+854/831160	Sarah	Wayne Callies	F movies: 31/57717	
+855/599601	Martina	Delisova	F movies: 11/34515	
+856/78595	Luciano	Cazaux	M movies: 23/396	
+857/102372	G?bor	Cs?re	M movies: 51/3392	
+858/589713	Pen?lope	Cruz	F movies: 55/29046	
+859/811129	Tia	Texada	F movies: 19/2837	
+860/577907	Heather	Chase	F movies: 48/10835	
+861/141705	Albertossy	Espinoza	M movies: 33/45698	
+862/452188	Todd	Stashwick	M movies: 2/35605	
+863/471746	Richard E. (II)	Thomas	M movies: 64/62422	
+864/153095	Ryan	Fleming	M movies: 57/1705	
+865/187312	Stefan	Gubser	M movies: 63/17371	
+866/360595	Scott (I)	Palmer	M movies: 25/32585	
+867/815639	Keegan Connor	Tracy	F movies: 1/59306	
+868/430696	Patrick	Serena	M movies: 63/17371	
+869/407078	Brion	Rose	M movies: 27/954	
+870/704355	Madeleine	Mackey	F movies: 64/62422	
+871/110042	Ben (V)	Davis	M movies: 17/10663	
+872/192438	Jacob	Hair	M movies: 57/1705	
+873/716350	Frances	McDormand	F movies: 69/7288	
+874/548207	Rachel	Bean	F movies: 15/22849	
+875/375440	Daniel	Pino	M movies: 54/35388	
+876/8862	Jos? (I)	Alonso	M movies: 5/49430	
+877/789482	Amy Jo	Sheketoff	F movies: 23/396	
+878/685700	Alicia	Lagano	F movies: 77/33376	
+879/453150	Axel	Stein	M movies: 59/30059	
+880/1232	Zachary Scott	Abramowitz	M movies: 29/10156	
+881/335144	Nilo	Mur	M movies: 75/52210	
+882/397408	Allan	Rich	M movies: 17/10663	
+883/483133	Paul	Tyreman	M movies: 18/17654	
+884/482284	Frank C. (I)	Turner	M movies: 20/37489	
+885/800532	Ang?la	Stefanovics	F movies: 51/3392	
+886/642775	Kit	Gwin	F movies: 77/33376	
+887/418146	Ed (V)	Sanders	M movies: 61/46413	
+888/306623	James	Mawhinney	M movies: 4/30959	
+889/113447	Johnny	de Mol	M movies: 41/545	
+890/69652	Mark	Camacho	M movies: 47/21187	
+891/222823	Len	Irving	M movies: 34/913	
+892/153864	Mike	Flowers	M movies: 48/10835	
+893/732976	Mich?le	M?ller	F movies: 63/17371	
+894/374293	Robert (II)	Pierce	M movies: 78/33394	
+895/602534	Jamie	Dickerson	F movies: 77/33376	
+896/119131	Pavel	Derevyanko	M movies: 65/43012	
+897/570521	Conchita	Campbell	F movies: 67/42391	
+898/277044	Mark (XI)	Lewis	M movies: 36/34190	
+899/741644	Sophie	Oda	F movies: 25/32585	
+900/256972	Charlie	Kranz	M movies: 4/30959	
+901/615198	Anne	Ewen	F movies: 15/22849	
+902/111021	Matthew	Dawson	M movies: 58/39004	
+903/128648	Steve	Draper	M movies: 21/27145	
+904/208520	Peter (VI)	Hill	M movies: 21/27145	
+905/432190	Naseeruddin	Shah	M movies: 68/33173	
+906/819363	Terry	Urdang	F movies: 42/968	
+907/200343	Pierre	Haudebourg	M movies: 14/44940	
+908/738643	Michelle	Nordin	F movies: 77/33376	
+909/565488	Julia	Brunner	F movies: 63/17371	
+910/530115	Mabel (II)	Adams	F movies: 52/2131	
+911/450547	Kristoff (I)	St. John	M movies: 13/2086	
+912/274536	Brian (IV)	Leonard	M movies: 25/32585	
+913/641004	H?l?ne	Gr?goire	F movies: 56/51500	
+914/773602	Leigh	Rose	F movies: 64/62422	
+915/436442	Kin	Shriner	M movies: 13/2086	
+916/66832	P.J.	Byrne	M movies: 2/35605	
+917/601202	Mayra	Desvernine	F movies: 23/396	
+918/159907	Sami	Frey	M movies: 46/18206	
+919/806575	M?rta	Szab?	F movies: 51/3392	
+920/756056	Amanda	Plummer	F movies: 16/47386	
+921/377416	Denis	Podalyd?s	M movies: 37/51739	
+922/275947	Fran?ois	Levantal	M movies: 30/15002	
+923/88752	Christian	Clavier	M movies: 12/18258	
+924/152284	Glenn	Fitzgerald	M movies: 58/39004	
+925/343681	Leon	Newton	M movies: 23/396	
+926/524127	Philip	Zand?n	M movies: 71/54806	
+927/619899	Katie	Finneran	F movies: 66/61282	
+928/562827	Jordana	Brewster	F movies: 18/17654	
+929/650199	Jessica	Hecht	F movies: 15/22849	
+930/714521	Genoveva	Mayer	F movies: 26/6170	
+931/813257	Nadja	Tiller	F movies: 59/30059	
+932/345452	Denis	Nikiforov	M movies: 65/43012	
+933/789780	Sherri	Shepherd	F movies: 74/32243	
+934/627381	Charlotte	Gainsbourg	F movies: 0/33578	
+935/51016	Jim	Borstelmann	M movies: 16/47386	
+936/12739	David	Andriole	M movies: 23/396	
+937/143431	Gunnar	Eyj?lfsson	M movies: 36/34190	
+938/181980	Brett	Granstaff	M movies: 33/45698	
+939/7458	Justin	Alioto	M movies: 25/32585	
+940/545080	Pilar	Bardem	F movies: 53/1616	
+941/743520	Isabel	Ordaz	F movies: 75/52210	
+942/557161	Alison	Bock	F movies: 64/62422	
+943/779954	Theresa	San-Nicholas	F movies: 27/954	
+944/77896	Field	Cate	M movies: 64/62422	
+945/156424	Joseph	Foster	M movies: 42/968	
+946/671340	Kareena	Kapoor	F movies: 70/9173	
+947/470813	Ole	Thestrup	M movies: 7/6210	
+948/574214	Delia	Casanova	F movies: 5/49430	
+949/272853	David	Legeno	M movies: 4/30959	
+950/243323	David (I)	Kelly	M movies: 32/59578	
+951/378191	Jon	Polito	M movies: 17/10663	
+952/161987	Dominic	Fumusa	M movies: 64/62422	
+953/349812	Joel	N??ez	M movies: 23/396	
+954/394970	Mark	Rendall	M movies: 47/21187	
+955/672479	Claudia (II)	Katz	F movies: 48/10835	
+956/817429	Amanda	Tuffin	F movies: 57/1705	
+957/273728	Gilles	Lellouche	M movies: 46/18206	
+958/628681	Aimee	Garcia	F movies: 17/10663	
+959/403272	Miguel (I)	Rodarte	M movies: 73/52969	
+960/98024	Herb	Coston	M movies: 58/39004	
+961/698339	Emma	Lockhart	F movies: 4/30959	
+962/651851	Ruthie	Henshall	F movies: 16/47386	
+963/338909	Mohammad Amir	Naji	M movies: 6/31503	
+964/252864	Jonathan	Koensgen	M movies: 47/21187	
+965/400728	Thomas	Rizza	M movies: 64/62422	
+966/589310	Laura	Cross	F movies: 25/32585	
+967/760410	Missi	Pyle	F movies: 32/59578	
+968/126307	Martin (II)	Donovan	M movies: 15/22849	
+969/228526	Myles	Jeffrey	M movies: 27/954	
+970/172481	Khris	Gibston	M movies: 31/57717	
+971/769905	Annasophia	Robb	F movies: 49/32355	32/59578	
+972/37788	Tony	Bentley	M movies: 15/22849	
+973/507607	James D.	Weston II	M movies: 25/32585	
+974/438474	Jonathan	Silverman	M movies: 3/32532	
+975/310474	Colin (I)	McFarlane	M movies: 4/30959	
+976/656018	Katie	Holmes	F movies: 4/30959	
+977/500853	Thommie	Walsh	M movies: 16/47386	
+978/437674	Ingvar Eggert	Sigur©£sson	M movies: 36/34190	
+979/20811	Larry K.	Avelar	M movies: 33/45698	
+980/729940	Elisabeth	Moss	F movies: 58/39004	
+981/256197	Lajos	Kov?cs	M movies: 51/3392	
+982/281225	John (I)	Livingston	M movies: 3/32532	
+983/266105	Jos	Laniado	M movies: 43/42607	
+984/2764	Paul	Adelstein	M movies: 80/31573	
+985/101627	Stephen	Crowder	M movies: 47/21187	
+986/184231	Nikolaj	Gregersen	M movies: 40/3315	
+987/369990	Paul	Perri	M movies: 1/59306	
+988/787605	Stafford	Serino	F movies: 15/22849	
+989/798502	Andrea	Spolarics	F movies: 51/3392	
+990/53146	Cory (II)	Bowles	M movies: 52/2131	
+991/716803	Kathy	McGraw	F movies: 25/32585	
+992/226474	Kevin (III)	James	M movies: 50/30240	
+993/21996	Obba	Babatund?	M movies: 31/57717	
+994/299042	Frank (IV)	Marino	M movies: 38/43379	
+995/598113	Marcia	DeBonis	F movies: 42/968	
+996/76370	Hugh	Casey	M movies: 57/1705	
+997/467876	Harry (V)	Taylor	M movies: 32/59578	
+998/512117	Robin (I)	Williams	M movies: 20/37489	
+999/777407	Georgina	Rylance	F movies: 60/2997	
+1000/347754	Lance	Norris	M movies: 80/31573	
+1001/382115	Gale	Preston	M movies: 23/396	
+1002/13605	George	Ansell	M movies: 21/27145	
+1003/636304	Barbara (II)	Gordon	F movies: 4/30959	
+1004/819154	Deborah (I)	Unger	F movies: 17/10663	
+1005/472550	Ulrich	Thomsen	M movies: 7/6210	
+1006/738300	Minae	Noji	F movies: 80/31573	
+1007/658168	Natalie	Hsieh	F movies: 48/10835	
+1008/230853	David (V)	John	M movies: 21/27145	
+1009/126294	Jeffrey	Donovan	M movies: 77/33376	
+1010/739450	Joanna	Noyes	F movies: 47/21187	
+1011/2372	Kyle	Adams	M movies: 10/17226	
+1012/138351	Jonathan D.	Ellis	M movies: 4/30959	
+1013/707887	Bronwen	Mantel	F movies: 47/21187	
+1014/780768	Lisa	Sanson	F movies: 33/45698	
+1015/326621	Henry	Moncrief	M movies: 21/27145	
+1016/704344	Chloe	Mackey	F movies: 64/62422	
+1017/96634	Clovis	Cornillac	M movies: 24/60913	
+1018/812718	Rachel	Thorp	F movies: 27/954	
+1019/606346	Joyful	Drake	F movies: 74/32243	
+1020/571186	Katie	Cannon	F movies: 21/27145	
+1021/228390	Slawoj	Jedrzejewski	M movies: 72/59307	
+1022/112863	Rafael	De la Torre	M movies: 23/396	
+1023/798278	Barbara	Spiegel	F movies: 58/39004	
+1024/216619	Kenneth	Huber	M movies: 63/17371	
+1025/767805	Nathalie	Richard	F movies: 28/33367	37/51739	
+1026/94742	Steve	Coogan	M movies: 17/10663	
+1027/735174	Alexandra	Neldel	F movies: 59/30059	
+1028/633683	Mira	Gittner	F movies: 26/6170	
+1029/714795	Debi	Mazar	F movies: 80/31573	
+1030/271543	Christopher (I)	Lee	M movies: 32/59578	
+1031/740812	Deirdre	O'Kane	F movies: 45/45409	
+1032/130071	Francis	Ducharme	M movies: 56/51500	
+1033/302010	Adrian (I)	Martinez	M movies: 9/47163	
+1034/492943	Ronan	Vibert	M movies: 36/34190	
+1035/102174	Vladimir	Cruz	M movies: 23/396	
+1036/355318	Dhobi	Oparei	M movies: 60/2997	
+1037/360448	Austen	Palmer	M movies: 76/21392	
+1038/678862	Keshia	Knight Pulliam	F movies: 74/32243	
+1039/365874	Philip	Pavel	M movies: 17/10663	
+1040/779379	Xenia	Salomonsen	F movies: 40/3315	
+1041/792026	Alicia	Silverstone	F movies: 74/32243	
+1042/564066	Golden	Brooks	F movies: 74/32243	
+1043/116634	Benicio	Del Toro	M movies: 79/60107	
+1044/395112	Jeremy	Renner	M movies: 42/968	
+1045/545278	Bridget	Barkan	F movies: 9/47163	
+1046/255427	David	Kostelecky	M movies: 11/34515	
+1047/718748	Dee	Mehmett	F movies: 21/27145	
+1048/798479	Diana	Splinter	F movies: 23/396	
+1049/297158	Andy	Mantineo	M movies: 57/1705	
+1050/437954	Douglas	Sills	M movies: 16/47386	
+1051/451192	Richard	Stamm	M movies: 77/33376	
+1052/807625	Alice	Taglioni	F movies: 24/60913	
+1053/712967	Heather	Matarazzo	F movies: 77/33376	
+1054/226120	Diego	Jalfen	M movies: 23/396	
+1055/21483	Bryan	Ayres	M movies: 29/10156	
+1056/448900	Scott	Speedman	M movies: 52/2131	
+1057/401534	Ian (I)	Roberts	M movies: 52/2131	
+1058/803766	Mania	Strzelecka	F movies: 72/59307	
+1059/387016	Scott	Rabinowitz	M movies: 80/31573	
+1060/144851	Roger	Fan	M movies: 18/17654	
+1061/746929	Yelena	Panova	F movies: 65/43012	
+1062/11245	Kim S©ªnderholm	Andersen	M movies: 40/3315	
+1063/158528	Daniel	Franzese	M movies: 9/47163	
+1064/329750	Fran?ois (I)	Morel	M movies: 12/18258	
+1065/155161	Cliff	Ford	M movies: 21/27145	
+1066/419780	Juan (II)	Sanz	M movies: 53/1616	75/52210	
+1067/123290	Bruce	Dinsmore	M movies: 47/21187	
+1068/76849	Pierre	Cassignard	M movies: 22/2324	
+1069/149166	Will	Ferrell	M movies: 2/35605	
+1070/132733	Fr?d?ric	Dussenne	M movies: 28/33367	
+1071/615770	Veronica	Fairhurst	F movies: 21/27145	
+1072/103593	Tony (I)	Curran	M movies: 36/34190	
+
+Directors
+0/65910	Ricky	Reidling movies: 33/45698	
+1/29082	Theo van	Gogh movies: 41/545	
+2/15356	Robert	Collector movies: 77/33376	
+3/40102	Stephen T.	Kay movies: 35/43873	
+4/51282	Armand	Mastroianni movies: 31/57717	
+5/27139	Nisha	Ganatra movies: 81/52093	
+6/73448	David (III)	Siegel movies: 25/32585	
+7/69865	Espen	Sandberg movies: 55/29046	
+8/59000	Steve	Oedekerk movies: 50/30240	
+9/64772	Stewart	Raffill movies: 38/43379	
+10/51511	Kurt	Mattila movies: 17/10663	
+11/38757	G?rard	Jugnot movies: 14/44940	
+12/64631	In?s	Rabad?n movies: 28/33367	
+13/46462	Scott	Lew movies: 44/36565	
+14/16948	Michael	Cuesta movies: 42/968	
+15/67521	Joachim	Roenning movies: 55/29046	
+16/37838	Anders Thomas	Jensen movies: 7/6210	
+17/56472	Mark	Mylod movies: 20/37489	
+18/10765	Abbas Alibhai	Burmawalla movies: 70/9173	
+19/17602	John (III)	Daly movies: 76/21392	
+20/54254	Attila	Misp?l movies: 51/3392	
+21/2366	Tom	Anton movies: 15/22849	
+22/25006	Thom	Fitzgerald movies: 52/2131	
+23/62754	G?rard	Pir?s movies: 24/60913	
+24/21954	Jorge	Dyszel movies: 23/396	
+25/86513	Bille	Woodruff movies: 74/32243	
+26/31226	Sturla	Gunnarsson movies: 36/34190	
+27/28458	Tony (I)	Giglio movies: 1/59306	
+28/38126	Rudy	Joffroy movies: 73/52969	
+29/40687	Steven	Kessler movies: 19/2837	
+30/23046	Nora	Ephron movies: 2/35605	
+31/43457	Karyn	Kusama movies: 69/7288	
+32/24182	Simon	Fellows movies: 60/2997	
+33/13738	Philippe de	Chauveron movies: 30/15002	
+34/63452	Ralph E.	Portillo movies: 78/33394	
+35/66476	Kenny (III)	Richards movies: 21/27145	
+36/17998	Brandon	David movies: 9/47163	
+37/84131	Wayne	Wang movies: 49/32355	
+38/82485	Pascal	Verdosci movies: 63/17371	
+39/9224	Stephen (III)	Bradley movies: 45/45409	
+40/80058	Robert	Towne movies: 39/22044	
+41/69613	J?r?me	Salle movies: 46/18206	
+42/27837	Bob	Gebert movies: 34/913	
+43/66172	Gabriel	Retes movies: 5/49430	
+44/58201	Christopher	Nolan movies: 4/30959	
+45/69526	Ram?n	Salazar movies: 53/1616	
+46/88802	Unknown	Director movies: 13/2086	47/21187	54/35388	43/42607	
+47/48829	Hettie	MacDonald movies: 21/27145	
+48/20276	Mark	Dindal movies: 66/61282	
+49/10885	Tim (I)	Burton movies: 32/59578	
+50/46919	Justin	Lin movies: 18/17654	
+51/14847	Mark	Clausen movies: 10/17226	
+52/77071	Tim (IX)	Sullivan movies: 57/1705	
+53/81629	Jean-Marc	Vall?e movies: 56/51500	
+54/16252	Rocky (I)	Costanzo movies: 27/954	
+55/52316	Rick	McKay movies: 16/47386	
+56/10766	Mastan Alibhai	Burmawalla movies: 70/9173	
+57/18396	Vincent	De Brus movies: 12/18258	
+58/1427	Michael	Almereyda movies: 61/46413	
+59/85975	Michel	Winckler-Krog movies: 40/3315	
+60/59507	Evan	Oppenheimer movies: 29/10156	
+61/19308	Antonio	Deli movies: 11/34515	
+62/31350	Chus	Guti?rrez movies: 75/52210	
+63/52182	Scott	McGehee movies: 25/32585	
+64/74758	Steven	Soderbergh movies: 79/60107	
+65/32277	Michael	Haneke movies: 37/51739	
+66/78634	C?cile	Telerman movies: 22/2324	
+67/13778	Matt	Checkowski movies: 17/10663	
+68/73426	Aleksei	Sidorov movies: 65/43012	
+69/10910	Christoph	Busche movies: 26/6170	
+70/25552	Eric	Forsberg movies: 48/10835	
+71/28335	Xavier	Giannoli movies: 0/33578	
+72/75372	Charlie	Spickler movies: 3/32532	
+73/46948	Daniel	Lind Lagerl?f movies: 71/54806	
+74/48977	Maura	Mackey movies: 64/62422	
+75/30221	F. Gary	Gray movies: 80/31573	
+76/73947	Gary	Sinyor movies: 67/42391	
+77/361	Homi	Adajania movies: 68/33173	
+78/49425	Majid	Majidi movies: 6/31503	
+79/88571	Xawery	Zulawski movies: 72/59307	
+80/5671	Josh	Becker movies: 62/10842	
+81/5542	Lightning	Bear movies: 21/27145	
+82/71548	Til	Schweiger movies: 59/30059	

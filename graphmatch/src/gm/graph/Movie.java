@@ -21,10 +21,18 @@ public class Movie extends Vertex implements Serializable{
 		this.title = m.getTitle();
 		this.year = m.year;
 	}
+	public Movie(String str){
+		String[] args = str.split("\t");
+		String[] ids = args[0].split("/");
+		setId(Integer.parseInt(ids[0]));
+		setOriginalId(Integer.parseInt(ids[1]));
+		this.title = args[1];
+		this.year = Integer.parseInt(args[2]);
+	}
 
 	
 	public String toString(){
-		return String.format("<%d,%d> %s (%d)",getId(), getOriginalId(), title, year); 
+		return String.format("%d/%d\t%s\t%d",getId(), getOriginalId(), title, year); 
 	}
 	
 	public void addActor(Actor a){
