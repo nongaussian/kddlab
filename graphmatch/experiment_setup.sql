@@ -1,19 +1,21 @@
-use imdb_small;
+
 /*
 drop table results;
 drop table experiments;
 */
 
 use imdb_2005_a;
-use imdb;
-drop table results;
-drop table experiments;
+
+
+drop table if exists results;
+drop table if exists experiments;
 create table experiments(
 	id integer auto_increment
+	,mm	 integer /*maximum number of movies*/
 	,wtype integer /* weight type*/
 	,stype integer /* sim type*/
-	,opr double/* object pruning ratio*/
-	,rpr double/* object pruning ratio*/
+	,mpr double/* movie pruning ratio*/
+	,rpr double/* relation pruning ratio*/
 	,lr double /* link ratio*/	
 	,nIter integer
 	,t_sim	integer

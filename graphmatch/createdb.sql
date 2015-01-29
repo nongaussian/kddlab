@@ -1,7 +1,8 @@
 use imdb;
 
 
-drop database imdb_2005_a;
+drop database if exists imdb_2005_a;
+
 create database imdb_2005_a;
 use imdb_2005_a;
 create table movies as

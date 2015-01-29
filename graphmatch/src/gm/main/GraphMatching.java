@@ -296,7 +296,7 @@ public class GraphMatching {
 	public int registerExperiment(int t_sim){
 		if(!LOGGING)
 			return -1;
-		return sqlunit.executeUpdateGetAutoKey(String.format("insert into experiments (mm, opr, rpr, lr,stype, wtype,nIter, t_sim) values (%d, %f,%f,%f,%d, %d,%d,%d)", maxMovies, movie_pruning_ratio, relation_pruning_ratio, link_ratio, simtype, simweight_type,nIter,t_sim));
+		return sqlunit.executeUpdateGetAutoKey(String.format("insert into experiments (mm, mpr, rpr, lr,stype, wtype,nIter, t_sim) values (%d, %f,%f,%f,%d, %d,%d,%d)", maxMovies, movie_pruning_ratio, relation_pruning_ratio, link_ratio, simtype, simweight_type,nIter,t_sim));
 	}
 	public void registerTmatching(int t_matching){
 		if(!LOGGING)
