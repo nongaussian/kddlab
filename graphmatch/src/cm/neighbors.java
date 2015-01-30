@@ -16,6 +16,7 @@ public class neighbors {
 	public void alloc () {
 		if (size == 0) return;
 		arr = new int[size];
+		tmp = 0;
 	}
 	public void add_neighbor (int id) {
 		arr[tmp++] = id;

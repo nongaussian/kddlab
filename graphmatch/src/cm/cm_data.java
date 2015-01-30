@@ -97,6 +97,7 @@ public class cm_data {
 				int id1 = Arrays.asList(nodetypes).indexOf(tmp[0]);
 				int id2 = Arrays.asList(nodetypes).indexOf(tmp[1]);
 				rel[id1][id2] = true;
+				rel[id2][id1] = true;
 				relations[i][0] = id1;
 				relations[i][1] = id2;
 			}
@@ -206,4 +207,27 @@ public class cm_data {
 		}
 	}
 
+	public void print_data () {
+		// print relations
+		for (int i=0; i<nrel; i++) {
+			System.out.println("" + nodetypes[relations[i][0]] + "_" + nodetypes[relations[i][1]]);
+			
+			int type1 = relations[i][0];
+			int type2 = relations[i][1];
+			
+			int totalline = 0;
+			int line = 0;
+			for (int j=0; j<nodes[type1].size; j++) {
+				int node1 = nodes[type1].arr[j].id;
+				
+				for (int k=0; k<nodes[type1].arr[j].neighbors[type2].size
+						&& line<100; k++, line++) {
+					System.out.println("" + node1 + "\t" + nodes[type1].arr[j].neighbors[type2].arr[k]);
+				}
+				totalline += nodes[type1].arr[j].neighbors[type2].size;
+			}
+			
+			System.out.println("size = " + totalline);
+		}
+	}
 }

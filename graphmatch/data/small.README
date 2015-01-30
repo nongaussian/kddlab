@@ -1,0 +1,5 @@
+nactor: 12181
+nmovie: 17410
+ndirec: 11999
+format of movie_actor: movieid <tab> actorid
+format of movie_director: movieid <tab> directorid
