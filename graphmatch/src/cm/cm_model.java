@@ -9,106 +9,17 @@ import org.apache.commons.math3.special.Gamma;
 
 
 /*
- * model parameters save & 
+ * manage model parameters
+ * - variables
+ * - functions to save to & load from files 
  */
 public class cm_model {
 	// data
-	private int				n_seq;
-	private int				n_region;
-	private int				n_topic;
-	private int				n_word;
-//	private Sequence[]		seqs;
+	cm_data dat = null;
 
-	private final double	init_alpha					= 1;
-	private final double	init_beta					= 1;
-	private final double[]	init_gamma					= {1, 9};
-	//private final double[]	init_nu						= {1, 9};
-	
-	public final double		log_f0						= 0;
-	
-	/*
-	 * approximate variables
-	 */
-	
-	public double			unif						= 0;
-
-	// approximate for theta (n_region by n_topic)
-	public double[][]		var_a						= null;
-	public double[][]		next_a						= null;
-	public double[]			var_asum					= null;
-	public double[][]		digamma_a					= null;
-	public double[]			digamma_asum				= null;
-	
-	// approximate for phi (n_topic by n_word)
-	public double[][]		var_b						= null;
-	public double[][]		next_b						= null;
-	public double[]			var_bsum					= null;
-	public double[][]		digamma_b					= null;
-	public double[]			digamma_bsum				= null;
-	
-	// approximate for lambda
-	public double[][]		var_c						= null;
-	public double[]			var_csum					= null;
-	public double[]			digamma_c					= null;
-	public double			digamma_csum				= 0;
-
-	// approximate for omega
-	//public double[][]		var_e						= null;
-	//public double[]			var_esum					= null;
-	//public double[]			digamma_e					= null;
-	//public double			digamma_esum				= 0;	
-
-	// approximate for S (max_seqlen by 2)
-	public double[][]		var_sigma					= null;
-	
-	// approximate for B
-	//public double[][][]		var_omega					= null;
-	
-	// approximate for R (max_seqlen by n_region)
-	public double[][]		var_rho						= null;
-	
-	// approximate for Z (max_seqlen by max_len by n_topic)
-	public double[][]		var_zhi						= null;
-	
-	// model parameters for Gaussian distribution (n_region by 2)
-	public double[][]		mu							= null;
-	public double[][]		Sigma						= null; // variance
-	public double[][]		next_mu						= null;
-	public double[][]		next_Sigma					= null; // weighted sum of the squares of data points 
-	public double[]			next_denom					= null; 
-	
-	// transition prob (n_region by n_region)
-	public double[]			delta0						= null;
-	public double[][][]		delta						= null;
-	public double[]			log_delta0					= null;
-	public double[][][]		log_delta					= null;
-
-	public double[]			next_delta0					= null;
-	public double[][][]		next_delta					= null;
-
-	// priors
-	public double[]			alpha						= null;
-	public double			alpha_sum					= 0;
-	public double[]			beta						= null;
-	public double			beta_sum					= 0;
-	public double[]			gamma						= null;
-	public double			gamma_sum					= 0;
-	public double[]			nu							= null;
-	public double			nu_sum						= 0;
-
-
-	// variables for Newton methods
-	public double[]			g							= null;
-	public double[]			h_1							= null;
-	public double[]			prev						= null;
-	
-	public double[]			log_phi0					= null;
-	
-	// temporary
-	public double[][]		tmplognormal				= null;
-	
-	public int 				max_seqlen					= 0;
-	public int 				max_msglen					= 0;
+	// model parameters
+	int type
+	double 
 
 	public cm_model(int n_seq, int n_word, int n_region, int n_topic, Sequence[] seqs) {
 		this.n_seq = n_seq;

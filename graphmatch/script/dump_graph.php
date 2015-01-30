@@ -122,4 +122,12 @@ while ( ($row = $res->fetch_assoc()) != null ) {
 $res->close();
 
 fclose($fp);
+
+$fp = fopen("$prefix.README", "w");
+fwrite($fp, "nactor: " . count($actorlist) . "\n");
+fwrite($fp, "nmovie: " . count($movielist) . "\n");
+fwrite($fp, "ndirec: " . count($directorlist) . "\n");
+fwrite($fp, "format of movie_actor: movieid <tab> actorid\n");
+fwrite($fp, "format of movie_director: movieid <tab> directorid\n");
+fclose($fp);
 ?>
