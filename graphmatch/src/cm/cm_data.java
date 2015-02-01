@@ -19,7 +19,8 @@ public class cm_data {
 	// has a relation between two types? 
 	public boolean[][] rel = null;
 	// list of nodes of each type
-	public nodelist[] nodes = null;
+	public nodelist[] lnodes = null;
+	public nodelist[] rnodes = null;
 	
 	// dataname is the prefix to the files
 	
@@ -28,17 +29,67 @@ public class cm_data {
 	//           .movie
 	//           .movie_actor
 	//           .movie_director
-	public cm_data (String dataname) {
-		read_meta_file (dataname + ".meta");
+	public cm_data (String ldataname, String rdataname) {
+		// XXX: meta files of left graph and right graph must be the same
+		read_meta_file (ldataname + ".meta");
 		
+		// read left graph
 		for (int i=0; i<ntype; i++) {
-			read_node_file (i, dataname + "." + nodetypes[i]);
+			read_node_file (lnodes, 
+					i, 
+					ldataname + "." + nodetypes[i]);
 		}
 		
 		for (int i=0; i<nrel; i++) {
-			read_relation_file (
-					dataname + "." + nodetypes[relations[i][0]] + "_" + nodetypes[relations[i][1]],
+			read_relation_file (lnodes,
+					ldataname + "." + nodetypes[relations[i][0]] + "_" + nodetypes[relations[i][1]],
 					relations[i][0], relations[i][1]);
+		}
+		
+		// read right graph
+		for (int i=0; i<ntype; i++) {
+			read_node_file (rnodes, 
+					i, 
+					ldataname + "." + nodetypes[i]);
+		}
+		
+		for (int i=0; i<nrel; i++) {
+			read_relation_file (rnodes,
+					rdataname + "." + nodetypes[relations[i][0]] + "_" + nodetypes[relations[i][1]],
+					relations[i][0], relations[i][1]);
+		}
+		
+		// read label file
+		for (int i=0; i<ntype; i++) {
+			read_label_file(i,
+					ldataname + ".label." + nodetypes[i]);
+		}
+	}
+
+	private void read_label_file(int t, String filename) {
+		System.out.println("read: " + filename);
+		try {
+			String line;
+			BufferedReader reader = new BufferedReader(new FileReader(filename));
+			
+			// the second line lists the edge types
+			while ((line = reader.readLine()) != null) {
+				String[] arr = line.trim().split("\t", 2);
+				if (arr == null || arr.length != 2) {
+					System.err.println ("syntax error in meta file");
+					System.exit(1);
+				}
+				int lidx = Integer.parseInt(arr[0]);
+				int ridx = Integer.parseInt(arr[1]);
+				
+				lnodes[t].arr[lidx].label = ridx;
+			}
+
+			reader.close();
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 
@@ -69,8 +120,11 @@ public class cm_data {
 			ntype = arr.length;
 			
 			// allocate node list
-			nodes = new nodelist [ntype];
-			for (int i=0; i<ntype; i++) nodes[i] = new nodelist (i, ntype);
+			lnodes = new nodelist [ntype];
+			for (int i=0; i<ntype; i++) lnodes[i] = new nodelist (i, ntype);
+			
+			rnodes = new nodelist [ntype];
+			for (int i=0; i<ntype; i++) rnodes[i] = new nodelist (i, ntype);
 			
 			// the second line lists the edge types
 			if ((line = reader.readLine()) == null) {
@@ -111,7 +165,7 @@ public class cm_data {
 	}
 
 	// XXX: we simply count the entries of each type only for now
-	private void read_node_file(int type, String filename) {
+	private void read_node_file(nodelist[] nodes, int type, String filename) {
 		System.out.println("read: " + filename);
 		try {
 			String line;
@@ -155,7 +209,7 @@ public class cm_data {
 		}
 	}
 
-	private void read_relation_file(String filename, int type1, int type2) {
+	private void read_relation_file(nodelist[] nodes, String filename, int type1, int type2) {
 		System.out.println("read: " + filename);
 		try {
 			String line;
@@ -207,7 +261,7 @@ public class cm_data {
 		}
 	}
 
-	public void print_data () {
+	public void print_data (nodelist[] nodes) {
 		// print relations
 		for (int i=0; i<nrel; i++) {
 			System.out.println("" + nodetypes[relations[i][0]] + "_" + nodetypes[relations[i][1]]);
@@ -229,5 +283,10 @@ public class cm_data {
 			
 			System.out.println("size = " + totalline);
 		}
+	}
+	
+	public void print_data () {
+		print_data(lnodes);
+		print_data(rnodes);
 	}
 }

@@ -3,6 +3,8 @@ package cm;
 public class node {
 	public int id;
 	
+	public int label = -1;
+	
 	public neighbors[] neighbors = null;
 	
 	public node (int id, int ntype, boolean[] rel) {
