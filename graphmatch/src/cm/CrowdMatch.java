@@ -17,7 +17,6 @@ public class CrowdMatch {
 		
 	public cm_data dat						= null;
 	public cm_model model					= null;
-	public boolean LOGGING 					= false;
 	
 	// debug
 	private final boolean verbose			= false;
@@ -86,7 +85,8 @@ public class CrowdMatch {
 
 	public void run() throws IOException{
 		// open an output file stream for logging likelihoods
-		PrintStream likelihood_file = new PrintStream(new FileOutputStream("res.our/likelihood.dat"));
+		PrintStream likelihood_file = new PrintStream(
+				new FileOutputStream("res.our/likelihood.dat"));
 		
 		// initialize variational variables
 		model.random_initialize_var();
@@ -104,7 +104,7 @@ public class CrowdMatch {
 			
 			/* 1) start an iteration */
 			iter++;
-			if(verbose) System.out.println("**** em iteration " + iter + " ****");
+			if (verbose) System.out.println("**** em iteration " + iter + " ****");
 
 			// start time
 			t_start_iter = System.currentTimeMillis();
@@ -112,7 +112,7 @@ public class CrowdMatch {
 			/* 3) m-step : update model parameters (w) */
 			em_mle(iter);
 
-			likelihood = compute_likelihood(); 
+			likelihood = compute_distance(); 
 
 			/* 4) now, finalize this iteration */
 			t_finish_iter = System.currentTimeMillis();
@@ -140,86 +140,137 @@ public class CrowdMatch {
 	}
 
 	private void em_mle(int iter) {
+		double z = 0;
+		
+		// init c
+		for (int t=0; t<dat.ntype; t++) {
+			model.c[t] = model.c_next[t];
+			model.c_next[t] = 0;
+		}
+
+		// init w
+		for (int t=0; t<dat.ntype; t++) {
+			for (int i=0; i<dat.lnodes[t].size; i++) {
+				for (int j=0; j<dat.rnodes[t].size; j++) {
+					model.w[t].val[i][j] = model.w_next[t].val[i][j];
+					model.w_next[t].val[i][j] = 0;
+				}
+			}
+		}
+		
+		// em step
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
 				// compute variables use in this iteration only
 				compute_alpha(t, i, model.alpha);
-				
-				double sum = 0;
 				
 				// compute a w distribution
 				for (int j=0; j<dat.rnodes[t].size; j++) {
 					// add alpha
 					model.w_next[t].val[i][j] += model.alpha[j];
 					
+					compute_delta(t, i, j, model.delta);
+					
+					// distribute delta
 					for (int s=0; s<dat.ntype; s++) {
-						// distribute delta
 						if (!dat.rel[t][s]) continue;
-						
-						compute_delta(t, s, i, j, model.delta);
 						
 						int n_i = dat.lnodes[t].arr[i].neighbors[s].size;
 						int n_j = dat.rnodes[t].arr[j].neighbors[s].size;
 						
 						for (int x=0; x<n_i; x++) {
 							for (int y=0; y<n_j; y++) {
-								model.w_next[s].val[x][y] += model.alpha[j] * model.delta[x][y];
+								int u = dat.lnodes[t].arr[i].neighbors[s].arr[x];
+								int v = dat.rnodes[t].arr[j].neighbors[s].arr[y];
+								double tmp = model.alpha[j] * model.delta[s][u][v];
+								
+								model.w_next[s].val[u][v] += tmp;
+								model.c[s] += tmp;
 							}
 						}
 					}
 				}
 				
-				// add beta
+				// XXX: add beta
 				if (dat.lnodes[t].arr[i].label > 0) {
-					model.w_next[t].val[i][dat.lnodes[t].arr[i].label] += model.mu * model.c[t];
-				}
-				
-				// normalize the w distribution
-				for (int j=0; j<dat.rnodes[t].size; j++) {
-					model.w_next[t].val[i][j] /= sum;
-				}
-				for (int j=0; j<dat.rnodes[t].size; j++) {
-					model.w_next[t].val[i][j] /= sum;
+					model.w_next[t].val[i][dat.lnodes[t].arr[i].label] += 
+							model.mu * Math.log(model.c[t]) / 2.;
 				}
 			}
 		}
 		
+		// normalize w
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
-				
+				z = 0;
+				for (int j=0; j<dat.rnodes[t].size; j++) {
+					model.w_next[t].val[i][j] += z;
+				}
+				for (int j=0; j<dat.rnodes[t].size; j++) {
+					model.w_next[t].val[i][j] = model.w_next[t].val[i][j] / z;
+				}
 			}
+		}
+		
+		// compute c
+		for (int t=0; t<dat.ntype; t++) {
+			double sum = 0;
+			for (int i=0; i<dat.lnodes[t].size; i++) {
+				double tmp = 0;
+				
+				// XXX
+				for (int j=0; j<dat.lnodes[t].size; j++) {
+					tmp += Math.sqrt(model.w[t].val[i][dat.lnodes[t].arr[i].label]);
+				}
+				
+				sum += Math.log(tmp);
+			}
+			
+			model.c[t] += model.mu * sum;
+			z += model.c[t];
+		}
+		
+		// normalize c
+		for (int t=0; t<dat.ntype; t++) {
+			model.c[t] = model.c_next[t];
 		}
 	}
 	
 	// XXX: for now, we assume each query has only one label 
 	@SuppressWarnings("unused")
 	private void compute_beta(int t, int i, double[] beta) {
-		/*
-		double sum = 0;
-		for (int j=0; j<dat.rnodes[t].size; j++) {
-			beta[j] = model.w[t].val[i][j] * w_bar[j];
-			sum += beta[j];
-		}
-		for (int j=0; j<dat.rnodes[t].size; j++) {
-			beta[j] /= sum;
-		}
-		*/
 	}
 
-	// XXX: check the equation (2015. 2. 2.)
-	private void compute_delta(int t, int s, int i, int j, double[][] delta) {
-		int n_i = dat.lnodes[t].arr[i].neighbors[s].size;
-		int n_j = dat.rnodes[t].arr[j].neighbors[s].size;
+	private void compute_delta(int t, int i, int j, double[][][] delta) {
 		double sum = 0;
-		for (int x=0; x<n_i; x++) {
-			for (int y=0; y<n_j; y++) {
-				delta[x][y] = model.w[s].val[x][y] / (double) dat.rnodes[s].arr[y].neighbors[t].size;
-				sum += delta[x][y]; 
+
+		for (int s=0; s<dat.ntype; s++) {
+			int n_i = dat.lnodes[t].arr[i].neighbors[s].size;
+			int n_j = dat.rnodes[t].arr[j].neighbors[s].size;
+			
+			for (int x=0; x<n_i; x++) {
+				for (int y=0; y<n_j; y++) {
+					int u = dat.lnodes[t].arr[i].neighbors[s].arr[x];
+					int v = dat.rnodes[t].arr[j].neighbors[s].arr[y];
+					
+					delta[s][x][y] = 
+							model.w[s].val[u][v]
+							* model.c[s]
+							/ (double) n_i
+							/ (double) dat.rnodes[s].arr[v].neighbors[t].size;
+					sum += delta[s][x][y]; 
+				}
 			}
 		}
-		for (int x=0; x<n_i; x++) {
-			for (int y=0; y<n_j; y++) {
-				delta[x][y] /= sum; 
+			
+		for (int s=0; s<dat.ntype; s++) {
+			int n_i = dat.lnodes[t].arr[i].neighbors[s].size;
+			int n_j = dat.rnodes[t].arr[j].neighbors[s].size;
+			
+			for (int x=0; x<n_i; x++) {
+				for (int y=0; y<n_j; y++) {
+					delta[s][x][y] /= sum; 
+				}
 			}
 		}
 	}
@@ -235,11 +286,15 @@ public class CrowdMatch {
 				double sum = 0;
 				for (int x=0; x<n_i; x++) {
 					for (int y=0; y<n_j; y++) {
-						sum += model.w[s].val[x][y] / (double) dat.rnodes[s].arr[y].neighbors[t].size;
+						int u = dat.lnodes[t].arr[i].neighbors[s].arr[x];
+						int v = dat.rnodes[t].arr[j].neighbors[s].arr[y];
+						
+						sum += model.w[s].val[u][v]
+								/ (double) dat.rnodes[s].arr[v].neighbors[t].size;
 					}
 				}
 				
-				tmp += model.c[s] * sum;
+				tmp += model.c[s] * sum / (double) n_i;
 			}
 			
 			alpha[j] = Math.sqrt(model.w[t].val[i][j] * tmp);
@@ -251,31 +306,8 @@ public class CrowdMatch {
 		}
 	}
 	
-	public void compute_c () {
-		double z = 0;
-		
-		for (int t=0; t<dat.ntype; t++) {
-			double sum = 0;
-			for (int i=0; i<dat.lnodes[t].size; i++) {
-				double tmp = 0;
-				
-				for (int j=0; j<dat.lnodes[t].size; j++) {
-					tmp += Math.sqrt(model.w[t].val[i][dat.lnodes[t].arr[i].label]);
-				}
-				
-				sum += Math.log(tmp);
-			}
-			
-			model.c[t] = 2 + model.mu * sum;
-			z += model.c[t];
-		}
-		
-		for (int t=0; t<dat.ntype; t++) {
-			model.c[t] /= z;
-		}
-	}
 	
-	public double compute_likelihood () {
+	public double compute_distance () {
 		double ret = 0;
 		for (int t=0; t<dat.ntype; t++)  {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
@@ -296,7 +328,8 @@ public class CrowdMatch {
 				double sub = 0;
 				for (int x=0; x<dat.lnodes[t].arr[i].neighbors[s].size; x++) {
 					for (int y=0; y<dat.rnodes[t].arr[j].neighbors[s].size; y++) {
-						sub += model.w[s].val[x][y] / (double)dat.rnodes[s].arr[y].neighbors[t].size;
+						sub += model.w[s].val[x][y] / 
+								(double)dat.rnodes[s].arr[y].neighbors[t].size;
 					}
 				}
 				

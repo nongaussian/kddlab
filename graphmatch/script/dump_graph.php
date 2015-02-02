@@ -1,7 +1,7 @@
 <?php
 
-if ($argc != 2) {
-	echo "usage: <prefix of data files>\n";
+if ($argc != 3) {
+	echo "usage: <dbname> <prefix of data files>\n";
 	exit;
 }
 
@@ -9,9 +9,10 @@ if ($argc != 2) {
 //$minmovact = $argv[2];
 //$minmovdir = $argv[3];
 
-$prefix = $argv[1];
+$dbname = $argv[1];
+$prefix = $argv[2];
 
-$db = new mysqli("localhost", "root", "", "imdb");
+$db = new mysqli("localhost", "root", "", $dbname);
 
 $res = $db->query ("select * from movies");
 if (!$res) {

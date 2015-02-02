@@ -20,10 +20,9 @@ public class cm_model {
 	public w[] w 								= null;
 	public w[] w_next							= null;
 	public double[] alpha						= null;
-	public double[] beta						= null;
-	public double[][] delta						= null;
-	public double[] w_bar						= null;
+	public double[][][] delta					= null;
 	public double[] c							= null;
+	public double[] c_next						= null;
 	
 	public int maxnodesize						= 0;
 	public int maxlneighborsize					= 0;
@@ -31,6 +30,9 @@ public class cm_model {
 
 	public cm_model(cm_data dat) {
 		this.dat = dat;
+		
+		c = new double[dat.ntype];
+		c_next = new double[dat.ntype];
 		
 		w = new w[dat.ntype];
 		for (int t=0; t<dat.ntype; t++) {
@@ -67,7 +69,7 @@ public class cm_model {
 			}
 		}
 		
-		delta = new double[maxlneighborsize][maxrneighborsize];
+		delta = new double[dat.ntype][maxlneighborsize][maxrneighborsize];
 	}
 
 	/*
@@ -82,7 +84,7 @@ public class cm_model {
 				double tmp = 1. / (double)dat.rnodes[t].size;
 				
 				for (int j=0; j<dat.rnodes[t].size; j++) {
-					w[t].val[i][j] = tmp;
+					w_next[t].val[i][j] = tmp;
 				}
 			}
 		}
