@@ -1,11 +1,10 @@
 package cm;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
 public class cm_data {
 	
@@ -69,6 +68,9 @@ public class cm_data {
 	private void read_label_file(int t, String filename) {
 		System.out.println("read: " + filename);
 		try {
+			File f = new File(filename);
+			if (!f.exists()) return;
+			
 			String line;
 			BufferedReader reader = new BufferedReader(new FileReader(filename));
 			

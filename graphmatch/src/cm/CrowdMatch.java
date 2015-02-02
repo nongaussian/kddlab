@@ -1,6 +1,5 @@
 package cm;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -75,10 +74,6 @@ public class CrowdMatch {
 						.type(String.class)
 						.required(true)
 						.help("Prefix name of right graph");
-			parser.addArgument("-label")
-						.type(String.class)
-						.required(true)
-						.help("Label file name");
 
 			Namespace res = parser.parseArgs(args);
 			System.out.println(res);
@@ -197,6 +192,7 @@ public class CrowdMatch {
 	}
 	
 	// XXX: for now, we assume each query has only one label 
+	@SuppressWarnings("unused")
 	private void compute_beta(int t, int i, double[] beta) {
 		/*
 		double sum = 0;
@@ -280,6 +276,46 @@ public class CrowdMatch {
 	}
 	
 	public double compute_likelihood () {
-		return 0;
+		double ret = 0;
+		for (int t=0; t<dat.ntype; t++)  {
+			for (int i=0; i<dat.lnodes[t].size; i++) {
+				ret += compute_bdistance(t, i);
+			}
+		}
+		return ret;
+	}
+
+	private double compute_bdistance(int t, int i) {
+		double sum1 = 0, sum2 = 0;
+		for (int j=0; j<dat.rnodes[t].size; j++) {
+			double tmp = 0;
+			
+			for (int s=0; s<dat.ntype; s++) {
+				if (!dat.rel[t][s]) continue;
+				
+				double sub = 0;
+				for (int x=0; x<dat.lnodes[t].arr[i].neighbors[s].size; x++) {
+					for (int y=0; y<dat.rnodes[t].arr[j].neighbors[s].size; y++) {
+						sub += model.w[s].val[x][y] / (double)dat.rnodes[s].arr[y].neighbors[t].size;
+					}
+				}
+				
+				sub /= (double)dat.lnodes[t].arr[i].neighbors[s].size;
+				
+				tmp += model.c[s] * sub;
+			}
+			sum1 += Math.sqrt(model.w[t].val[i][j] * tmp);
+		}
+		sum1 = Math.log(sum1);
+		
+		// for labeled data, 
+		for (int j=0; j<dat.rnodes[t].size; j++) {
+			if (dat.rnodes[t].arr[i].label < 0) continue;
+			
+			sum2 += Math.sqrt(model.w[t].val[i][dat.rnodes[t].arr[i].label]);
+		}
+		sum2 = Math.log(sum2);
+		
+		return sum1 + model.mu * Math.log(model.c[t]) * sum2;
 	}
 }
