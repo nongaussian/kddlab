@@ -24,7 +24,7 @@ public class cm_model {
 	public double[] c							= null;
 	public double[] c_next						= null;
 	
-	public int maxnodesize						= 0;
+	public int maxrnodesize						= 0;
 	public int maxlneighborsize					= 0;
 	public int maxrneighborsize					= 0;
 
@@ -39,18 +39,25 @@ public class cm_model {
 			w[t] = new w(dat.lnodes[t].size, dat.rnodes[t].size);
 		}
 		
+		w_next = new w[dat.ntype];
 		for (int t=0; t<dat.ntype; t++) {
-			if (maxnodesize < dat.ntype) {
-				maxnodesize = dat.ntype;
+			w_next[t] = new w(dat.lnodes[t].size, dat.rnodes[t].size);
+		}
+		
+		maxrnodesize = 0;
+		for (int t=0; t<dat.ntype; t++) {
+			if (maxrnodesize < dat.rnodes[t].size) {
+				maxrnodesize = dat.rnodes[t].size;
 			}
 		}
 		
-		alpha = new double[maxnodesize];
+		alpha = new double[maxrnodesize];
 		
 		maxlneighborsize = 0;
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
 				for (int s=0; s<dat.ntype; s++) {
+					if (!dat.rel[t][s]) continue;
 					if (maxlneighborsize < dat.lnodes[t].arr[i].neighbors[s].size) {
 						maxlneighborsize = dat.lnodes[t].arr[i].neighbors[s].size;
 					}
@@ -62,6 +69,7 @@ public class cm_model {
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.rnodes[t].size; i++) {
 				for (int s=0; s<dat.ntype; s++) {
+					if (!dat.rel[t][s]) continue;
 					if (maxrneighborsize < dat.rnodes[t].arr[i].neighbors[s].size) {
 						maxrneighborsize = dat.rnodes[t].arr[i].neighbors[s].size;
 					}
@@ -91,7 +99,7 @@ public class cm_model {
 		
 		// init c
 		for (int t=0; t<dat.ntype; t++) {
-			c[t] = 1. / (double)dat.ntype;
+			c_next[t] = 1. / (double)dat.ntype;
 		}
 	}
 
