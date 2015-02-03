@@ -86,7 +86,7 @@ public class CrowdMatch {
 	public void run() throws IOException{
 		// open an output file stream for logging likelihoods
 		PrintStream likelihood_file = new PrintStream(
-				new FileOutputStream("res.our/likelihood.dat"));
+				new FileOutputStream("res/likelihood.dat"));
 		
 		// initialize variational variables
 		model.random_initialize_var();
@@ -136,7 +136,7 @@ public class CrowdMatch {
 		likelihood_file.close();
 
 		// output the final model
-		model.save_model("res.our/final");
+		model.save_model("res/final");
 	}
 
 	private void em_mle(int iter) {
@@ -182,16 +182,16 @@ public class CrowdMatch {
 							for (int y=0; y<n_j; y++) {
 								int u = dat.lnodes[t].arr[i].neighbors[s].arr[x];
 								int v = dat.rnodes[t].arr[j].neighbors[s].arr[y];
-								double tmp = model.alpha[j] * model.delta[s][u][v];
+								double tmp = model.alpha[j] * model.delta[s][x][y];
 								
 								model.w_next[s].val[u][v] += tmp;
-								model.c[s] += tmp;
+								model.c_next[s] += tmp;
 							}
 						}
 					}
 				}
 				
-				// XXX: add beta
+				// XXX: simple w_bar
 				if (dat.lnodes[t].arr[i].label > 0) {
 					model.w_next[t].val[i][dat.lnodes[t].arr[i].label] += 
 							model.mu * Math.log(model.c[t]) / 2.;
@@ -204,35 +204,32 @@ public class CrowdMatch {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
 				z = 0;
 				for (int j=0; j<dat.rnodes[t].size; j++) {
-					model.w_next[t].val[i][j] += z;
+					z += model.w_next[t].val[i][j];
 				}
 				for (int j=0; j<dat.rnodes[t].size; j++) {
-					model.w_next[t].val[i][j] = model.w_next[t].val[i][j] / z;
+					model.w_next[t].val[i][j] /= z;
 				}
 			}
 		}
 		
 		// compute c
+		z = 0;
 		for (int t=0; t<dat.ntype; t++) {
 			double sum = 0;
 			for (int i=0; i<dat.lnodes[t].size; i++) {
-				double tmp = 0;
+				if (dat.lnodes[t].arr[i].label < 0) continue;
 				
-				// XXX
-				for (int j=0; j<dat.lnodes[t].size; j++) {
-					tmp += Math.sqrt(model.w[t].val[i][dat.lnodes[t].arr[i].label]);
-				}
-				
-				sum += Math.log(tmp);
+				// XXX: simple w_bar computation
+				sum += Math.log(model.w[t].val[i][dat.lnodes[t].arr[i].label]) / 2.;
 			}
 			
-			model.c[t] += model.mu * sum;
-			z += model.c[t];
+			model.c_next[t] += model.mu * sum;
+			z += model.c_next[t];
 		}
 		
 		// normalize c
 		for (int t=0; t<dat.ntype; t++) {
-			model.c[t] = model.c_next[t];
+			model.c_next[t] = model.c_next[t] / z;
 		}
 	}
 	
@@ -245,6 +242,8 @@ public class CrowdMatch {
 		double sum = 0;
 
 		for (int s=0; s<dat.ntype; s++) {
+			if (!dat.rel[t][s]) continue;
+			
 			int n_i = dat.lnodes[t].arr[i].neighbors[s].size;
 			int n_j = dat.rnodes[t].arr[j].neighbors[s].size;
 			
@@ -264,6 +263,8 @@ public class CrowdMatch {
 		}
 			
 		for (int s=0; s<dat.ntype; s++) {
+			if (!dat.rel[t][s]) continue;
+			
 			int n_i = dat.lnodes[t].arr[i].neighbors[s].size;
 			int n_j = dat.rnodes[t].arr[j].neighbors[s].size;
 			
@@ -280,6 +281,8 @@ public class CrowdMatch {
 		for (int j=0; j<dat.rnodes[t].size; j++) {
 			double tmp = 0;
 			for (int s=0; s<dat.ntype; s++) {
+				if (!dat.rel[t][s]) continue;
+				
 				int n_i = dat.lnodes[t].arr[i].neighbors[s].size;
 				int n_j = dat.rnodes[t].arr[j].neighbors[s].size;
 				
@@ -325,11 +328,16 @@ public class CrowdMatch {
 			for (int s=0; s<dat.ntype; s++) {
 				if (!dat.rel[t][s]) continue;
 				
+				if (dat.lnodes[t].arr[i].neighbors[s].size == 0) continue;
+				
 				double sub = 0;
 				for (int x=0; x<dat.lnodes[t].arr[i].neighbors[s].size; x++) {
 					for (int y=0; y<dat.rnodes[t].arr[j].neighbors[s].size; y++) {
-						sub += model.w[s].val[x][y] / 
-								(double)dat.rnodes[s].arr[y].neighbors[t].size;
+						int u = dat.lnodes[t].arr[i].neighbors[s].arr[x];
+						int v = dat.rnodes[t].arr[j].neighbors[s].arr[y];
+						
+						sub += model.w[s].val[u][v] / 
+								(double)dat.rnodes[s].arr[v].neighbors[t].size;
 					}
 				}
 				
@@ -343,11 +351,11 @@ public class CrowdMatch {
 		
 		// for labeled data, 
 		for (int j=0; j<dat.rnodes[t].size; j++) {
-			if (dat.rnodes[t].arr[i].label < 0) continue;
+			if (dat.lnodes[t].arr[i].label < 0) continue;
 			
-			sum2 += Math.sqrt(model.w[t].val[i][dat.rnodes[t].arr[i].label]);
+			sum2 += Math.sqrt(model.w[t].val[i][dat.lnodes[t].arr[i].label]);
 		}
-		sum2 = Math.log(sum2);
+		if (sum2 > 0) sum2 = Math.log(sum2);
 		
 		return sum1 + model.mu * Math.log(model.c[t]) * sum2;
 	}
