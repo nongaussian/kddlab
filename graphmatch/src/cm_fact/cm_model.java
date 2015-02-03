@@ -13,6 +13,7 @@ import java.util.Random;
 public class cm_model {
 	// constant
 	public double mu							= 1.;
+	public int nfact							= 10;
 	
 	// data
 	private cm_data dat 						= null;
@@ -20,6 +21,7 @@ public class cm_model {
 	// model parameters
 	public w[] w 								= null;
 	public w[] w_next							= null;
+	public double[] pi							= null;
 	public double[] alpha						= null;
 	public double[][][] delta					= null;
 	public double[] c							= null;
@@ -29,21 +31,24 @@ public class cm_model {
 	public int maxlneighborsize					= 0;
 	public int maxrneighborsize					= 0;
 
-	public cm_model(cm_data dat) {
+	public cm_model(cm_data dat, double mu, int nfact) {
 		this.dat = dat;
+		this.mu = mu;
+		this.nfact = nfact;
 		
 		c = new double[dat.ntype];
 		c_next = new double[dat.ntype];
+		pi = new double[nfact];
 		
 		w = new w[dat.ntype];
 		for (int t=0; t<dat.ntype; t++) {
 			System.out.println(t + "\t" + dat.lnodes[t].size + "\t" + dat.rnodes[t].size);
-			w[t] = new w(dat.lnodes[t].size, dat.rnodes[t].size);
+			w[t] = new w(nfact, dat.lnodes[t].size, dat.rnodes[t].size);
 		}
 		
 		w_next = new w[dat.ntype];
 		for (int t=0; t<dat.ntype; t++) {
-			w_next[t] = new w(dat.lnodes[t].size, dat.rnodes[t].size);
+			w_next[t] = new w(nfact, dat.lnodes[t].size, dat.rnodes[t].size);
 		}
 		
 		maxrnodesize = 0;
@@ -85,46 +90,101 @@ public class cm_model {
 	/*
 	 * setting variational variables
 	 */
-	public void random_initialize_var() {
+	public void update_var () {
+		// init c
+		for (int t=0; t<dat.ntype; t++) {
+			c[t] = c_next[t];
+			c_next[t] = 0;
+		}
+
+		// init w
+		for (int t=0; t<dat.ntype; t++) {
+			for (int i=0; i<dat.lnodes[t].size; i++) {
+				for (int k=0; k<nfact; k++) {
+					w[t].f1[i][k] = w_next[t].f1[i][k];
+					w_next[t].f1[i][k] = 0;
+				}
+			}
+			for (int k=0; k<nfact; k++) {
+				for (int j=0; j<dat.rnodes[t].size; j++) {
+					w[t].f2[k][j] = w_next[t].f2[k][j];
+					w_next[t].f2[k][j] = 0;
+				}
+			}
+		}
+	}
+	
+	public void initialize_var() {
 		// init w
 		Random rand = new Random(System.currentTimeMillis());
 
-		/*
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
 				double tmp = 0;
 				
-				for (int j=0; j<dat.rnodes[t].size; j++) {
-					w_next[t].val[i][j] = rand.nextDouble();
-					tmp += w_next[t].val[i][j];
+				for (int k=0; k<nfact; k++) {
+					w_next[t].f1[i][k] = rand.nextDouble();
+					tmp += w_next[t].f1[i][k];
 				}
-				for (int j=0; j<dat.rnodes[t].size; j++) {
-					w_next[t].val[i][j] /= tmp;
+				for (int k=0; k<nfact; k++) {
+					w_next[t].f1[i][k] /= tmp;
 				}
 			}
-		}
-		
-		// init c
-		for (int t=0; t<dat.ntype; t++) {
-			c_next[t] = 1. / (double)dat.ntype;
-		}
-		*/
-		for (int t=0; t<dat.ntype; t++) {
-			for (int i=0; i<dat.lnodes[t].size; i++) {
-				double tmp = 1. / (double)dat.rnodes[t].size;
+			
+			for (int k=0; k<nfact; k++) {
+				double tmp = 0;
 				
 				for (int j=0; j<dat.rnodes[t].size; j++) {
-					w_next[t].val[i][j] = tmp;
+					w_next[t].f2[k][j] = rand.nextDouble();
+					tmp += w_next[t].f2[k][j];
+				}
+				for (int j=0; j<dat.rnodes[t].size; j++) {
+					w_next[t].f2[k][j] /= tmp;
 				}
 			}
 		}
+
 		
 		// init c
 		for (int t=0; t<dat.ntype; t++) {
 			c_next[t] = 1. / (double)dat.ntype;
 		}
 	}
-
+	
+	public void normalize_var () {
+		// normalize w
+		for (int t=0; t<dat.ntype; t++) {
+			for (int i=0; i<dat.lnodes[t].size; i++) {
+				double z = 0;
+				for (int k=0; k<nfact; k++) {
+					z += w_next[t].f1[i][k];
+				}
+				for (int k=0; k<nfact; k++) {
+					w_next[t].f1[i][k] /= z;
+				}
+			}
+			
+			for (int k=0; k<nfact; k++) {
+				double z = 0;
+				for (int j=0; j<dat.rnodes[t].size; j++) {
+					z += w_next[t].f2[k][j];
+				}
+				for (int j=0; j<dat.rnodes[t].size; j++) {
+					w_next[t].f2[k][j] /= z;
+				}
+			}
+		}
+		
+		// normalize c
+		double z = 0;
+		for (int t=0; t<dat.ntype; t++) {
+			z += c_next[t];
+		}
+		for (int t=0; t<dat.ntype; t++) {
+			c_next[t] /= z;
+		}
+	}
+	
 	public void save_model(String prefix) {
 		// print w
 		save_w(prefix);
@@ -135,11 +195,21 @@ public class cm_model {
 
 	private void save_w(String prefix) {
 		try {
-			PrintStream out = new PrintStream(new FileOutputStream(prefix + ".w"));
+			PrintStream out = new PrintStream(new FileOutputStream(prefix + ".w1"));
 			for (int t=0; t<dat.ntype; t++) {
 				for(int i = 0 ; i < dat.lnodes[t].size ; i++) {
+					for(int k = 0 ; k < nfact ; k++) {
+						out.println ("" + t + "\t" + i + "\t" + k + "\t" + w_next[t].f1[i][k]);
+					}
+				}
+			}
+			out.close();
+			
+			out = new PrintStream(new FileOutputStream(prefix + ".w2"));
+			for (int t=0; t<dat.ntype; t++) {
+				for(int k = 0 ; k < nfact ; k++) {
 					for(int j = 0 ; j < dat.rnodes[t].size ; j++) {
-						out.println ("" + t + "\t" + i + "\t" + j + "\t" + w[t].val[i][j]);
+						out.println ("" + t + "\t" + k + "\t" + j + "\t" + w_next[t].f1[k][j]);
 					}
 				}
 			}
@@ -156,7 +226,7 @@ public class cm_model {
 			PrintStream out = new PrintStream(new FileOutputStream(prefix + ".c"));
 			out.print("" + c[0]);
 			for(int t = 1 ; t < dat.ntype ; t++) {
-				out.print("\t" + c[t]);
+				out.print("\t" + c_next[t]);
 			}
 			out.println();
 			out.close();

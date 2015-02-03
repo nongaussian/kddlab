@@ -14,6 +14,7 @@ public class CrowdMatch {
 	// constants
 	private double em_converged				= 1.0e-6;
 	private int em_max_iter					= 100;
+	private int nfact						= 10;
 		
 	public cm_data dat						= null;
 	public cm_model model					= null;
@@ -33,6 +34,7 @@ public class CrowdMatch {
 		// data parameters
 		String lprefix				= nes.getString("lprefix");
 		String rprefix				= nes.getString("rprefix");
+		nfact						= nes.getInt("nfact"); 
 		em_max_iter					= nes.getInt("niter");
 		em_converged				= nes.getDouble("thres");
 		
@@ -43,8 +45,7 @@ public class CrowdMatch {
 		dat 						= new cm_data(lprefix, rprefix);
 		
 		// init model parameter
-		model						= new cm_model(dat);
-		model.mu					= mu;
+		model						= new cm_model(dat, mu, nfact);
 	}
 		
 	
@@ -61,6 +62,10 @@ public class CrowdMatch {
 				        .type(Integer.class)
 				        .setDefault(100)
 				        .help("Maximum number of iterations");
+			parser.addArgument("-nfact")
+			            .type(Integer.class)
+			            .setDefault(10)
+			            .help("mu");
 			parser.addArgument("-thres")
 			            .type(Double.class)
 			            .setDefault(1.0e-6)
@@ -89,7 +94,7 @@ public class CrowdMatch {
 				new FileOutputStream("res/likelihood.dat"));
 		
 		// initialize variational variables
-		model.random_initialize_var();
+		model.initialize_var();
 		
 		long t_start = System.currentTimeMillis();
 		long t_finish, t_start_iter, t_finish_iter, gap;
@@ -142,21 +147,7 @@ public class CrowdMatch {
 	private void em_mle(int iter) {
 		double z = 0;
 		
-		// init c
-		for (int t=0; t<dat.ntype; t++) {
-			model.c[t] = model.c_next[t];
-			model.c_next[t] = 0;
-		}
-
-		// init w
-		for (int t=0; t<dat.ntype; t++) {
-			for (int i=0; i<dat.lnodes[t].size; i++) {
-				for (int j=0; j<dat.rnodes[t].size; j++) {
-					model.w[t].val[i][j] = model.w_next[t].val[i][j];
-					model.w_next[t].val[i][j] = 0;
-				}
-			}
-		}
+		model.update_var();
 		
 		// em step
 		for (int t=0; t<dat.ntype; t++) {
@@ -166,12 +157,13 @@ public class CrowdMatch {
 				
 				// compute a w distribution
 				for (int j=0; j<dat.rnodes[t].size; j++) {
-					// add alpha
-					model.w_next[t].val[i][j] += model.alpha[j];
-					
+					compute_pi(t, i, j, model.pi);
 					compute_delta(t, i, j, model.delta);
 					
-					// distribute delta
+					for (int k=0; k<nfact; k++) {
+						model.w_next[t].f1[i][k] += model.alpha[j] * model.pi[k];
+					}
+					
 					for (int s=0; s<dat.ntype; s++) {
 						if (!dat.rel[t][s]) continue;
 						
@@ -198,29 +190,20 @@ public class CrowdMatch {
 			}
 		}
 		
-		// normalize w
-		for (int t=0; t<dat.ntype; t++) {
-			for (int i=0; i<dat.lnodes[t].size; i++) {
-				z = 0;
-				for (int j=0; j<dat.rnodes[t].size; j++) {
-					z += model.w_next[t].val[i][j];
-				}
-				for (int j=0; j<dat.rnodes[t].size; j++) {
-					model.w_next[t].val[i][j] /= z;
-				}
-			}
-		}
-		
-		// normalize c
-		z = 0;
-		for (int t=0; t<dat.ntype; t++) {
-			z += model.c_next[t];
-		}
-		for (int t=0; t<dat.ntype; t++) {
-			model.c_next[t] /= z;
-		}
+		model.normalize_var();
 	}
 	
+	private void compute_pi(int t, int i, int j, double[] pi) {
+		double sum = 0;
+		for (int k=0; k<nfact; k++) {
+			pi[k] = model.w[t].f1[i][k] * model.w[t].f2[k][j];
+			sum += pi[k];
+		}
+		for (int k=0; k<nfact; k++) {
+			pi[k] /= sum;
+		}
+	}
+
 	// XXX: for now, we assume each query has only one label 
 	@SuppressWarnings("unused")
 	private void compute_beta(int t, int i, double[] beta) {
@@ -354,5 +337,13 @@ public class CrowdMatch {
 		if (sum2 > 0) sum2 = Math.log(sum2);
 		
 		return sum1 + model.mu * sum2;
+	}
+	
+	public double get_w(int t, int i, int j) {
+		double sum = 0;
+		for (int k=0; k<nfact; k++) {
+			sum += model.w[t].f1[i][k] * model.w[t].f2[k][j];
+		}
+		return sum;
 	}
 }

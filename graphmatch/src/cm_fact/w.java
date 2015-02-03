@@ -1,8 +1,10 @@
 package cm_fact;
 
 public class w {
-	public double[][] val			= null;
-	public w (int size1, int size2) {
-		val = new double[size1][size2];
+	public double[][] f1			= null;
+	public double[][] f2			= null;
+	public w (int k, int size1, int size2) {
+		f1 = new double[size1][k];
+		f2 = new double[k][size2];
 	}
 }
