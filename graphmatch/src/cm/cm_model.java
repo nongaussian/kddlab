@@ -3,6 +3,7 @@ package cm;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Random;
 
 /*
  * manage model parameters
@@ -85,8 +86,28 @@ public class cm_model {
 	 */
 	public void random_initialize_var() {
 		// init w
-		//Random rand = new Random(System.currentTimeMillis());
+		Random rand = new Random(System.currentTimeMillis());
 
+		/*
+		for (int t=0; t<dat.ntype; t++) {
+			for (int i=0; i<dat.lnodes[t].size; i++) {
+				double tmp = 0;
+				
+				for (int j=0; j<dat.rnodes[t].size; j++) {
+					w_next[t].val[i][j] = rand.nextDouble();
+					tmp += w_next[t].val[i][j];
+				}
+				for (int j=0; j<dat.rnodes[t].size; j++) {
+					w_next[t].val[i][j] /= tmp;
+				}
+			}
+		}
+		
+		// init c
+		for (int t=0; t<dat.ntype; t++) {
+			c_next[t] = 1. / (double)dat.ntype;
+		}
+		*/
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
 				double tmp = 1. / (double)dat.rnodes[t].size;

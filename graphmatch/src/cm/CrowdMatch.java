@@ -54,17 +54,17 @@ public class CrowdMatch {
 			
 		try {
 			parser.addArgument("-mu")
-		                .type(Double.class)
-		                .setDefault(1.)
-		                .help("mu");
+						.type(Double.class)
+						.setDefault(1.)
+						.help("mu");
 			parser.addArgument("-niter")
-				        .type(Integer.class)
-				        .setDefault(100)
-				        .help("Maximum number of iterations");
+						.type(Integer.class)
+						.setDefault(100)
+						.help("Maximum number of iterations");
 			parser.addArgument("-thres")
-			            .type(Double.class)
-			            .setDefault(1.0e-6)
-			            .help("Threshold of log-likelihood ratio for convergence test");
+						.type(Double.class)
+						.setDefault(1.0e-6)
+						.help("Threshold of log-likelihood ratio for convergence test");
 			parser.addArgument("-lprefix")
 						.type(String.class)
 						.required(true)
@@ -192,9 +192,8 @@ public class CrowdMatch {
 				}
 				
 				// XXX: simple w_bar
-				if (dat.lnodes[t].arr[i].label > 0) {
-					model.w_next[t].val[i][dat.lnodes[t].arr[i].label] += 
-							model.mu * Math.log(model.c[t]) / 2.;
+				if (dat.lnodes[t].arr[i].label >= 0) {
+					model.w_next[t].val[i][dat.lnodes[t].arr[i].label] += model.mu;
 				}
 			}
 		}
@@ -212,24 +211,13 @@ public class CrowdMatch {
 			}
 		}
 		
-		// compute c
+		// normalize c
 		z = 0;
 		for (int t=0; t<dat.ntype; t++) {
-			double sum = 0;
-			for (int i=0; i<dat.lnodes[t].size; i++) {
-				if (dat.lnodes[t].arr[i].label < 0) continue;
-				
-				// XXX: simple w_bar computation
-				sum += Math.log(model.w[t].val[i][dat.lnodes[t].arr[i].label]) / 2.;
-			}
-			
-			model.c_next[t] += model.mu * sum;
 			z += model.c_next[t];
 		}
-		
-		// normalize c
 		for (int t=0; t<dat.ntype; t++) {
-			model.c_next[t] = model.c_next[t] / z;
+			model.c_next[t] /= z;
 		}
 	}
 	
@@ -247,10 +235,14 @@ public class CrowdMatch {
 			int n_i = dat.lnodes[t].arr[i].neighbors[s].size;
 			int n_j = dat.rnodes[t].arr[j].neighbors[s].size;
 			
+			if (n_i == 0) continue;
+			
 			for (int x=0; x<n_i; x++) {
 				for (int y=0; y<n_j; y++) {
 					int u = dat.lnodes[t].arr[i].neighbors[s].arr[x];
 					int v = dat.rnodes[t].arr[j].neighbors[s].arr[y];
+					
+					if (dat.rnodes[s].arr[v].neighbors[t].size == 0) continue;
 					
 					delta[s][x][y] = 
 							model.w[s].val[u][v]
@@ -286,11 +278,15 @@ public class CrowdMatch {
 				int n_i = dat.lnodes[t].arr[i].neighbors[s].size;
 				int n_j = dat.rnodes[t].arr[j].neighbors[s].size;
 				
+				if (n_i == 0) continue;
+				
 				double sum = 0;
 				for (int x=0; x<n_i; x++) {
 					for (int y=0; y<n_j; y++) {
 						int u = dat.lnodes[t].arr[i].neighbors[s].arr[x];
 						int v = dat.rnodes[t].arr[j].neighbors[s].arr[y];
+						
+						if (dat.rnodes[s].arr[v].neighbors[t].size == 0) continue;
 						
 						sum += model.w[s].val[u][v]
 								/ (double) dat.rnodes[s].arr[v].neighbors[t].size;
@@ -336,16 +332,16 @@ public class CrowdMatch {
 						int u = dat.lnodes[t].arr[i].neighbors[s].arr[x];
 						int v = dat.rnodes[t].arr[j].neighbors[s].arr[y];
 						
-						sub += model.w[s].val[u][v] / 
+						sub += model.w_next[s].val[u][v] / 
 								(double)dat.rnodes[s].arr[v].neighbors[t].size;
 					}
 				}
 				
 				sub /= (double)dat.lnodes[t].arr[i].neighbors[s].size;
 				
-				tmp += model.c[s] * sub;
+				tmp += model.c_next[s] * sub;
 			}
-			sum1 += Math.sqrt(model.w[t].val[i][j] * tmp);
+			sum1 += Math.sqrt(model.w_next[t].val[i][j] * tmp);
 		}
 		sum1 = Math.log(sum1);
 		
@@ -353,10 +349,10 @@ public class CrowdMatch {
 		for (int j=0; j<dat.rnodes[t].size; j++) {
 			if (dat.lnodes[t].arr[i].label < 0) continue;
 			
-			sum2 += Math.sqrt(model.w[t].val[i][dat.lnodes[t].arr[i].label]);
+			sum2 += Math.sqrt(model.w_next[t].val[i][dat.lnodes[t].arr[i].label]);
 		}
 		if (sum2 > 0) sum2 = Math.log(sum2);
 		
-		return sum1 + model.mu * Math.log(model.c[t]) * sum2;
+		return sum1 + model.mu * sum2;
 	}
 }

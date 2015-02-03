@@ -49,7 +49,7 @@ public class cm_data {
 		for (int i=0; i<ntype; i++) {
 			read_node_file (rnodes, 
 					i, 
-					ldataname + "." + nodetypes[i]);
+					rdataname + "." + nodetypes[i]);
 		}
 		
 		for (int i=0; i<nrel; i++) {
@@ -66,10 +66,11 @@ public class cm_data {
 	}
 
 	private void read_label_file(int t, String filename) {
-		System.out.println("read: " + filename);
 		try {
 			File f = new File(filename);
 			if (!f.exists()) return;
+			
+			System.out.println("read: " + filename);
 			
 			String line;
 			BufferedReader reader = new BufferedReader(new FileReader(filename));
@@ -281,6 +282,10 @@ public class cm_data {
 					System.out.println("" + node1 + "\t" + nodes[type1].arr[j].neighbors[type2].arr[k]);
 				}
 				totalline += nodes[type1].arr[j].neighbors[type2].size;
+				
+				if (nodes[type1].arr[j].label >= 0) {
+					System.out.println("" + node1 + " -> " + nodes[type1].arr[j].label);
+				}
 			}
 			
 			System.out.println("size = " + totalline);
@@ -288,7 +293,9 @@ public class cm_data {
 	}
 	
 	public void print_data () {
+		System.out.println("left graph:");
 		print_data(lnodes);
+		System.out.println("right graph:");
 		print_data(rnodes);
 	}
 }
