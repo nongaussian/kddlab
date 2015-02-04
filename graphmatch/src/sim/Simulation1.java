@@ -10,13 +10,13 @@ import net.sourceforge.argparse4j.inf.Namespace;
  * two exactly the same heterogeneous graphs
  */
 public class Simulation1 {
-	double max_iter					= 100;
+	double ncand						= 100;
 	
 	public Simulation1 (Namespace nes) {
 		// data parameters
 		String lprefix				= nes.getString("lprefix");
 		String rprefix				= nes.getString("rprefix");
-		double max_iter				= nes.getInt("niter");
+		ncand						= nes.getInt("ncand");
 	}
 
 	/**
@@ -65,10 +65,12 @@ public class Simulation1 {
 
 	public void run () {
 		int iter = 0;
+		int[] cand = new int[ncand];
 		while (iter < max_iter) {
 			iter++;
 			
 			// select a query & candidates
+			int q = select_query (cand);
 			
 			// compute the cost
 			
