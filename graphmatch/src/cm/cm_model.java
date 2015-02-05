@@ -97,6 +97,13 @@ public class cm_model {
 		for (int t=0; t<dat.ntype; t++) {
 			w[t] = new w(dat.lnodes[t].size, dat.rnodes[t].size);
 		}
+		
+		maxrnodesize = 0;
+		for (int t=0; t<dat.ntype; t++) {
+			if (maxrnodesize < dat.rnodes[t].size) {
+				maxrnodesize = dat.rnodes[t].size;
+			}
+		}
 	}
 
 	/*

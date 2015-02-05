@@ -1,5 +1,6 @@
 package sim;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
@@ -16,7 +17,6 @@ import cm.cm_model;
  */
 public class Simulation1 {
 	int nquery							= 10;
-	int ncandidate						= -1;
 	int nmaxquery						= -1;
 	double mu							= 1;
 	
@@ -33,7 +33,6 @@ public class Simulation1 {
 		outputfile					= nes.getString("output");
 		nmaxquery					= nes.getInt("nmaxq");
 		nquery						= nes.getInt("nq");
-		ncandidate					= nes.getInt("nc");
 		
 		dat							= new cm_data(lprefix, rprefix);
 		model						= new cm_model();
@@ -79,10 +78,6 @@ public class Simulation1 {
 		                .type(Integer.class)
 		                .setDefault(10)
 		                .help("Number of queries in each iteration");
-			parser.addArgument("-nc")
-			            .type(Integer.class)
-			            .setDefault(-1)
-			            .help("Number of candidates for each query (default: infinity)");
 			parser.addArgument("-nmaxq")
 				        .type(Integer.class)
 				        .setDefault(-1)
@@ -99,22 +94,22 @@ public class Simulation1 {
 
 	public void run () {
 		int cnt = 0;
-		int[] queries = new int[nquery];
-		int[] cands = new int[ncandidate];
 		int cost = 0;
+		
+		CandNode[] cand = new CandNode[model.maxrnodesize];
 		
 		while ((nmaxquery == -1 || cnt < nmaxquery) && (cnt < dat.totallnode)) {
 			
 			// run model?
 			
 			// select a query & candidates
-			int nq = select_query (queries, nquery);
-			cnt += nq;
+			QueryNode[] queries = select_query (nquery);
+			cnt += queries.length;
 			
-			for (int i=0; i<nq; i++) {
-				int nc = select_candidates(queries[i], cands, ncandidate);
+			for (QueryNode q : queries) {
+				int nc = select_candidates(q, cand);
 
-				cost += compute_cost(queries[i], cands, nc);
+				cost += compute_cost(q);
 			}
 		}
 		
@@ -134,7 +129,7 @@ public class Simulation1 {
 	}
 
 	// select the best n queries & return the actual number of selected queries
-	private int select_query(int[] qs, int n) {
+	private QueryNode[] select_query(int n) {
 		PriorityQueue<QueryNode> topk = new PriorityQueue<QueryNode> (n, new Comparator<QueryNode> () {
 			public int compare (QueryNode q1, QueryNode q2) {
 				return (q1.diff < q2.diff) ? -1 : ((q1.diff > q2.diff) ? 1 : 0);
@@ -158,7 +153,8 @@ public class Simulation1 {
 				}
 			}
 		}
-		return 0;
+		
+		return (QueryNode[]) topk.toArray();
 	}
 	
 	private double compute_expected_model_change(int t, int i) {
@@ -191,14 +187,32 @@ public class Simulation1 {
 	}
 
 	// choose n candidates for the node i & return the actual number of candidates
-	private int select_candidates(int i, int[] cand, int n) {
-		// TODO Auto-generated method stub
-		return 0;
+	class CandNode {
+		public int j;
+		public double w;
+	}
+	private int select_candidates(QueryNode q, CandNode[] cand) {
+		for (int j=0; j<dat.rnodes[q.t].size; j++) {
+			cand[j].j = j;
+			cand[j].w = model.w[q.t].val[q.i][j];
+		}
+		
+		Arrays.sort(cand, new Comparator<CandNode> () {
+			@Override
+			public int compare(CandNode c1, CandNode c2) {
+				return (c1.w > c2.w) ? -1 : ((c1.w < c2.w) ? 1 : 0);
+			}
+		});
+		return dat.rnodes[q.t].size;
 	}
 	
 	// compute cost (how many entries checked in cands to find the node i by linear search)
-	private int compute_cost(int i, int[] cands, int nc) {
-		// TODO Auto-generated method stub
-		return 0;
+	private int compute_cost(QueryNode q, CandNode[] cand, int nc) {
+		for (int i=0; i<nc; i++) {
+			if (q.i == cand[i].j) {
+				return (i+1);
+			}
+		}
+		return nc;
 	}
 }
