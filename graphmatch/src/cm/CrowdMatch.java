@@ -43,8 +43,8 @@ public class CrowdMatch {
 		dat 						= new cm_data(lprefix, rprefix);
 		
 		// init model parameter
-		model						= new cm_model(dat);
-		model.mu					= mu;
+		model						= new cm_model();
+		model.init_learner(dat, mu);
 	}
 		
 	

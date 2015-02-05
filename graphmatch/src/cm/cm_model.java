@@ -1,6 +1,8 @@
 package cm;
 
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Random;
@@ -29,8 +31,12 @@ public class cm_model {
 	public int maxlneighborsize					= 0;
 	public int maxrneighborsize					= 0;
 
-	public cm_model(cm_data dat) {
+	public cm_model() {
+	}
+	
+	public void init_learner (cm_data dat, double mu) {
 		this.dat = dat;
+		this.mu = mu;
 		
 		c = new double[dat.ntype];
 		c_next = new double[dat.ntype];
@@ -79,6 +85,18 @@ public class cm_model {
 		}
 		
 		delta = new double[dat.ntype][maxlneighborsize][maxrneighborsize];
+	}
+	
+	public void init_tester (cm_data dat, double mu) {
+		this.dat = dat;
+		this.mu = mu;
+		
+		c = new double[dat.ntype];
+		
+		w = new w[dat.ntype];
+		for (int t=0; t<dat.ntype; t++) {
+			w[t] = new w(dat.lnodes[t].size, dat.rnodes[t].size);
+		}
 	}
 
 	/*
@@ -159,6 +177,58 @@ public class cm_model {
 			}
 			out.println();
 			out.close();
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+	
+	public void load_model(String prefix) {
+		// read w
+		load_w(prefix);
+
+		// read c
+		load_c(prefix);
+	}
+
+	private void load_w(String prefix) {
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(prefix + ".w"));
+			String line = null;
+			
+			while((line = reader.readLine()) != null) {
+				String[] arr = line.split("\t");
+				
+				int t = Integer.parseInt(arr[0]);
+				int i = Integer.parseInt(arr[1]);
+				int j = Integer.parseInt(arr[2]);
+				double val = Double.parseDouble(arr[3]);
+				
+				w[t].val[i][j] = val;
+			}
+			reader.close();
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+
+	public void load_c(String prefix) {
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(prefix + ".w"));
+			String line = null;
+			
+			while((line = reader.readLine()) != null) {
+				String[] arr = line.split("\t");
+				
+				int t=0;
+				for (String val : arr) {
+					c[t++] = Integer.parseInt(val);
+				}
+			}
+			reader.close();
 		}
 		catch(IOException e) {
 			e.printStackTrace();

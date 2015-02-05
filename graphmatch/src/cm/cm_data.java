@@ -10,6 +10,8 @@ public class cm_data {
 	
 	public int ntype;
 	public int nrel;
+	public int totallnode;
+	public int totalrnode;
 	
 	// names of types
 	public String[] nodetypes = null;
@@ -33,10 +35,12 @@ public class cm_data {
 		read_meta_file (ldataname + ".meta");
 		
 		// read left graph
+		totallnode = 0;
 		for (int i=0; i<ntype; i++) {
 			read_node_file (lnodes, 
 					i, 
 					ldataname + "." + nodetypes[i]);
+			totallnode += lnodes[i].size;
 		}
 		
 		for (int i=0; i<nrel; i++) {
@@ -46,10 +50,12 @@ public class cm_data {
 		}
 		
 		// read right graph
+		totalrnode = 0;
 		for (int i=0; i<ntype; i++) {
 			read_node_file (rnodes, 
 					i, 
 					rdataname + "." + nodetypes[i]);
+			totalrnode += rnodes[i].size;
 		}
 		
 		for (int i=0; i<nrel; i++) {
