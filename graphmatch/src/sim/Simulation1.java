@@ -71,7 +71,7 @@ public class Simulation1 {
 						.help("Maximum number of iterations");
 			parser.addArgument("-thres")
 						.type(Double.class)
-						.setDefault(1.0e-6)
+						.setDefault(1.0e-5)
 						.help("Threshold of log-likelihood ratio for convergence test");
 			parser.addArgument("-lprefix")
 						.type(String.class)

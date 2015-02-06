@@ -137,7 +137,7 @@ public class CrowdMatch {
 			likelihood_file.println(likelihood + "\t" + converged_ratio + "\t" + gap + "\t" + (t_finish_iter - t_start));
 			System.out.println("iteration (" + iter + ") likelihood: " + likelihood + "\t" + converged_ratio + " (" + gap + " ms)");
 
-			if ((iter % 20) == 0) {
+			if (verbose && (iter % 20) == 0) {
 				model.save_model(String.format("res/%03d", iter));
 			}
 		}
@@ -148,7 +148,7 @@ public class CrowdMatch {
 		likelihood_file.close();
 
 		// output the final model
-		model.save_model("res/final");
+		if (verbose) model.save_model("res/final");
 	}
 
 	private void em_mle(int iter) {

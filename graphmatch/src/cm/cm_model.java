@@ -32,6 +32,7 @@ public class cm_model {
 	public int maxrneighborsize					= 0;
 	
 	public boolean is_cont						= false;
+	public boolean firstrun						= true;
 
 	public cm_model() {
 	}
@@ -113,7 +114,8 @@ public class cm_model {
 	 * setting variational variables
 	 */
 	public void random_initialize_var() {
-		if (is_cont) return;
+		if (!firstrun && is_cont) return;
+		firstrun = false;
 		
 		// init w
 		Random rand = new Random(System.currentTimeMillis());
