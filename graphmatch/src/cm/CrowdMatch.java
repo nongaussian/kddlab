@@ -12,41 +12,36 @@ import net.sourceforge.argparse4j.inf.Namespace;
 
 public class CrowdMatch {
 	// constants
-	private double em_converged				= 1.0e-6;
+	private double em_converged				= 1.0e-5;
 	private int em_max_iter					= 100;
+	private double mu						= 1.;
 		
-	public cm_data dat						= null;
-	public cm_model model					= null;
+	private cm_data dat						= null;
+	private cm_model model					= null;
+	
+	private String lprefix					= null;
+	private String rprefix					= null;
 	
 	// debug
-	private final boolean verbose			= false;
+	public boolean verbose					= false;
 	
 	public static void main(String[] args) throws IOException {
 		Namespace nes = parseArguments(args);
 		CrowdMatch obj = new CrowdMatch(nes);
 		
 		// run em
+		obj.init();
 		obj.run();
 	}
 	
 	public CrowdMatch(Namespace nes){
 		// data parameters
-		String lprefix				= nes.getString("lprefix");
-		String rprefix				= nes.getString("rprefix");
+		lprefix						= nes.getString("lprefix");
+		rprefix						= nes.getString("rprefix");
 		em_max_iter					= nes.getInt("niter");
 		em_converged				= nes.getDouble("thres");
-		
-		// model parameters
-		double mu					= nes.getDouble("mu");
-		
-		// data loading
-		dat 						= new cm_data(lprefix, rprefix);
-		
-		// init model parameter
-		model						= new cm_model();
-		model.init_learner(dat, mu);
+		mu							= nes.getDouble("mu");
 	}
-		
 	
 	public static Namespace parseArguments(String[] args){
 		ArgumentParser parser = ArgumentParsers.newArgumentParser("CrowdMatch")
@@ -81,6 +76,23 @@ public class CrowdMatch {
 			parser.handleError(e);
 		}
 		return null;
+	}
+	
+	public void init() {
+		// data loading
+		dat 						= new cm_data(lprefix, rprefix);
+		
+		// init model parameter
+		model						= new cm_model();
+		model.init_learner(dat, mu);
+	}
+	
+	public void set_dat (cm_data dat) {
+		this.dat = dat;
+	}
+	
+	public void set_model (cm_model model) {
+		this.model = model;
 	}
 
 	public void run() throws IOException{

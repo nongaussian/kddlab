@@ -30,6 +30,8 @@ public class cm_model {
 	public int maxrnodesize						= 0;
 	public int maxlneighborsize					= 0;
 	public int maxrneighborsize					= 0;
+	
+	public boolean is_cont						= false;
 
 	public cm_model() {
 	}
@@ -51,14 +53,36 @@ public class cm_model {
 			w_next[t] = new w(dat.lnodes[t].size, dat.rnodes[t].size);
 		}
 		
+		temp_stat();
+		
+		alpha = new double[maxrnodesize];
+		
+		delta = new double[dat.ntype][maxlneighborsize][maxrneighborsize];
+	}
+	
+	public void init_tester (cm_data dat, double mu) {
+		this.dat = dat;
+		this.mu = mu;
+		
+		c = new double[dat.ntype];
+		
+		w = new w[dat.ntype];
+		for (int t=0; t<dat.ntype; t++) {
+			w[t] = new w(dat.lnodes[t].size, dat.rnodes[t].size);
+		}
+		
+		temp_stat();
+		
+		is_cont = true;
+	}
+	
+	private void temp_stat() {
 		maxrnodesize = 0;
 		for (int t=0; t<dat.ntype; t++) {
 			if (maxrnodesize < dat.rnodes[t].size) {
 				maxrnodesize = dat.rnodes[t].size;
 			}
 		}
-		
-		alpha = new double[maxrnodesize];
 		
 		maxlneighborsize = 0;
 		for (int t=0; t<dat.ntype; t++) {
@@ -83,33 +107,14 @@ public class cm_model {
 				}
 			}
 		}
-		
-		delta = new double[dat.ntype][maxlneighborsize][maxrneighborsize];
-	}
-	
-	public void init_tester (cm_data dat, double mu) {
-		this.dat = dat;
-		this.mu = mu;
-		
-		c = new double[dat.ntype];
-		
-		w = new w[dat.ntype];
-		for (int t=0; t<dat.ntype; t++) {
-			w[t] = new w(dat.lnodes[t].size, dat.rnodes[t].size);
-		}
-		
-		maxrnodesize = 0;
-		for (int t=0; t<dat.ntype; t++) {
-			if (maxrnodesize < dat.rnodes[t].size) {
-				maxrnodesize = dat.rnodes[t].size;
-			}
-		}
 	}
 
 	/*
 	 * setting variational variables
 	 */
 	public void random_initialize_var() {
+		if (is_cont) return;
+		
 		// init w
 		Random rand = new Random(System.currentTimeMillis());
 
