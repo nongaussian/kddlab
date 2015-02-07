@@ -226,7 +226,7 @@ public class cm_model {
 				int j = Integer.parseInt(arr[2]);
 				double val = Double.parseDouble(arr[3]);
 				
-				w[t].val[i][j] = val;
+				w_next[t].val[i][j] = val;
 			}
 			reader.close();
 		}
@@ -246,7 +246,7 @@ public class cm_model {
 				
 				int t=0;
 				for (String val : arr) {
-					c[t++] = Integer.parseInt(val);
+					c_next[t++] = Integer.parseInt(val);
 				}
 			}
 			reader.close();
