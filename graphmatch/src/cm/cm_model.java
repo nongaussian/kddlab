@@ -214,6 +214,7 @@ public class cm_model {
 	}
 
 	private void load_w(String prefix) {
+		System.out.println("load: " + prefix + ".w");
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(prefix + ".w"));
 			String line = null;
@@ -237,8 +238,9 @@ public class cm_model {
 	}
 
 	public void load_c(String prefix) {
+		System.out.println("load: " + prefix + ".c");
 		try {
-			BufferedReader reader = new BufferedReader(new FileReader(prefix + ".w"));
+			BufferedReader reader = new BufferedReader(new FileReader(prefix + ".c"));
 			String line = null;
 			
 			while((line = reader.readLine()) != null) {

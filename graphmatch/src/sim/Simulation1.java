@@ -83,7 +83,7 @@ public class Simulation1 {
 						.type(String.class)
 						.required(true)
 						.help("Prefix name of right graph");
-			parser.addArgument("-oprefix")
+			parser.addArgument("-wprefix")
 						.type(String.class)
 						.help("Prefix name of model parameters to use for initialization");
 			parser.addArgument("-output")
