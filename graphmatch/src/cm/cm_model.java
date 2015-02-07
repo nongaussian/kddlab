@@ -109,6 +109,12 @@ public class cm_model {
 			}
 		}
 	}
+	
+	public void init_with(String filename) {
+		load_model(filename);
+		firstrun = false;
+		is_cont = true;
+	}
 
 	/*
 	 * setting variational variables
@@ -118,6 +124,7 @@ public class cm_model {
 		firstrun = false;
 		
 		// init w
+		@SuppressWarnings("unused")
 		Random rand = new Random(System.currentTimeMillis());
 
 		/*

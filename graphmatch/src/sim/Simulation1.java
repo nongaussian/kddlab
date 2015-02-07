@@ -30,6 +30,7 @@ public class Simulation1 {
 	
 	String lprefix						= null;
 	String rprefix						= null;
+	String wprefix						= null;
 	String outputfile					= null;
 	
 	double[] tmp_w						= null;
@@ -38,6 +39,7 @@ public class Simulation1 {
 		// data parameters
 		lprefix						= nes.getString("lprefix");
 		rprefix						= nes.getString("rprefix");
+		wprefix						= nes.getString("wprefix");
 		outputfile					= nes.getString("output");
 		nmaxquery					= nes.getInt("nmaxq");
 		nquery						= nes.getInt("nq");
@@ -81,6 +83,9 @@ public class Simulation1 {
 						.type(String.class)
 						.required(true)
 						.help("Prefix name of right graph");
+			parser.addArgument("-oprefix")
+						.type(String.class)
+						.help("Prefix name of model parameters to use for initialization");
 			parser.addArgument("-output")
 						.type(String.class)
 						.required(true)
@@ -107,6 +112,7 @@ public class Simulation1 {
 		dat							= new cm_data(lprefix, rprefix);
 		model						= new cm_model();
 		model.init_learner(dat, mu);
+		if (wprefix != null) model.init_with(wprefix);
 		model.is_cont = true;
 		
 		learner.set_dat(dat);
@@ -229,7 +235,7 @@ public class Simulation1 {
 	private void estimate_w(double[] w, int t, int i, int j, int s, int u) {
 		double tmp = 0;
 		
-		for (int v=0; v<dat.rnodes[t].size; v++) {
+		for (int v=0; v<dat.rnodes[s].size; v++) {
 			w[v] = model.w[s].val[u][v];
 		}
 		// for j's neighborhood,
@@ -238,10 +244,10 @@ public class Simulation1 {
 			estimate_w(w, t, i, j, s, u, v);
 		}
 		
-		for (int v=0; v<dat.rnodes[t].size; v++) {
+		for (int v=0; v<dat.rnodes[s].size; v++) {
 			tmp += w[v];
 		}
-		for (int v=0; v<dat.rnodes[t].size; v++) {
+		for (int v=0; v<dat.rnodes[s].size; v++) {
 			w[v] /= tmp;
 		}
 	}
