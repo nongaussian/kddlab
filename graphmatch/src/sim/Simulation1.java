@@ -125,6 +125,7 @@ public class Simulation1 {
 		
 		PrintStream out = new PrintStream(new FileOutputStream(outputfile));
 		
+		QueryNode[] queries = new QueryNode[nquery];
 		CandNode[] cand = new CandNode[model.maxrnodesize];
 		tmp_w = new double[model.maxrnodesize];
 		
@@ -134,10 +135,11 @@ public class Simulation1 {
 			learner.run();
 			
 			// select a query & candidates
-			QueryNode[] queries = select_query (nquery);
+			int nq = select_query (nquery, queries);
 			
 			int tmpcnt = 0;
-			for (QueryNode q : queries) {
+			for (int i=0; i<nq; i++) {
+				QueryNode q = queries[i];
 				int nc = select_candidates(q, cand);
 
 				double cost = compute_cost(q, cand, nc);
@@ -172,7 +174,7 @@ public class Simulation1 {
 	}
 
 	// select the best n queries & return the actual number of selected queries
-	private QueryNode[] select_query(int n) {
+	private int select_query(int n, QueryNode[] res) {
 		PriorityQueue<QueryNode> topk = new PriorityQueue<QueryNode> (n, new Comparator<QueryNode> () {
 			public int compare (QueryNode q1, QueryNode q2) {
 				return (q1.diff < q2.diff) ? -1 : ((q1.diff > q2.diff) ? 1 : 0);
@@ -197,7 +199,11 @@ public class Simulation1 {
 			}
 		}
 		
-		return (QueryNode[]) topk.toArray();
+		int idx=0;
+		for (QueryNode q : topk) {
+			res[idx++] = q;
+		}
+		return idx;
 	}
 	
 	// compute the (approximate) expected model change when we ask to annotate for node i of type t
@@ -219,7 +225,7 @@ public class Simulation1 {
 					
 					estimate_w(tmp_w, t, i, j, s, u);
 					
-					for (int v=0; v<dat.rnodes[t].size; v++) {
+					for (int v=0; v<dat.rnodes[s].size; v++) {
 						tmp += Math.sqrt(model.w[s].val[u][v] * tmp_w[v]);
 					}
 					diff += tmp;
