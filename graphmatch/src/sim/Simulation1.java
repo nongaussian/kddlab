@@ -129,6 +129,8 @@ public class Simulation1 {
 		CandNode[] cand = new CandNode[model.maxrnodesize];
 		tmp_w = new double[model.maxrnodesize];
 		
+		System.out.println("now, we start to find queries..");
+		
 		while ((nmaxquery == -1 || cnt < nmaxquery) && (cnt < dat.totallnode)) {
 			
 			// run model
@@ -186,6 +188,7 @@ public class Simulation1 {
 				if (dat.lnodes[t].arr[i].label >= 0) continue;
 				            
 				double val = compute_expected_model_change(t, i);
+				System.out.println("\texpected model chanage of node " + i + " of type " + dat.nodetypes[t] + ": " + val);
 				if (topk.size() < n) {
 					topk.add(new QueryNode(t, i, val));
 				}
@@ -201,6 +204,7 @@ public class Simulation1 {
 		
 		int idx=0;
 		for (QueryNode q : topk) {
+			System.out.println("=> selected: " + q.id + " + of type " + dat.nodetypes[q.t]);
 			res[idx++] = q;
 		}
 		return idx;
