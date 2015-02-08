@@ -219,7 +219,7 @@ public class Simulation1 {
 					
 					estimate_w(tmp_w, t, i, j, s, u);
 					
-					for (int v=0; v<dat.rnodes[t].size; v++) {
+					for (int v=0; v<dat.rnodes[s].size; v++) {
 						tmp += Math.sqrt(model.w[s].val[u][v] * tmp_w[v]);
 					}
 					diff += tmp;

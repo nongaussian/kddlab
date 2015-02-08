@@ -248,7 +248,7 @@ public class cm_model {
 				
 				int t=0;
 				for (String val : arr) {
-					c_next[t++] = Integer.parseInt(val);
+					c_next[t++] = Double.parseDouble(val);
 				}
 			}
 			reader.close();
