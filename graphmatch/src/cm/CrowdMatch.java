@@ -148,7 +148,7 @@ public class CrowdMatch {
 		likelihood_file.close();
 
 		// output the final model
-		if (verbose) model.save_model("res/final");
+		model.save_model("res/final");
 	}
 
 	private void em_mle(int iter) {

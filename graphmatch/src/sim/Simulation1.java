@@ -127,6 +127,7 @@ public class Simulation1 {
 		
 		QueryNode[] queries = new QueryNode[nquery];
 		CandNode[] cand = new CandNode[model.maxrnodesize];
+		for (int i=0; i<model.maxrnodesize; i++) cand[i] = new CandNode();
 		tmp_w = new double[model.maxrnodesize];
 		
 		System.out.println("now, we start to find queries..");
@@ -204,7 +205,7 @@ public class Simulation1 {
 		
 		int idx=0;
 		for (QueryNode q : topk) {
-			System.out.println("=> selected: " + q.id + " + of type " + dat.nodetypes[q.t]);
+			System.out.println("=> selected: " + q.id + " of type " + dat.nodetypes[q.t]);
 			res[idx++] = q;
 		}
 		return idx;
