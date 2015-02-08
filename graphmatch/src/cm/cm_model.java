@@ -205,6 +205,26 @@ public class cm_model {
 		}
 	}
 	
+	public void save_label(String prefix) {
+		try {
+			for (int t=0; t<dat.ntype; t++) {
+				PrintStream out = new PrintStream(
+						new FileOutputStream(prefix + ".label." + dat.nodetypes[t]));
+				
+				for(int i = 1 ; i < dat.lnodes[t].size; i++) {
+					if (dat.lnodes[t].arr[i].label >= 0) {
+						out.println(i + "\t" + dat.lnodes[t].arr[i].label);
+					}
+				}
+				out.close();
+			}
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+	
 	public void load_model(String prefix) {
 		// read w
 		load_w(prefix);

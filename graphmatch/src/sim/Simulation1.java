@@ -148,10 +148,12 @@ public class Simulation1 {
 				double cost = compute_cost(q, cand, nc);
 				totalcost += cost;
 				System.out.println("CNT=" + (cnt + tmpcnt) + ", COST: " + cost + ", ACC: " + totalcost);
-				out.println("" + (cnt + tmpcnt) + "\t" + cost + "\t" + totalcost);
+				out.println("" + (cnt + tmpcnt) + "\t" + cost + "\t" + totalcost + "\t" + q.t + "\t" + q.id);
 				
 				tmpcnt++;
 			}
+			
+			model.save_label("res/test");
 			
 			cnt += queries.length;
 
