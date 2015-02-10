@@ -6,7 +6,6 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
-import java.util.Random;
 
 import cm.cm_data;
 import net.sourceforge.argparse4j.ArgumentParsers;
@@ -15,14 +14,14 @@ import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 
 /*
- * Simulate a crowdsourcing process with random selection
+ * Simulate a crowdsourcing process by selecting neighbors of labeled nodes
+ * for queries
  */
-public class Simulation0 {
+public class Simulation2 {
 	cm_data dat							= null;
-	Random rand							= new Random ();
 	int nquery							= 10;
 	int nmaxquery						= -1;
-	int maxrnodesize					= 0;
+	double mu							= 1;
 	
 	String lprefix						= null;
 	String rprefix						= null;
@@ -31,7 +30,7 @@ public class Simulation0 {
 	
 	double[] tmp_w						= null;
 	
-	public Simulation0 (Namespace nes) {
+	public Simulation2 (Namespace nes) {
 		// data parameters
 		lprefix						= nes.getString("lprefix");
 		rprefix						= nes.getString("rprefix");
@@ -92,13 +91,6 @@ public class Simulation0 {
 	
 	public void init() {
 		dat							= new cm_data(lprefix, rprefix);
-		
-		maxrnodesize = 0;
-		for (int t=0; t<dat.ntype; t++) {
-			if (maxrnodesize < dat.rnodes[t].size) {
-				maxrnodesize = dat.rnodes[t].size;
-			}
-		}
 	}
 
 	public void run () throws IOException {
@@ -108,7 +100,7 @@ public class Simulation0 {
 		PrintStream out = new PrintStream(new FileOutputStream(outputfile));
 		
 		QueryNode[] queries = new QueryNode[nquery];
-		CandNode[] cand = new CandNode[maxrnodesize];
+		CandNode[] cand = new CandNode[model.maxrnodesize];
 		
 		System.out.println("now, we start to find queries..");
 		
@@ -129,6 +121,8 @@ public class Simulation0 {
 				
 				tmpcnt++;
 			}
+			
+			model.save_label("res/test");
 			
 			cnt += queries.length;
 
@@ -155,10 +149,28 @@ public class Simulation0 {
 
 	// select the best n queries & return the actual number of selected queries
 	private int select_query(int n, QueryNode[] res) {
+		PriorityQueue<QueryNode> topk = new PriorityQueue<QueryNode> (n, new Comparator<QueryNode> () {
+			public int compare (QueryNode q1, QueryNode q2) {
+				return (q1.diff < q2.diff) ? -1 : ((q1.diff > q2.diff) ? 1 : 0);
+			}
+		});
 		
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
 				if (dat.lnodes[t].arr[i].label >= 0) continue;
+				            
+				double val = compute_expected_model_change(t, i);
+				System.out.println("\texpected model chanage of node " + i + " of type " + dat.nodetypes[t] + ": " + val);
+				if (topk.size() < n) {
+					topk.add(new QueryNode(t, i, val));
+				}
+				else if (topk.peek().diff < val) {
+					QueryNode tmp = topk.remove();
+					tmp.t = t;
+					tmp.id = i;
+					tmp.diff = val;
+					topk.add(tmp);
+				}
 			}
 		}
 		
