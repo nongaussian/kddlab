@@ -18,4 +18,6 @@ public class nodelist {
 		assert size > 0 : "node type " + type + " has no instance";
 		arr = new node[size];
 	}
+	
+	
 }

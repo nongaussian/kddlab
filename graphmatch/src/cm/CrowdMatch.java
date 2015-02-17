@@ -10,17 +10,16 @@ import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 
 
-public class CrowdMatch {
+public class CrowdMatch extends CM_Learner{
 	// constants
 	private double em_converged				= 1.0e-5;
 	private int em_max_iter					= 100;
 	private double mu						= 1.;
 		
-	private cm_data dat						= null;
+
 	private cm_model model					= null;
 	
-	private String lprefix					= null;
-	private String rprefix					= null;
+
 	
 	// debug
 	public boolean verbose					= false;
@@ -36,8 +35,7 @@ public class CrowdMatch {
 	
 	public CrowdMatch(Namespace nes){
 		// data parameters
-		lprefix						= nes.getString("lprefix");
-		rprefix						= nes.getString("rprefix");
+		setArgs(nes);
 		em_max_iter					= nes.getInt("niter");
 		em_converged				= nes.getDouble("thres");
 		mu							= nes.getDouble("mu");
