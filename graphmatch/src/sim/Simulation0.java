@@ -5,14 +5,14 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.PriorityQueue;
 import java.util.Random;
 
-import cm.cm_data;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
+import cm.QueryNode;
+import cm.cm_data;
 
 /*
  * Simulate a crowdsourcing process with random selection
@@ -142,16 +142,7 @@ public class Simulation0 {
 		out.close();
 	}
 
-	class QueryNode {
-		public int t;
-		public int id;
-		public double diff;
-		public QueryNode (int t, int i, double diff) {
-			this.t = t;
-			this.id = i;
-			this.diff = diff;
-		}
-	}
+	
 
 	// select the best n queries & return the actual number of selected queries
 	private int select_query(int n, QueryNode[] res) {
