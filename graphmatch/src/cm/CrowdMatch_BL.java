@@ -13,13 +13,13 @@ import net.sourceforge.argparse4j.inf.Namespace;
 
 public class CrowdMatch_BL extends CM_Learner{
 	public ArrayList<node>[] nodes_queried;
-	
+	public int maxrnodesize						= 0;
 	
 	public CrowdMatch_BL(Namespace nes) {
 		// data parameters
 		setArgs(nes);
 		
-		init_query_nodes(nodes_queried, dat.ntype);
+		
 	}
 	
 	public static void init_query_nodes(ArrayList<node>[] query_nodes, int ntype){
@@ -31,6 +31,10 @@ public class CrowdMatch_BL extends CM_Learner{
 	public static void main(String[] args) throws IOException {
 		Namespace nes = parseArguments(args);
 		CrowdMatch_BL obj = new CrowdMatch_BL(nes);
+		
+		obj.init();
+		
+		
 		
 		
 	}
@@ -60,6 +64,13 @@ public class CrowdMatch_BL extends CM_Learner{
 	public void init() {
 		// data loading
 		dat 						= new cm_data(lprefix, rprefix);
+		init_query_nodes(nodes_queried, dat.ntype);
+		maxrnodesize = 0;
+		for (int t=0; t<dat.ntype; t++) {
+			if (maxrnodesize < dat.rnodes[t].size) {
+				maxrnodesize = dat.rnodes[t].size;
+			}
+		}
 	}
 	@Override
 	public void run() {
@@ -134,7 +145,7 @@ public class CrowdMatch_BL extends CM_Learner{
 		return selected_queries;
 	}
 	
-	private int select_query(int n, QueryNode[] res) {
+	public int select_query(int n, QueryNode[] res) {
 		ArrayList<IntDouble > selected_queries = select_query_nodes(n);
 		
 		selected_queries.toArray(res);

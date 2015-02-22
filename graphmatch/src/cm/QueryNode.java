@@ -1,6 +1,6 @@
 package cm;
 
-public class QueryNode {
+public class QueryNode implements Comparable<QueryNode> {
 	public int t;
 	public int id;
 	public double diff;
@@ -12,4 +12,12 @@ public class QueryNode {
 		this(t,i);
 		this.diff = diff;
 	}
+	@Override
+	public int compareTo(QueryNode o) {
+		if(t==o.t){
+			return id-o.id;
+		}
+		return t-o.t;
+	}
+	
 }
