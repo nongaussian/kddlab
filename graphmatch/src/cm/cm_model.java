@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Random;
 
 /*
@@ -15,13 +17,16 @@ import java.util.Random;
 public class cm_model {
 	// constant
 	public double mu							= 1.;
+	public int radius							= -1;
 	
 	// data
 	private cm_data dat 						= null;
-
+	public HashSet<Integer>[][] eff_pairs		= null; 
+	
+	
 	// model parameters
-	public w[] w 								= null;
-	public w[] w_next							= null;
+	public SparseMatrix[] w 								= null;
+	public SparseMatrix[] w_next							= null;
 	public double[] alpha						= null;
 	public double[][][] delta					= null;
 	public double[] c							= null;
@@ -34,7 +39,8 @@ public class cm_model {
 	public boolean is_cont						= false;
 	public boolean firstrun						= true;
 
-	public cm_model() {
+	public cm_model(int radius) {
+		this.radius = radius;
 	}
 	
 	public void init_learner (cm_data dat, double mu) {
@@ -44,15 +50,15 @@ public class cm_model {
 		c = new double[dat.ntype];
 		c_next = new double[dat.ntype];
 		
-		w = new w[dat.ntype];
+		w = new SparseMatrix[dat.ntype];
+		w_next = new SparseMatrix[dat.ntype];
+		
+		
 		for (int t=0; t<dat.ntype; t++) {
-			w[t] = new w(dat.lnodes[t].size, dat.rnodes[t].size);
+			w[t] = new SparseMatrix(dat.lnodes[t].size);
+			w_next[t] = new SparseMatrix(dat.lnodes[t].size);
 		}
 		
-		w_next = new w[dat.ntype];
-		for (int t=0; t<dat.ntype; t++) {
-			w_next[t] = new w(dat.lnodes[t].size, dat.rnodes[t].size);
-		}
 		
 		temp_stat();
 		
@@ -67,9 +73,9 @@ public class cm_model {
 		
 		c = new double[dat.ntype];
 		
-		w = new w[dat.ntype];
+		w = new SparseMatrix[dat.ntype];
 		for (int t=0; t<dat.ntype; t++) {
-			w[t] = new w(dat.lnodes[t].size, dat.rnodes[t].size);
+			w[t] = new SparseMatrix(dat.lnodes[t].size);
 		}
 		
 		temp_stat();
@@ -116,43 +122,126 @@ public class cm_model {
 		is_cont = true;
 	}
 
+	
+	
+	@SuppressWarnings("unchecked")
+	private void initialize_effpairs(cm_data dat){
+		eff_pairs = new HashSet[dat.ntype][];
+		HashSet<Integer>[] lgroup = new HashSet[dat.ntype];
+		HashSet<Integer>[] rgroup = new HashSet[dat.ntype];
+		
+		for(int t = 0; t<dat.ntype; t++){
+			lgroup[t] = new HashSet<Integer>();
+			rgroup[t] = new HashSet<Integer>();
+			eff_pairs[t] = new HashSet[dat.lnodes[t].size];
+			for(int i = 0; i<eff_pairs[t].length; i++){
+				eff_pairs[t][i] = new HashSet<Integer>();
+			}
+		}
+		
+
+		for(int t = 0; t<dat.ntype; t++){
+			for(int i = 0; i<eff_pairs[t].length; i++){
+				if(dat.lnodes[t].arr[i].label>=0){
+					eff_pairs[t][i].add(dat.lnodes[t].arr[i].label);
+					register_node(lgroup, dat.lnodes[t].arr[i], t, radius, true);
+					register_node(rgroup, dat.rnodes[t].arr[dat.lnodes[t].arr[i].label], t, radius, false);
+				}
+
+
+				Integer[] l_list,r_list;
+				
+				for(int t_ = 0; t_<dat.ntype; t_++){
+					l_list = lgroup[t_].toArray(new Integer[0]);
+					r_list = rgroup[t_].toArray(new Integer[0]);
+					for(Integer x:l_list){
+						for(Integer y:r_list){
+							eff_pairs[t_][x].add(y);
+						}
+					}
+					lgroup[t_].clear();
+					rgroup[t_].clear();
+				}
+				
+			}
+		}
+	}
+	
+	public void update_effpairs(QueryNode[] queries, cm_data dat){
+		//TODO: implementation
+		/*
+		 * update effective pairs
+		 * update w
+		 *  
+		 */
+		HashSet<Integer>[] lgroup = new HashSet[dat.ntype];
+		HashSet<Integer>[] rgroup = new HashSet[dat.ntype];
+		for(int t = 0; t<dat.ntype; t++){
+			lgroup[t] = new HashSet<Integer>();
+			rgroup[t] = new HashSet<Integer>();
+		}
+		Integer[] l_list,r_list;
+		for (QueryNode q : queries) {
+			if(q.matched_id >= 0){
+				eff_pairs[q.t][q.id].add(q.matched_id);
+				register_node(lgroup, dat.lnodes[q.t].arr[q.id], q.t, radius, true);
+				register_node(rgroup, dat.rnodes[q.t].arr[q.matched_id], q.t, radius, false);
+				
+				w[q.t].put(q.id, dat.lnodes[q.t].arr[q.id].label, 1.0);
+			}
+			
+			l_list = lgroup[q.t].toArray(new Integer[0]);
+			r_list = rgroup[q.t].toArray(new Integer[0]);
+			for(Integer x:l_list){
+				for(Integer y:r_list){
+					eff_pairs[q.t][x].add(y);
+				}
+			}
+			
+			lgroup[q.t].clear();
+			rgroup[q.t].clear();
+			
+		}
+		
+	}
+	
+	
+	private void register_node(HashSet<Integer>[] nodeset, node n, int type, int radius, boolean left){
+		if(radius==0){
+			return;
+		}
+		for(int t = 0; t < dat.ntype; t++){
+			if (!dat.rel[type][t]) continue;
+			for(int x = 0; x < n.neighbors[t].size; x++){
+				nodeset[t].add(n.neighbors[t].arr[x]);
+				register_node(nodeset, left?dat.lnodes[t].arr[n.neighbors[t].arr[x]]:dat.rnodes[t].arr[n.neighbors[t].arr[x]], t, radius-1,left);
+			}
+		}
+	}
+	
 	/*
 	 * setting variational variables
 	 */
-	public void random_initialize_var() {
+	public void random_initialize_var(cm_data dat) {
 		if (!firstrun && is_cont) return;
+		initialize_effpairs(dat);
 		firstrun = false;
 		
 		// init w
 		@SuppressWarnings("unused")
 		Random rand = new Random(System.currentTimeMillis());
 
-		/*
-		for (int t=0; t<dat.ntype; t++) {
-			for (int i=0; i<dat.lnodes[t].size; i++) {
-				double tmp = 0;
-				
-				for (int j=0; j<dat.rnodes[t].size; j++) {
-					w_next[t].val[i][j] = rand.nextDouble();
-					tmp += w_next[t].val[i][j];
-				}
-				for (int j=0; j<dat.rnodes[t].size; j++) {
-					w_next[t].val[i][j] /= tmp;
-				}
-			}
-		}
 		
-		// init c
-		for (int t=0; t<dat.ntype; t++) {
-			c_next[t] = 1. / (double)dat.ntype;
-		}
-		*/
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
-				double tmp = 1. / (double)dat.rnodes[t].size;
+				Integer[] cand_r = eff_pairs[t][i].toArray(new Integer[0]);
+				if(cand_r.length==0){
+					continue;
+				}
+				double tmp = 1. / cand_r.length;
 				
-				for (int j=0; j<dat.rnodes[t].size; j++) {
-					w_next[t].val[i][j] = tmp;
+				for (int j=0; j<cand_r.length; j++) {
+					w_next[t].put(i, cand_r[j], tmp);
 				}
 			}
 		}
@@ -176,8 +265,11 @@ public class cm_model {
 			PrintStream out = new PrintStream(new FileOutputStream(prefix + ".w"));
 			for (int t=0; t<dat.ntype; t++) {
 				for(int i = 0 ; i < dat.lnodes[t].size ; i++) {
-					for(int j = 0 ; j < dat.rnodes[t].size ; j++) {
-						out.println ("" + t + "\t" + i + "\t" + j + "\t" + w[t].val[i][j]);
+					Iterator<Integer> iter = eff_pairs[t][i].iterator();
+					int j;
+					while(iter.hasNext()){
+						j = iter.next();
+						out.println ("" + t + "\t" + i + "\t" + j + "\t" + w[t].get(i, j));
 					}
 				}
 			}
@@ -247,7 +339,7 @@ public class cm_model {
 				int j = Integer.parseInt(arr[2]);
 				double val = Double.parseDouble(arr[3]);
 				
-				w_next[t].val[i][j] = val;
+				w_next[t].put(i, j, val);
 			}
 			reader.close();
 		}

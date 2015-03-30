@@ -107,7 +107,7 @@ public class cm_data {
 	// e.g., imdb database
 	//   movie	actor	director
 	//   movie_actor	movie_director
-	private void read_meta_file(String filename) {
+	protected void read_meta_file(String filename) {
 		System.out.println("read: " + filename);
 		try {
 			String line;

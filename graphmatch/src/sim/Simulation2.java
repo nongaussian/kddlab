@@ -94,6 +94,7 @@ public class Simulation2 {
 		dat							= new cm_data(lprefix, rprefix);
 	}
 
+	/*
 	public void run () throws IOException {
 		int cnt = 0;
 		int totalcost = 0;
@@ -285,5 +286,5 @@ public class Simulation2 {
 			}
 		}
 		return nc;
-	}
+	}*/
 }

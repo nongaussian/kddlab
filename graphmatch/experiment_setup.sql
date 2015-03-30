@@ -17,7 +17,7 @@ create table experiments(
 	,mpr double/* movie pruning ratio*/
 	,rpr double/* relation pruning ratio*/
 	,lr double /* link ratio*/	
-	,nIter integer
+	,nIter integer/*maximum iteration  of simrank*/
 	,t_sim	integer
 	,t_match integer
 	,primary key (id)
@@ -25,8 +25,8 @@ create table experiments(
 );
 create table results(
 	exp_id integer
-	,vtype integer
-	,n_true integer
+	,vtype integer	/*vertex type*/
+	,n_true integer		/* true positive */
 	,n_false integer
 	,n_nomatch integer
 

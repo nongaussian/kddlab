@@ -101,6 +101,7 @@ public class Simulation0 {
 		}
 	}
 
+	/*
 	public void run () throws IOException {
 		int cnt = 0;
 		int totalcost = 0;
@@ -143,17 +144,21 @@ public class Simulation0 {
 	}
 
 	
-
+	
 	// select the best n queries & return the actual number of selected queries
 	private int select_query(int n, QueryNode[] res) {
 		
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
 				if (dat.lnodes[t].arr[i].label >= 0) continue;
+				
+				
+				
 			}
 		}
 		
 		int idx=0;
+		
 		for (QueryNode q : topk) {
 			System.out.println("=> selected: " + q.id + " of type " + dat.nodetypes[q.t]);
 			res[idx++] = q;
@@ -213,37 +218,7 @@ public class Simulation0 {
 		}
 	}
 
-	// estimate w[s].arr[u][v]
-	private void estimate_w(double[] w, int t, int i, int j, int s, int u, int v) {
-		double sum = 0;
-		
-		for (int o=0; o<dat.ntype; o++) {
-			if (!dat.rel[s][o]) continue;
-			
-			double tmp = 0;
-			for (int xx=0; xx<dat.lnodes[s].arr[u].neighbors[o].size; xx++) {
-				int uu = dat.lnodes[s].arr[u].neighbors[o].arr[xx];
-				for (int yy=0; yy<dat.rnodes[s].arr[v].neighbors[o].size; yy++) {
-					int vv = dat.rnodes[s].arr[v].neighbors[o].arr[yy];
-					
-					if (o == t && uu == i && vv == j) {
-						tmp += 1. 
-								/ (double)dat.lnodes[s].arr[u].neighbors[o].size
-								/ (double)dat.rnodes[o].arr[vv].neighbors[s].size;
-					}
-					else {
-						tmp += model.w[o].val[uu][vv]
-								/ (double)dat.lnodes[s].arr[u].neighbors[o].size
-								/ (double)dat.rnodes[o].arr[vv].neighbors[s].size;
-					}
-				}
-			}
-			
-			sum += model.c[o] * tmp;
-		}
-
-		w[v] = sum;
-	}
+	
 
 	// choose n candidates for the node i & return the actual number of candidates
 	class CandNode {
@@ -274,4 +249,6 @@ public class Simulation0 {
 		}
 		return nc;
 	}
+
+*/
 }
