@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
 
+import common.SparseMatrix;
+
 /*
  * manage model parameters
  * - variables

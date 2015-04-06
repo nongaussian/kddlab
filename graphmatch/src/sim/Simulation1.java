@@ -9,7 +9,9 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.PriorityQueue;
-import java.util.Random;
+import java.util.Map.Entry;
+
+import common.SparseMatrix;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
@@ -25,43 +27,27 @@ import cm.cm_model;
  * We simulate a crowdsourcing process with
  * two exactly the same heterogeneous graphs
  */
-public class Simulation1 {
-	static final int CONST_MAX_MATCH	= 2*1000;
-	static Random r = new Random();
-	
-	int nmatch							= 0;
-	
-	int nquery							= 100;
-	int ncand							= 100;
-	int nmaxquery						= -1;
-	
+public class Simulation1 extends Simulation{	
 	double mu							= 1;
 	public int radius					= -1;
-	
-	cm_data dat							= null;
+
 	cm_model model						= null;
 	CrowdMatch learner					= null;
-	
-	String lprefix						= null;
-	String rprefix						= null;
-	String wprefix						= null;
-	String outputfile					= null;
+
 	
 	double[] tmp_w						= null;
 	
 	public Simulation1 (Namespace nes) {
 		// data parameters
-		lprefix						= nes.getString("lprefix");
-		rprefix						= nes.getString("rprefix");
-		wprefix						= nes.getString("wprefix");
-		outputfile					= nes.getString("output");
-		nmaxquery					= nes.getInt("nmaxq");
-		nquery						= nes.getInt("nq");
-		ncand						= nes.getInt("ncand");
+		super(nes);
+		
 		radius						= nes.getInt("radius");
-		
-		
 		learner						= new CrowdMatch(nes);
+	}
+	
+	public Simulation1 (String[] args) {
+		this(parseArguments(args));
+		algorithm = "simul1";
 	}
 
 	/**
@@ -76,51 +62,9 @@ public class Simulation1 {
 	}
 	
 	public static Namespace parseArguments(String[] args){
-		ArgumentParser parser = ArgumentParsers.newArgumentParser("CrowdMatch")
-	                .description("Graph matching");
+		ArgumentParser parser = getArgParser();
 			
 		try {
-			parser.addArgument("-mu")
-						.type(Double.class)
-						.setDefault(1.)
-						.help("mu");
-			parser.addArgument("-niter")
-						.type(Integer.class)
-						.setDefault(100)
-						.help("Maximum number of iterations");
-			parser.addArgument("-thres")
-						.type(Double.class)
-						.setDefault(1.0e-5)
-						.help("Threshold of log-likelihood ratio for convergence test");
-			parser.addArgument("-lprefix")
-						.type(String.class)
-						.required(true)
-						.help("Prefix name of left graph");
-			parser.addArgument("-rprefix")
-						.type(String.class)
-						.required(true)
-						.help("Prefix name of right graph");
-			parser.addArgument("-wprefix")
-						.type(String.class)
-						.help("Prefix name of model parameters to use for initialization");
-			parser.addArgument("-output")
-						.type(String.class)
-						.required(true)
-						.help("Output file name");
-			parser.addArgument("-nq")
-		                .type(Integer.class)
-		                .setDefault(10)
-		                .help("Number of queries in each iteration");
-			parser.addArgument("-nmaxq")
-				        .type(Integer.class)
-				        .setDefault(-1)
-				        .help("Maximum number of queries (default: infinity)");
-			parser.addArgument("-radius")
-						.type(Integer.class)
-						.setDefault(-1);
-			parser.addArgument("-ncand")
-						.type(Integer.class)
-						.setDefault(-1);
 			Namespace res = parser.parseArgs(args);
 			System.out.println(res);
 			return res;
@@ -128,6 +72,26 @@ public class Simulation1 {
 			parser.handleError(e);
 		}
 		return null;
+	}
+	
+	public static ArgumentParser getArgParser(){
+		ArgumentParser parser =Simulation.getArgParser();
+		parser.addArgument("-mu")
+				.type(Double.class)
+				.setDefault(1.)
+				.help("mu");
+		parser.addArgument("-niter")
+				.type(Integer.class)
+				.setDefault(100)
+				.help("Maximum number of iterations");
+		parser.addArgument("-thres")
+				.type(Double.class)
+				.setDefault(1.0e-5)
+				.help("Threshold of log-likelihood ratio for convergence test");
+		parser.addArgument("-radius")
+				.type(Integer.class)
+				.setDefault(-1);
+		return parser;
 	}
 	
 	public void init() {
@@ -153,9 +117,9 @@ public class Simulation1 {
 		tmp_w = new double[model.maxrnodesize];
 		
 		System.out.println("now, we start to find queries..");
-		
-		while ((nmaxquery == -1 || cnt < nmaxquery) && (cnt < dat.totallnode)&&(nmatch<CONST_MAX_MATCH)) {
-			
+		int iteration = 0;
+		while ((nmaxquery == -1 || cnt < nmaxquery) && (cnt < dat.totallnode)) {
+			iteration++;
 			// run model
 			learner.run();
 			
@@ -165,7 +129,8 @@ public class Simulation1 {
 			int tmpcnt = 0;
 			for (int i=0; i<nq; i++) {
 				QueryNode q = queries[i];
-				int nc = select_candidates(q, cand, ncand);
+				ncand = dat.rnodes[q.t].size;
+				int nc = select_candidates(q, cand, dat.rnodes[q.t].size);
 
 				double cost = match(q, cand, nc);
 				totalcost += cost;
@@ -184,13 +149,14 @@ public class Simulation1 {
 				if (q.matched_id >= 0){
 					dat.lnodes[q.t].arr[q.id].label = q.matched_id;
 					dat.rnodes[q.t].arr[q.matched_id].label = q.id;
-					System.out.printf("match node (t,i,j,w)=(%2d,%5d,%5d,%5f)\n",q.t,q.id,q.matched_id,model.w[q.t].get(q.id, q.matched_id));
+					//System.out.printf("match node (t,i,j,w)=(%2d,%5d,%5d,%5f)\n",q.t,q.id,q.matched_id,model.w[q.t].get(q.id, q.matched_id));
 					nmatch++;
 				}
 			}
-			System.out.printf("#Matchs %d\n",nmatch);
 			model.update_effpairs(queries, dat);
 			stat();
+			double accuracy = computeAccuracy(iteration, totalcost, nmatch);
+			System.out.printf("Accuracy:  %f\n", accuracy);
 		}
 		
 		out.close();
@@ -240,8 +206,8 @@ public class Simulation1 {
 			
 			IntInt key = new IntInt(-1,-1);
 			while(topk.size( )< n){
-				int t = r.nextInt(dat.ntype);
-				int i = r.nextInt(dat.lnodes[t].size);
+				int t = rand.nextInt(dat.ntype);
+				int i = rand.nextInt(dat.lnodes[t].size);
 				key.v1 = t;
 				key.v2 = i;
 				if(!selected.contains(key)){
@@ -274,31 +240,33 @@ public class Simulation1 {
 			j = iter_j.next();
 			double diff = 0;
 
-			// change of the node i
-			diff += -Math.log(model.w[t].get(i, j)) / 2.;
+			// change of the node i//TODO: Log?????
+			//diff += -Math.log(model.w[t].get(i, j)) / 2.;
 			
 			// change of the neighbors of i
 			for (int s=0; s<dat.ntype; s++) {
 				if (!dat.rel[t][s]) continue;
 				
-				for (int x=0; x<dat.lnodes[t].arr[i].neighbors[s].size; x++) {
-					int u = dat.lnodes[t].arr[i].neighbors[s].arr[x];
+				for (int n_x=0; n_x<dat.lnodes[t].arr[i].neighbors[s].size; n_x++) {
+					int x = dat.lnodes[t].arr[i].neighbors[s].arr[n_x];
 					double tmp = 0;
 					
-					estimate_w(tmp_w, t, i, j, s, u);
-					Iterator<Integer> iter_v = model.eff_pairs[t][i].iterator();
-					int v;
-					while(iter_v.hasNext()){
-						v = iter_v.next();
-						tmp += Math.sqrt(model.w[s].get(u, v) * tmp_w[v]);
+					estimate_w(tmp_w, t, i, j, s, x);
+					Iterator<Integer> iter_y = model.eff_pairs[s][x].iterator();
+					int y;
+					while(iter_y.hasNext()){
+						y = iter_y.next();
+						tmp += Math.sqrt(model.w[s].get(x, y) * tmp_w[y]);
 					}
-					diff += tmp;
-					if(Double.isNaN(diff)){
-						System.out.printf("tmp:%f\n",tmp);
-						 iter_v = model.eff_pairs[t][i].iterator();
-						while(iter_v.hasNext()){
-							v = iter_v.next();
-							System.out.printf("s:%d,u:%d,v:%d,w_suv:%f, tmp_w[v]=%f \n",s,u,v,model.w[s].get(u, v),tmp_w[v]);
+					if(tmp>0.0){
+						diff += -Math.log(tmp);
+					}
+					if(Double.isNaN(diff)||Double.isInfinite(diff)){
+						System.out.printf("diff: %f, tmp:%f\n",diff,tmp);
+						iter_y = model.eff_pairs[s][x].iterator();
+						while(iter_y.hasNext()){
+							y = iter_y.next();
+							System.out.printf("s:%d,x:%d,y:%d,w_sxy:%f, tmp_w[y]=%f \n",s,x,y,model.w[s].get(x, y),tmp_w[y]);
 						}
 					}
 				}
@@ -312,7 +280,15 @@ public class Simulation1 {
 	private void stat(){
 		int count = 0;
 		int eff_l = 0;
+		int eff_r = 0;
 		
+		HashSet<Integer>[][] effpair_r = new HashSet[dat.ntype][];
+		for (int t=0; t<dat.ntype; t++) {
+			effpair_r[t] = new HashSet[dat.rnodes[t].size];
+			for (int j=0; j<dat.rnodes[t].size; j++) {
+				effpair_r[t][j] = new HashSet<Integer>();
+			}
+		}
 		
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
@@ -320,14 +296,24 @@ public class Simulation1 {
 				if(model.eff_pairs[t][i].size()>0){
 					eff_l++;
 				}
+				Iterator<Integer> iterator  = model.eff_pairs[t][i].iterator();
+				while(iterator.hasNext()){
+					effpair_r[t][iterator.next()].add(i);
+				}
 			}
 		}
-		System.out.printf("count tot:%d, leff:%d\n", count,eff_l);
+		for (int t=0; t<dat.ntype; t++) {
+			for (int j=0; j<dat.rnodes[t].size; j++) {
+				if(effpair_r[t][j].size()>0){
+					eff_r++;
+				}
+			}
+		}
+		System.out.printf("count tot:%d, leff:%d, reff:%d\n", count,eff_l, eff_r);
 	}
 
 	// estimate w[s].arr[u]
 	private void estimate_w(double[] w, int t, int i, int j, int s, int x) {
-		double tmp = 0;
 		Arrays.fill(w, 0.0);
 		
 		
@@ -350,8 +336,13 @@ public class Simulation1 {
 		double nst_x = (double) x_neighbors.length;
 		double nts_j = (double) j_neighbors.length;
 		
+		double tmp = (1.0-model.w[t].get(i, j))/nst_x;
+		boolean zero = true;
 		for(int y:j_neighbors){
-			w[y] = model.w[s].get(x, y)+(1.0-model.w[t].get(i, j)/nst_x/nts_j);
+			w[y] = model.w[s].get(x, y)+tmp/nts_j;
+			if(w[y]>0.0){
+				zero = true;
+			}
 		}
 		
 		return;			
@@ -363,21 +354,23 @@ public class Simulation1 {
 	// choose n candidates for the node i & return the actual number of candidates
 	private int select_candidates(QueryNode q, CandNode[] cand, int maxcand) {
 			
-		Iterator<Integer> iter_j = model.eff_pairs[q.t][q.id].iterator();
-		int j;
-		int idx=0;
-		while(iter_j.hasNext()){
-			j = iter_j.next();
-			if(dat.rnodes[q.t].arr[j].label<0){
-				cand[idx].id = j;
-				cand[idx].w = model.w[q.t].get(q.id, j);
-				idx++;
-			}
+		//Iterator<Integer> iter_j = model.eff_pairs[q.t][q.id].iterator();
+		//int j;
+		//int idx=0;
+		//while(iter_j.hasNext()){
+		//	j = iter_j.next();
+		
+		for(int j = 0; j<maxcand; j++){
+			//if(dat.rnodes[q.t].arr[j].label<0){
+			cand[j].id = j;
+			cand[j].w = model.w[q.t].get(q.id, j);
+			//idx++;
+			//}
 		}
 		
-		int n_cand = Math.min(maxcand, idx);
+		//int n_cand = Math.min(maxcand, idx);
 		
-		Arrays.sort(cand, 0,idx, new Comparator<CandNode> () {
+		Arrays.sort(cand, 0,maxcand, new Comparator<CandNode> () {
 			@Override
 			public int compare(CandNode c1, CandNode c2) {
 				return (c1.w > c2.w) ? -1 : ((c1.w < c2.w) ? 1 : 0);
@@ -385,6 +378,7 @@ public class Simulation1 {
 		});
 		
 		
+		/*//if the candidate size is limited
 		if(maxcand<idx){
 			int idx_begin = 0;
 			while(idx_begin<maxcand){
@@ -409,25 +403,51 @@ public class Simulation1 {
 			
 			}
 		}
+		*/
 		
 		
 		
-		
-		return n_cand;
+		return maxcand;
 	}
 	
-	// compute cost (how many entries checked in cands to find the node i by linear search)
-	private int match(QueryNode q, CandNode[] cand, int nc) {
-		q.setKnownLink(null);
-		for (int i=0; i<nc; i++) {
-			if (q.id == cand[i].id) {
-				q.setKnownLink(cand[i]);
-				return (i+1);
+	
+	protected final double computeAccuracy(int iteration,int cost, int nmatched){
+		int count_correct 	= 0;
+		int count_tot		= 0;
+
+		for (int t=0; t<dat.ntype; t++) {
+			count_tot += dat.lnodes[t].size;
+			for (int i=0; i<dat.lnodes[t].size; i++) {
+				if(dat.lnodes[t].arr[i].label>=0){
+					count_correct++;
+					continue;
+				}
+				
+				int idx_max = 0;
+				double val_max = 0;
+				Iterator<Entry<Integer,Double>> iter = model.w_next[t].getEntryIterator(i);
+				while(iter.hasNext()){
+					Entry<Integer,Double> entry = iter.next();
+					if(entry.getValue()>val_max){
+						idx_max = entry.getKey();
+						val_max = entry.getValue();
+					}
+				}
+				
+				if(i == idx_max){
+					count_correct++;
+				}
 			}
 		}
-		return nc;
-		
+		regiResult(iteration, cost, nmatched, count_correct, count_tot-count_correct);
+		return ((double)count_correct)/count_tot;
 	}
+
+	@Override
+	public void regiExp() {
+		expid = sqlunit.executeUpdateGetAutoKey(String.format("insert into experiment (algorithm,nq,radius) values ('%s',%d,%d);",algorithm,nquery,radius));		
+	}
+	
 }
 
 

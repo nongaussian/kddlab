@@ -18,7 +18,9 @@ public class CrowdMatch extends CM_Learner{
 	private int em_max_iter					= 100;
 	private double mu						= 1.;
 	private int radius						= -1;
-		
+
+	protected String lprefix					= null;
+	protected String rprefix					= null;
 
 	private cm_model model					= null;
 	
@@ -28,72 +30,19 @@ public class CrowdMatch extends CM_Learner{
 	public boolean verbose					= false;
 	//public boolean verbose					= true;
 	
-	public static void main(String[] args) throws IOException {
-		Namespace nes = parseArguments(args);
-		CrowdMatch obj = new CrowdMatch(nes);
-		
-		// run em
-		obj.init();
-		obj.run();
-	}
+
 	
 	public CrowdMatch(Namespace nes){
 		// data parameters
-		setArgs(nes);
+		lprefix						= nes.getString("lprefix");
+		rprefix						= nes.getString("rprefix");
 		em_max_iter					= nes.getInt("niter");
 		em_converged				= nes.getDouble("thres");
 		mu							= nes.getDouble("mu");
 		radius						= nes.getInt("radius");
 		
 	}
-	
-	public static Namespace parseArguments(String[] args){
-		ArgumentParser parser = ArgumentParsers.newArgumentParser("CrowdMatch")
-	                .description("Graph matching");
-			
-		try {
-			parser.addArgument("-mu")
-						.type(Double.class)
-						.setDefault(1.)
-						.help("mu");
-			parser.addArgument("-niter")
-						.type(Integer.class)
-						.setDefault(100)
-						.help("Maximum number of iterations");
-			parser.addArgument("-thres")
-						.type(Double.class)
-						.setDefault(1.0e-5)
-						.help("Threshold of log-distance ratio for convergence test");
-			parser.addArgument("-lprefix")
-						.type(String.class)
-						.required(true)
-						.help("Prefix name of left graph");
-			parser.addArgument("-rprefix")
-						.type(String.class)
-						.required(true)
-						.help("Prefix name of right graph");
 
-			Namespace res = parser.parseArgs(args);
-			System.out.println(res);
-			return res;
-		} catch (ArgumentParserException e) {
-			parser.handleError(e);
-		}
-		return null;
-	}
-	
-	public void init() {
-		// data loading
-		dat 						= new cm_data(lprefix, rprefix);
-		
-		// init model parameter
-		model						= new cm_model(radius);
-		model.init_learner(dat, mu);
-	}
-	
-	public void set_dat (cm_data dat) {
-		this.dat = dat;
-	}
 	
 	public void set_model (cm_model model) {
 		this.model = model;
@@ -114,7 +63,7 @@ public class CrowdMatch extends CM_Learner{
 		double distance = 0, distance_old = 0, converged_ratio = 1;
 
 		int iter = 0;
-		while (((converged_ratio > em_converged) || (iter <= 2)) && (iter < em_max_iter)) {
+		while (((converged_ratio > em_converged) || (iter <= 10)) && (iter < em_max_iter)) {
 			
 			/* 1) start an iteration */
 			iter++;
@@ -432,23 +381,93 @@ public class CrowdMatch extends CM_Learner{
 		
 		
 		// for labeled data, 
-		iter_j = model.eff_pairs[t][i].iterator();
-		while(iter_j.hasNext()){
-			j = iter_j.next();
-			if (dat.lnodes[t].arr[i].label < 0) continue;
-			
-			sum2 += Math.sqrt(model.w_next[t].get(i, dat.lnodes[t].arr[i].label));
-			if(Double.isNaN(sum2)){
-				System.out.printf("sum2 NaN t:%d, i:%d, j:%d, wij: %f\n", t, i, j, model.w_next[t].get(i, j));
+		if(dat.lnodes[t].arr[i].label>=0){
+			sum2 = Math.sqrt(model.w_next[t].get(i, dat.lnodes[t].arr[i].label));
+			/*
+			iter_j = model.eff_pairs[t][i].iterator();
+			while(iter_j.hasNext()){
+				j = iter_j.next();
+				
+				sum2 = Math.sqrt(model.w_next[t].get(i, dat.lnodes[t].arr[i].label));
+				if(Double.isNaN(sum2)){
+					System.out.printf("sum2 NaN t:%d, i:%d, j:%d, wij: %f\n", t, i, j, model.w_next[t].get(i, j));
+				}
 			}
+			if(sum2==0.0){
+				System.out.printf("sum2 NaN t:%d, i:%d\n", t, i);
+			}*/
+			
+			if (sum2 > 0) sum2 = Math.log(sum2);
 		}
-		/*if(sum2==0.0){
-			System.out.printf("sum2 NaN t:%d, i:%d\n", t, i);
-		}*/
-		if (sum2 > 0) sum2 = Math.log(sum2);
 		
 		
 		
-		return sum1 + model.mu * sum2;
+		return -(sum1 + model.mu * sum2);
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	@Deprecated
+	public static void main(String[] args) throws IOException {
+		Namespace nes = parseArguments(args);
+		CrowdMatch obj = new CrowdMatch(nes);
+		
+		// run em
+		obj.init();
+		obj.run();
+	}
+	@Deprecated
+	public static Namespace parseArguments(String[] args){
+		ArgumentParser parser = ArgumentParsers.newArgumentParser("CrowdMatch")
+	                .description("Graph matching");
+			
+		try {
+			parser.addArgument("-mu")
+						.type(Double.class)
+						.setDefault(1.)
+						.help("mu");
+			parser.addArgument("-niter")
+						.type(Integer.class)
+						.setDefault(100)
+						.help("Maximum number of iterations");
+			parser.addArgument("-thres")
+						.type(Double.class)
+						.setDefault(1.0e-5)
+						.help("Threshold of log-distance ratio for convergence test");
+			parser.addArgument("-lprefix")
+						.type(String.class)
+						.required(true)
+						.help("Prefix name of left graph");
+			parser.addArgument("-rprefix")
+						.type(String.class)
+						.required(true)
+						.help("Prefix name of right graph");
+
+			Namespace res = parser.parseArgs(args);
+			System.out.println(res);
+			return res;
+		} catch (ArgumentParserException e) {
+			parser.handleError(e);
+		}
+		return null;
+	}
+	
+	@Deprecated
+	public void init() {
+		// data loading
+		dat 						= new cm_data(lprefix, rprefix);
+		
+		// init model parameter
+		model						= new cm_model(radius);
+		model.init_learner(dat, mu);
+	}
+	
 }

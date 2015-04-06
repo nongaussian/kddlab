@@ -1,7 +1,5 @@
 package gm.data;
 
-import gm.main.GraphMatching;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -9,8 +7,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class SqlUnit {
-	public static Connection con = null;
-	private static Statement st = null;
+	private boolean usedb = false;
+	public Connection con = null;
+	private Statement st = null;
 	
 	public String dbname;
 	
@@ -23,7 +22,19 @@ public class SqlUnit {
 			handlingSQLException(e);
 			System.exit(0);
 		}
+		
 	}
+	public SqlUnit(String dbname, String username, String pwd) {
+		try {
+			this.dbname = dbname;
+			connect(dbname,username,pwd);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			handlingSQLException(e);
+			System.exit(0);
+		}
+	}
+	public SqlUnit() {}
 	private static String reform(String a){
 		//a = a.replaceAll("\\", "\\\\");
 		a = a.replaceAll("'", "\\\\'");	
@@ -38,11 +49,14 @@ public class SqlUnit {
 	}
 	
 	
-	private static void connect(String dbname) throws SQLException{
-		con = DriverManager.getConnection("jdbc:mysql://147.46.143.245/?useUnicode=true&characterEncoding=utf8","root", "adminjwh");
+	private void connect(String dbname) throws SQLException{
+		connect(dbname, "graphmatching", "graphmatching");
+	}
+	private void connect(String dbname, String username, String pwd) throws SQLException{
+		con = DriverManager.getConnection("jdbc:mysql://147.46.143.245/?useUnicode=true&characterEncoding=utf8",username, pwd);
 		st = con.createStatement();
 		st.execute("use "+dbname);
-		
+		usedb = true;
 		//pst_timeline = con.prepareStatement("insert into Status(id, user_id, text, created, rtcount, isRetweet) values (?,?,?,?,?,?);");
 		//pst_timeline_loc = con.prepareStatement("insert into Status(id, user_id, text, created, rtcount, isRetweet, loc_latitude, loc_longitude) values (?,?,?,?,?,?,?,?);");
 	}
@@ -51,6 +65,7 @@ public class SqlUnit {
 		return st;
 	}
 	public ResultSet executeQuery(String query){
+		if(!usedb) return null;
 		try {
 			return st.executeQuery(query);
 		} catch (SQLException e) {
@@ -59,6 +74,7 @@ public class SqlUnit {
 		return null;
 	}
 	public int executeUpdate(String query){
+		if(!usedb) return 0;
 		try {
 			
 			return st.executeUpdate(query);
@@ -70,6 +86,7 @@ public class SqlUnit {
 		return 0;
 	}
 	public int executeUpdateGetAutoKey(String query){
+		if(!usedb) return 0;
 		try {
 			
 			st.executeUpdate(query,Statement.RETURN_GENERATED_KEYS);
@@ -85,7 +102,7 @@ public class SqlUnit {
 		}
 		return 0;
 	} 
-	private static void disconnect(){
+	private void disconnect(){
 		if(con==null)
 			return;
 		try {
@@ -95,7 +112,8 @@ public class SqlUnit {
 			handlingSQLException(e);
 		}
 	}
-	public static void exit(){
+	public void exit(){
+		if(!usedb) return;
 		disconnect();
 	}
 	
