@@ -133,7 +133,7 @@ public class CrowdMatch extends CM_Learner{
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
 				// compute variables use in this iteration only
-				compute_alpha(t, i, model.alpha);
+				compute_alpha(t, i, model.alpha);//alpha^t_i*
 				
 				// compute a w distribution
 				//*/
@@ -147,10 +147,14 @@ public class CrowdMatch extends CM_Learner{
 				//*/
 					boolean tij_eff = model.eff_pairs[t][i].contains(j);
 					
-					compute_delta(t, i, j, model.delta);
+					compute_delta(t, i, j, model.delta);//delta^ts_ij**
 					
 					if(tij_eff){
 						// add alpha
+						double a = model.alpha[j];
+						if(a>0){
+							a = 1.0*a;
+						}
 						model.w_next[t].add(i, j, model.alpha[j]);
 					}
 					
@@ -241,12 +245,15 @@ public class CrowdMatch extends CM_Learner{
 			
 			for (int x=0; x<n_i; x++) {
 				Arrays.fill(delta[s][x], 0.0);
-				
+				int u = dat.lnodes[t].arr[i].neighbors[s].arr[x];
+				if(model.eff_pairs[s][u].size()==0){
+					continue;
+				}
 				for (int y=0; y<n_j; y++) {
-					int u = dat.lnodes[t].arr[i].neighbors[s].arr[x];
 					int v = dat.rnodes[t].arr[j].neighbors[s].arr[y];
-					
-					if (dat.rnodes[s].arr[v].neighbors[t].size == 0) continue;
+					//if (dat.rnodes[s].arr[v].neighbors[t].size == 0) continue; //it cannot be zero
+					//if(!model.eff_pairs[t][u].contains(v)) continue;
+						
 					
 					delta[s][x][y] = 
 							model.w[s].get(u, v)
@@ -463,7 +470,7 @@ public class CrowdMatch extends CM_Learner{
 	@Deprecated
 	public void init() {
 		// data loading
-		dat 						= new cm_data(lprefix, rprefix);
+		dat 						= new cm_data(lprefix, rprefix, 0.0);
 		
 		// init model parameter
 		model						= new cm_model(radius);

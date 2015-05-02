@@ -30,7 +30,7 @@ public class cm_data {
 	//           .movie
 	//           .movie_actor
 	//           .movie_director
-	public cm_data (String ldataname, String rdataname) {
+	public cm_data (String ldataname, String rdataname, double rm_ratio) {
 		// XXX: meta files of left graph and right graph must be the same
 		read_meta_file (ldataname + ".meta");
 		
@@ -69,7 +69,41 @@ public class cm_data {
 			read_label_file(i,
 					ldataname + ".label." + nodetypes[i]);
 		}
+		
+		if(rm_ratio>0){
+			removeActings(rm_ratio);
+		}
+		
 	}
+	
+	public void removeActings(double rm_ratio){
+		int t_movie = 0;
+		int t_actor = 0;
+		
+		for(int t = 0; t < nodetypes.length ; t++){
+			if (nodetypes[t].equals("movie")){
+				t_movie = t;
+			}else if(nodetypes[t].equals("actor")){
+				t_actor = t;
+			}
+		}
+		
+		
+		for(int i = 0; i<lnodes[t_movie].size; i++){
+			node movie = lnodes[t_movie].arr[i];
+			int[] remove_list = movie.neighbors[t_actor].remove(rm_ratio);
+			if(remove_list!=null){
+				for(int idx_actor:remove_list){
+					lnodes[t_actor].arr[idx_actor].neighbors[t_movie].remove(i);
+				}
+			}
+		}
+		for(int i = 0; i<lnodes[t_actor].size; i++){
+			node actor = lnodes[t_actor].arr[i];
+			actor.trim(t_movie);
+		}
+	}
+	
 
 	private void read_label_file(int t, String filename) {
 		try {

@@ -43,7 +43,7 @@ public class Simulation2 extends SimulationSimRank {
 	}
 	
 	public void init() {
-		dat							= new cm_data(lprefix, rprefix);
+		dat							= new cm_data(lprefix, rprefix,rm_ratio);
 		maxrnodesize = 0;
 		for (int t=0; t<dat.ntype; t++) {
 			if (maxrnodesize < dat.rnodes[t].size) {

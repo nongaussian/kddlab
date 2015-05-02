@@ -43,7 +43,7 @@ public class Simulation0 extends SimulationSimRank{
 	}
 	
 	public void init() {
-		dat							= new cm_data(lprefix, rprefix);
+		dat							= new cm_data(lprefix, rprefix,rm_ratio);
 		
 		maxrnodesize 				= 0;
 		for (int t=0; t<dat.ntype; t++) {
@@ -97,18 +97,22 @@ public class Simulation0 extends SimulationSimRank{
 
 	
 	int select_candidates(QueryNode q, CandNode[] cand) {
+		int idx=0;
 		for (int j=0; j<dat.rnodes[q.t].size; j++) {
-			cand[j].id = j;
-			cand[j].w = rand.nextDouble();
+			if(dat.rnodes[q.t].arr[j].label<0){
+				cand[idx].id = j;
+				cand[idx].w = rand.nextDouble();
+				idx++;
+			}
 		}
 		
-		Arrays.sort(cand,0,dat.rnodes[q.t].size, new Comparator<CandNode> () {
+		Arrays.sort(cand,0,idx, new Comparator<CandNode> () {
 			@Override
 			public int compare(CandNode c1, CandNode c2) {
 				return (c1.w > c2.w) ? -1 : ((c1.w < c2.w) ? 1 : 0);
 			}
 		});
-		return dat.rnodes[q.t].size;
+		return idx;
 	}
 
 

@@ -1,5 +1,7 @@
 package cm;
 
+import java.util.Arrays;
+
 public class node {
 	public int id;
 	
@@ -27,5 +29,13 @@ public class node {
 	}
 	public void add_neighbor(int type, int id) {
 		neighbors[type].add_neighbor(id);
+	}
+	
+	public void trim(int ntype){
+		if(neighbors[ntype].arr.length>neighbors[ntype].size){
+			int [] arr = Arrays.copyOf(neighbors[ntype].arr, neighbors[ntype].size);
+			neighbors[ntype].arr = arr;
+		}
+		
 	}
 }

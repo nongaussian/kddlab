@@ -31,4 +31,8 @@ public class QueryNode implements Comparable<QueryNode> {
 		return t-o.t;
 	}
 	
+	@Override
+	public String toString(){
+		return String.format("t:%d, id:%d, diff:%f", t,id,diff);
+	}
 }

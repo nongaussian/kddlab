@@ -189,7 +189,7 @@ public class cm_model {
 				register_node(lgroup, dat.lnodes[q.t].arr[q.id], q.t, radius, true);
 				register_node(rgroup, dat.rnodes[q.t].arr[q.matched_id], q.t, radius, false);
 				
-				w[q.t].put(q.id, dat.lnodes[q.t].arr[q.id].label, 1.0);
+				w_next[q.t].put(q.id, dat.lnodes[q.t].arr[q.id].label, 1.0);
 			}
 			
 			l_list = lgroup[q.t].toArray(new Integer[0]);
@@ -204,9 +204,33 @@ public class cm_model {
 			rgroup[q.t].clear();
 			
 		}
-		
+		smoothing();
 	}
 	
+	private void smoothing(){
+		for(int t = 0; t < dat.ntype; t++){
+			for (int i=0; i<dat.lnodes[t].size; i++) {
+				Iterator<Integer> iter_j = eff_pairs[t][i].iterator();
+				int j;
+				double sm_f = .2/eff_pairs[t][i].size();
+				double sum = 0.0;
+				while(iter_j.hasNext()){
+					j = iter_j.next();
+					w_next[t].add(i, j, sm_f);
+					sum += w_next[t].get(i, j);
+				}
+				
+				iter_j = eff_pairs[t][i].iterator();
+								
+				while(iter_j.hasNext()){
+					j = iter_j.next();
+					w_next[t].put(i, j, w_next[t].get(i, j)/sum);
+				}
+				
+			}
+		}
+		
+	}
 	
 	private void register_node(HashSet<Integer>[] nodeset, node n, int type, int radius, boolean left){
 		if(radius==0){
