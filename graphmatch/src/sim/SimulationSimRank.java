@@ -37,6 +37,7 @@ public abstract class SimulationSimRank extends Simulation {
 		return parser;
 	}
 	
+	
 	protected final double computeAccuracy(int iteration,int cost, int nmatched){
 		int count_correct 	= 0;
 		int count_tot		= 0;

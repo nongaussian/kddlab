@@ -28,14 +28,14 @@ import cm.cm_model;
  * two exactly the same heterogeneous graphs
  */
 public abstract class SimulationProposed extends Simulation{	
-	double mu							= 1;
-	public int radius					= -1;
+	double mu						= 1;
+	public int radius				= -1;
 
-	cm_model model						= null;
-	CrowdMatch learner					= null;
+	cm_model model					= null;
+	CrowdMatch learner				= null;
 
 	
-	double[] tmp_w						= null;
+	double[] tmp_w					= null;
 	
 	public SimulationProposed (Namespace nes) {
 		// data parameters

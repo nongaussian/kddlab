@@ -1,5 +1,7 @@
 package sim;
 
+import graph.neighbors;
+
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
@@ -10,7 +12,6 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import cm.CandNode;
 import cm.QueryNode;
 import cm.cm_data;
-import cm.neighbors;
 
 import common.SparseIntMatrix;
 import common.SparseMatrix;

@@ -1,22 +1,16 @@
 package cm;
 
-import gm.graph.Actor;
-import gm.graph.Director;
-import gm.graph.Graph;
-import gm.graph.Movie;
-import gm.graph.Vertex;
+import graph.node;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
 import net.sourceforge.argparse4j.inf.Namespace;
 
-import common.SparseIntMatrix;
 import common.SparseMatrix;
 
-public class SimRank extends CM_Learner{
+public class SimRank extends cm_learner{
 	//SparseIntMatrix[] neighbor_pairs;
 	public HashSet<Integer>[][] eff_pairs		= null; 
 	SparseMatrix[] sim;
@@ -249,30 +243,7 @@ public class SimRank extends CM_Learner{
 		return diff_sum/sim_sum;
 	}
 
-	private void smoothing(){
-		for(int t = 0; t < dat.ntype; t++){
-			for (int i=0; i<dat.lnodes[t].size; i++) {
-				Iterator<Integer> iter_j = eff_pairs[t][i].iterator();
-				int j;
-				double sm_f = .2/eff_pairs[t][i].size();
-				double sum = 0.0;
-				while(iter_j.hasNext()){
-					j = iter_j.next();
-					sim_next[t].add(i, j, sm_f);
-					sum += sim_next[t].get(i, j);
-				}
-				
-				iter_j = eff_pairs[t][i].iterator();
-								
-				while(iter_j.hasNext()){
-					j = iter_j.next();
-					sim_next[t].put(i, j, sim_next[t].get(i, j)/sum);
-				}
-				
-			}
-		}
-		
-	}
+	
 	
 	public int getRadius() {
 		return radius;

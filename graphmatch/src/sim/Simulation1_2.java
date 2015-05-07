@@ -1,5 +1,7 @@
 package sim;
 
+import graph.neighbors;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -23,7 +25,6 @@ import cm.CrowdMatch;
 import cm.QueryNode;
 import cm.cm_data;
 import cm.cm_model;
-import cm.neighbors;
 
 /*
  * We simulate a crowdsourcing process with

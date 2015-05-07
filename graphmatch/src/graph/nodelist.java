@@ -1,4 +1,4 @@
-package cm;
+package graph;
 
 public class nodelist {
 	public int type;

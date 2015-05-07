@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import net.sourceforge.argparse4j.inf.Namespace;
 
-public abstract class CM_Learner {
+public abstract class cm_learner {
 	protected cm_data dat						= null;
 
 	

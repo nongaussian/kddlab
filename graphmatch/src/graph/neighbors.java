@@ -1,4 +1,4 @@
-package cm;
+package graph;
 
 import java.util.Random;
 

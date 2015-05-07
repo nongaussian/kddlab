@@ -1,4 +1,4 @@
-package cm;
+package similarity;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -6,55 +6,108 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import net.sourceforge.argparse4j.ArgumentParsers;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
+import cm.cm_data;
 
-
-public class CrowdMatch extends cm_learner{
-	// constants
-	private double em_converged				= 1.0e-5;
-	private int em_max_iter					= 100;
-	private double mu						= 1.;
-	private int radius						= -1;
-
-	protected String lprefix					= null;
-	protected String rprefix					= null;
-
-	private cm_model model					= null;
+public class EM extends Similarity{
+	double mu						= 1;
+	public double[] alpha			= null;
+	public double[][][] delta		= null;
+	public double[] c				= null;
+	public double[] c_next			= null;
+	double[] tmp_w					= null;
 	
-
 	
-	// debug
-	public boolean verbose					= false;
-	//public boolean verbose					= true;
+	public EM(Namespace nes) {
+		super(nes);
+	}
 	
-
-	
-	public CrowdMatch(Namespace nes){
-		// data parameters
-		lprefix						= nes.getString("lprefix");
-		rprefix						= nes.getString("rprefix");
-		em_max_iter					= nes.getInt("niter");
-		em_converged				= nes.getDouble("thres");
-		mu							= nes.getDouble("mu");
-		radius						= nes.getInt("radius");
+	public void init_learner (cm_data dat, double mu) {
+		this.dat = dat;
+		this.mu = mu;
 		
+		c = new double[dat.ntype];
+		c_next = new double[dat.ntype];
+		
+		
+		temp_stat();
+		
+		alpha = new double[maxrnodesize];
+		
+		delta = new double[dat.ntype][maxlneighborsize][maxrneighborsize];
 	}
-
 	
-	public void set_model (cm_model model) {
-		this.model = model;
+	
+	
+	private void temp_stat() {
+		maxrnodesize = 0;
+		for (int t=0; t<dat.ntype; t++) {
+			if (maxrnodesize < dat.rnodes[t].size) {
+				maxrnodesize = dat.rnodes[t].size;
+			}
+		}
+		
+		maxlneighborsize = 0;
+		for (int t=0; t<dat.ntype; t++) {
+			for (int i=0; i<dat.lnodes[t].size; i++) {
+				for (int s=0; s<dat.ntype; s++) {
+					if (!dat.rel[t][s]) continue;
+					if (maxlneighborsize < dat.lnodes[t].arr[i].neighbors[s].size) {
+						maxlneighborsize = dat.lnodes[t].arr[i].neighbors[s].size;
+					}
+				}
+			}
+		}
+		
+		maxrneighborsize = 0;
+		for (int t=0; t<dat.ntype; t++) {
+			for (int i=0; i<dat.rnodes[t].size; i++) {
+				for (int s=0; s<dat.ntype; s++) {
+					if (!dat.rel[t][s]) continue;
+					if (maxrneighborsize < dat.rnodes[t].arr[i].neighbors[s].size) {
+						maxrneighborsize = dat.rnodes[t].arr[i].neighbors[s].size;
+					}
+				}
+			}
+		}
 	}
 
+	@Override
+	public void initialize(cm_data dat) {
+		if (!firstrun ) return;
+		initSimMatrix();
+		initialize_effpairs(dat);
+		firstrun = false;
+		
+		// init w
+		for (int t=0; t<dat.ntype; t++) {
+			for (int i=0; i<dat.lnodes[t].size; i++) {
+				Integer[] cand_r = eff_pairs[t][i].toArray(new Integer[0]);
+				if(cand_r.length==0){
+					continue;
+				}
+				double tmp = 1. / cand_r.length;
+				
+				for (int j=0; j<cand_r.length; j++) {
+					sim_next[t].put(i, cand_r[j], tmp);
+				}
+			}
+		}
+		
+		// init c
+		for (int t=0; t<dat.ntype; t++) {
+			c_next[t] = 1. / (double)dat.ntype;
+		}
+	}
+
+	@Override
 	public void run() throws IOException{
 		// open an output file stream for logging scores
 		PrintStream distance_file = new PrintStream(
 				new FileOutputStream("res/distance.dat"));
 		
 		// initialize variational variables
-		model.random_initialize_var(dat);
+		initialize(dat);
 		
 		long t_start = System.currentTimeMillis();
 		long t_finish, t_start_iter, t_finish_iter, gap;
@@ -63,12 +116,11 @@ public class CrowdMatch extends cm_learner{
 		double distance = 0, distance_old = 0, converged_ratio = 1;
 
 		int iter = 0;
-		while (((converged_ratio > em_converged) || (iter <= 10)) && (iter < em_max_iter)) {
+		while (((converged_ratio > th_convergence) || (iter <= min_iter)) && (iter < max_iter)) {
 			
 			/* 1) start an iteration */
 			iter++;
-			if (verbose) System.out.println("**** em iteration " + iter + " ****");
-
+			
 			// start time
 			t_start_iter = System.currentTimeMillis();
 
@@ -92,9 +144,7 @@ public class CrowdMatch extends cm_learner{
 			distance_file.println(distance + "\t" + converged_ratio + "\t" + gap + "\t" + (t_finish_iter - t_start));
 			System.out.println("iteration (" + iter + ") distance: " + distance + "\t" + converged_ratio + " (" + gap + " ms)");
 
-			if (verbose && (iter % 20) == 0) {
-				model.save_model(String.format("res/%03d", iter));
-			}
+			
 		}
 
 		t_finish = System.currentTimeMillis();
@@ -103,27 +153,90 @@ public class CrowdMatch extends cm_learner{
 		distance_file.close();
 
 		// output the final model
-		model.save_model("res/final");
+		//save_model("res/final");
+	}
+	
+	// compute the (approximate) expected model change when we ask to annotate for node i of type t
+	public double compute_expected_model_change(int t, int i) {
+		double sum = 0;
+		
+		Iterator<Integer> iter_j = eff_pairs[t][i].iterator();
+		int j;
+		while(iter_j.hasNext()){
+			j = iter_j.next();
+			double diff = 0;
+
+			// change of the node i//TODO: Log?????
+			//diff += -Math.log(sim[t].get(i, j)) / 2.;
+			
+			// change of the neighbors of i
+			for (int s=0; s<dat.ntype; s++) {
+				if (!dat.rel[t][s]) continue;
+				
+				for (int n_x=0; n_x<dat.lnodes[t].arr[i].neighbors[s].size; n_x++) {
+					int x = dat.lnodes[t].arr[i].neighbors[s].arr[n_x];
+					double tmp = 0;
+					
+					estimate_w(tmp_w, t, i, j, s, x);
+					
+					for (int n_y=0; n_y<dat.rnodes[t].arr[j].neighbors[s].size; n_y++) {
+						int y = dat.rnodes[t].arr[j].neighbors[s].arr[n_y];
+						tmp += Math.sqrt(sim_next[s].get(x, y) * tmp_w[n_y]);
+					}
+					if(tmp>0.0){
+						diff += -Math.log(tmp);
+					}
+					if(Double.isNaN(diff)||Double.isInfinite(diff)){
+						System.out.printf("diff: %f, tmp:%f\n",diff,tmp);
+					}
+				}
+			}
+			sum += diff * sim_next[t].get(i, j);
+		}
+		
+		return sum;
 	}
 
+	// estimate w[s].arr[u]
+	
+	private void estimate_w(double[] w, int t, int i, int j, int s, int x) {
+		int[] x_neighbors = dat.lnodes[s].arr[x].neighbors[t].arr;
+		int[] j_neighbors = dat.rnodes[t].arr[j].neighbors[s].arr;
+		for (int idx_y=0; idx_y< j_neighbors.length; idx_y++){
+			int y = dat.rnodes[t].arr[j].neighbors[s].arr[idx_y];
+			w[idx_y] = sim_next[s].get(x, y);
+		}			
+		
+		if(x_neighbors.length>0&& j_neighbors.length>0){
+			double nst_x = (double) x_neighbors.length;
+			double nts_j = (double) j_neighbors.length;
+			double tmp = (1.0-sim_next[t].get(i, j))/nst_x;
+			
+			for (int idx_y=0; idx_y< j_neighbors.length; idx_y++){
+				w[idx_y] += tmp/nts_j;
+			}
+		}
+				
+		
+	}
 	private void em_mle(int iter) {
 		double z = 0;
 		
 		// init c
 		for (int t=0; t<dat.ntype; t++) {
-			model.c[t] = model.c_next[t];
-			model.c_next[t] = 0;
+			c[t] = c_next[t];
+			c_next[t] = 0;
 		}
-
+	
 		// init w
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
-				Iterator<Integer> iter_j = model.eff_pairs[t][i].iterator();
+				Iterator<Integer> iter_j = eff_pairs[t][i].iterator();
 				int j;
 				while(iter_j.hasNext()){
 					j = iter_j.next();
-					model.w[t].put(i, j, model.w_next[t].get(i, j));
-					model.w_next[t].put(i, j, 0.0);
+					sim[t].put(i, j, sim_next[t].get(i, j));
+					sim_next[t].put(i, j, 0.0);
 				}
 				
 			}
@@ -133,11 +246,11 @@ public class CrowdMatch extends cm_learner{
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
 				// compute variables use in this iteration only
-				compute_alpha(t, i, model.alpha);//alpha^t_i*
+				compute_alpha(t, i, alpha);//alpha^t_i*
 				
 				// compute a w distribution
 				//*/
-				Iterator<Integer> iter_j = model.eff_pairs[t][i].iterator();
+				Iterator<Integer> iter_j = eff_pairs[t][i].iterator();
 				int j;
 				while(iter_j.hasNext()){
 					j = iter_j.next();
@@ -145,17 +258,17 @@ public class CrowdMatch extends cm_learner{
 				for (int j=0; j<dat.lnodes[t].size; j++) {
 					
 				//*/
-					boolean tij_eff = model.eff_pairs[t][i].contains(j);
+					boolean tij_eff = eff_pairs[t][i].contains(j);
 					
-					compute_delta(t, i, j, model.delta);//delta^ts_ij**
+					compute_delta(t, i, j, delta);//delta^ts_ij**
 					
 					if(tij_eff){
 						// add alpha
-						double a = model.alpha[j];
+						double a = alpha[j];
 						if(a>0){
 							a = 1.0*a;
 						}
-						model.w_next[t].add(i, j, model.alpha[j]);
+						sim_next[t].add(i, j, alpha[j]);
 					}
 					
 					// distribute delta
@@ -168,14 +281,14 @@ public class CrowdMatch extends cm_learner{
 							int u = dat.lnodes[t].arr[i].neighbors[s].arr[x];
 							for (int y=0; y<n_j; y++) {
 								int v = dat.rnodes[t].arr[j].neighbors[s].arr[y];
-								boolean suv_eff = model.eff_pairs[s][u].contains(v);
+								boolean suv_eff = eff_pairs[s][u].contains(v);
 								if(suv_eff){
-									double tmp = model.alpha[j] * model.delta[s][x][y];
+									double tmp = alpha[j] * delta[s][x][y];
 									if(Double.isNaN(tmp)){
-										System.out.printf("NaN w_%d(%d,%d)   alpha[%d]=%f delta[%d][%d][%d]=%f:\n",t,i,j,j,model.alpha[j],s,x,y,model.delta[s][x][y]);
+										System.out.printf("NaN w_%d(%d,%d)   alpha[%d]=%f delta[%d][%d][%d]=%f:\n",t,i,j,j,alpha[j],s,x,y,delta[s][x][y]);
 									}
-									model.w_next[s].add(u, v, tmp);
-									model.c_next[s] += tmp;
+									sim_next[s].add(u, v, tmp);
+									c_next[s] += tmp;
 								}
 							}
 						}
@@ -184,7 +297,7 @@ public class CrowdMatch extends cm_learner{
 				
 				// XXX: simple w_bar
 				if (dat.lnodes[t].arr[i].label >= 0) {
-					model.w_next[t].add(i, dat.lnodes[t].arr[i].label, model.mu);
+					sim_next[t].add(i, dat.lnodes[t].arr[i].label, mu);
 				}
 			}
 		}
@@ -192,20 +305,20 @@ public class CrowdMatch extends cm_learner{
 		// normalize w
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
-				Iterator<Integer> iter_j = model.eff_pairs[t][i].iterator();
+				Iterator<Integer> iter_j = eff_pairs[t][i].iterator();
 				
 				z = 0;
 				int j;
 				while(iter_j.hasNext()){
 					j = iter_j.next();
-					z += model.w_next[t].get(i, j);
+					z += sim_next[t].get(i, j);
 				}
 				
 				if(z>0.0){
-					iter_j = model.eff_pairs[t][i].iterator();
+					iter_j = eff_pairs[t][i].iterator();
 					while(iter_j.hasNext()){
 						j = iter_j.next();
-						model.w_next[t].put(i, j, model.w_next[t].get(i, j)/z);
+						sim_next[t].put(i, j, sim_next[t].get(i, j)/z);
 					}
 				}
 			}
@@ -214,22 +327,17 @@ public class CrowdMatch extends cm_learner{
 		// normalize c
 		z = 0;
 		for (int t=0; t<dat.ntype; t++) {
-			z += model.c_next[t];
+			z += c_next[t];
 		}
 		if(z==0.0){
-			Arrays.fill(model.c_next, 1.0/dat.ntype);
+			Arrays.fill(c_next, 1.0/dat.ntype);
 		}else{
 			for (int t=0; t<dat.ntype; t++) {
-				model.c_next[t] /= z;
+				c_next[t] /= z;
 			}
 		}
 	}
 	
-	// XXX: for now, we assume each query has only one label 
-	@SuppressWarnings("unused")
-	private void compute_beta(int t, int i, double[] beta) {
-	}
-
 	private void compute_delta(int t, int i, int j, double[][][] delta) {
 		double sum = 0;
 
@@ -246,18 +354,18 @@ public class CrowdMatch extends cm_learner{
 			for (int x=0; x<n_i; x++) {
 				Arrays.fill(delta[s][x], 0.0);
 				int u = dat.lnodes[t].arr[i].neighbors[s].arr[x];
-				if(model.eff_pairs[s][u].size()==0){
+				if(eff_pairs[s][u].size()==0){
 					continue;
 				}
 				for (int y=0; y<n_j; y++) {
 					int v = dat.rnodes[t].arr[j].neighbors[s].arr[y];
 					//if (dat.rnodes[s].arr[v].neighbors[t].size == 0) continue; //it cannot be zero
-					//if(!model.eff_pairs[t][u].contains(v)) continue;
+					//if(!eff_pairs[t][u].contains(v)) continue;
 						
 					
 					delta[s][x][y] = 
-							model.w[s].get(u, v)
-							* model.c[s]
+							sim[s].get(u, v)
+							* c[s]
 							/ (double) n_i
 							/ (double) dat.rnodes[s].arr[v].neighbors[t].size;
 					sum += delta[s][x][y]; 
@@ -286,7 +394,7 @@ public class CrowdMatch extends cm_learner{
 	private void compute_alpha(int t, int i, double[] alpha) {
 		Arrays.fill(alpha, 0.0);
 		double z = 0;
-		Iterator<Integer> iter_j = model.eff_pairs[t][i].iterator();
+		Iterator<Integer> iter_j = eff_pairs[t][i].iterator();
 		int j;
 		while(iter_j.hasNext()){
 			j = iter_j.next();
@@ -307,30 +415,30 @@ public class CrowdMatch extends cm_learner{
 						
 						if (dat.rnodes[s].arr[v].neighbors[t].size == 0) continue;
 						
-						sum += model.w[s].get(u, v)
+						sum += sim[s].get(u, v)
 								/ (double) dat.rnodes[s].arr[v].neighbors[t].size;
 						
 					}
 				}
 				
-				tmp += model.c[s] * sum / (double) n_i;
+				tmp += c[s] * sum / (double) n_i;
 			}
 			
-			alpha[j] = Math.sqrt(model.w[t].get(i, j) * tmp);
+			alpha[j] = Math.sqrt(sim[t].get(i, j) * tmp);
 			if(Double.isNaN(alpha[j])){
-				System.out.printf("alpha NaN  t:%d, i:%d, j:%d, tmp:%f, wij:%f\n",t,i,j,tmp, model.w[t].get(i, j));
+				System.out.printf("alpha NaN  t:%d, i:%d, j:%d, tmp:%f, wij:%f\n",t,i,j,tmp, sim[t].get(i, j));
 			}
 			z += alpha[j];
 		}
 		if(z==0.0)
 			return;
 		
-		iter_j = model.eff_pairs[t][i].iterator();
+		iter_j = eff_pairs[t][i].iterator();
 		while(iter_j.hasNext()){
 			j = iter_j.next();
 			alpha[j] /= z;
 			if(Double.isNaN(alpha[j])){
-				System.out.printf("alpha NaN  t:%d, i:%d, j:%d, z:%f, wij:%f\n",t,i,j, z, model.w[t].get(i, j));
+				System.out.printf("alpha NaN  t:%d, i:%d, j:%d, z:%f, wij:%f\n",t,i,j, z, sim[t].get(i, j));
 			}
 		}
 	}
@@ -340,7 +448,7 @@ public class CrowdMatch extends cm_learner{
 		double ret = 0;
 		for (int t=0; t<dat.ntype; t++)  {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
-				if(model.eff_pairs[t][i].size()>0){
+				if(eff_pairs[t][i].size()>0){
 					ret += compute_bdistance(t, i);
 				}
 			}
@@ -350,7 +458,7 @@ public class CrowdMatch extends cm_learner{
 
 	private double compute_bdistance(int t, int i) {
 		double sum1 = 0, sum2 = 0;
-		Iterator<Integer> iter_j = model.eff_pairs[t][i].iterator();
+		Iterator<Integer> iter_j = eff_pairs[t][i].iterator();
 		int j;
 		while(iter_j.hasNext()){
 			j = iter_j.next();
@@ -367,19 +475,19 @@ public class CrowdMatch extends cm_learner{
 						int u = dat.lnodes[t].arr[i].neighbors[s].arr[x];
 						int v = dat.rnodes[t].arr[j].neighbors[s].arr[y];
 						
-						sub += model.w_next[s].get(u, v) / 
+						sub += sim_next[s].get(u, v) / 
 								(double)dat.rnodes[s].arr[v].neighbors[t].size;
 					}
 				}
 				
 				sub /= (double)dat.lnodes[t].arr[i].neighbors[s].size;
 				
-				tmp += model.c_next[s] * sub;
+				tmp += c_next[s] * sub;
 			}
-			sum1 += Math.sqrt(model.w_next[t].get(i, j) * tmp);
+			sum1 += Math.sqrt(sim_next[t].get(i, j) * tmp);
 			
 			if(Double.isNaN(sum1)){
-				System.out.printf("sum1 NaN t:%d, i:%d, j:%d, tmp:%f, wij: %f\n", t, i, j, tmp, model.w_next[t].get(i, j));
+				System.out.printf("sum1 NaN t:%d, i:%d, j:%d, tmp:%f, wij: %f\n", t, i, j, tmp, sim_next[t].get(i, j));
 			}
 			
 		}
@@ -389,15 +497,15 @@ public class CrowdMatch extends cm_learner{
 		
 		// for labeled data, 
 		if(dat.lnodes[t].arr[i].label>=0){
-			sum2 = Math.sqrt(model.w_next[t].get(i, dat.lnodes[t].arr[i].label));
+			sum2 = Math.sqrt(sim_next[t].get(i, dat.lnodes[t].arr[i].label));
 			/*
-			iter_j = model.eff_pairs[t][i].iterator();
+			iter_j = eff_pairs[t][i].iterator();
 			while(iter_j.hasNext()){
 				j = iter_j.next();
 				
-				sum2 = Math.sqrt(model.w_next[t].get(i, dat.lnodes[t].arr[i].label));
+				sum2 = Math.sqrt(sim_next[t].get(i, dat.lnodes[t].arr[i].label));
 				if(Double.isNaN(sum2)){
-					System.out.printf("sum2 NaN t:%d, i:%d, j:%d, wij: %f\n", t, i, j, model.w_next[t].get(i, j));
+					System.out.printf("sum2 NaN t:%d, i:%d, j:%d, wij: %f\n", t, i, j, sim_next[t].get(i, j));
 				}
 			}
 			if(sum2==0.0){
@@ -409,72 +517,6 @@ public class CrowdMatch extends cm_learner{
 		
 		
 		
-		return -(sum1 + model.mu * sum2);
+		return -(sum1 + mu * sum2);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	@Deprecated
-	public static void main(String[] args) throws IOException {
-		Namespace nes = parseArguments(args);
-		CrowdMatch obj = new CrowdMatch(nes);
-		
-		// run em
-		obj.init();
-		obj.run();
-	}
-	@Deprecated
-	public static Namespace parseArguments(String[] args){
-		ArgumentParser parser = ArgumentParsers.newArgumentParser("CrowdMatch")
-	                .description("Graph matching");
-			
-		try {
-			parser.addArgument("-mu")
-						.type(Double.class)
-						.setDefault(1.)
-						.help("mu");
-			parser.addArgument("-niter")
-						.type(Integer.class)
-						.setDefault(100)
-						.help("Maximum number of iterations");
-			parser.addArgument("-thres")
-						.type(Double.class)
-						.setDefault(1.0e-5)
-						.help("Threshold of log-distance ratio for convergence test");
-			parser.addArgument("-lprefix")
-						.type(String.class)
-						.required(true)
-						.help("Prefix name of left graph");
-			parser.addArgument("-rprefix")
-						.type(String.class)
-						.required(true)
-						.help("Prefix name of right graph");
-
-			Namespace res = parser.parseArgs(args);
-			System.out.println(res);
-			return res;
-		} catch (ArgumentParserException e) {
-			parser.handleError(e);
-		}
-		return null;
-	}
-	
-	@Deprecated
-	public void init() {
-		// data loading
-		dat 						= new cm_data(lprefix, rprefix, 0.0);
-		
-		// init model parameter
-		model						= new cm_model(radius);
-		model.init_learner(dat, mu);
-	}
-	
 }

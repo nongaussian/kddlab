@@ -1,5 +1,7 @@
 package cm;
 
+import graph.node;
+
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
