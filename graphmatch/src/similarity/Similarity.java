@@ -1,18 +1,17 @@
 package similarity;
 
 import graph.node;
+import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Iterator;
-
-import common.SparseIntMatrix;
-import common.SparseMatrix;
 
 import net.sourceforge.argparse4j.inf.Namespace;
 import cm.QueryNode;
 import cm.cm_data;
-import cm.cm_learner;
+
+import common.SparseMatrix;
 
 public abstract class Similarity{
 	boolean firstrun = true;
@@ -23,7 +22,7 @@ public abstract class Similarity{
 	protected int 	min_iter			= 5;
 	protected int 	radius				= -1;
 	
-	public HashSet<Integer>[][] eff_pairs	= null; 
+	public IntOpenHashSet[][] eff_pairs	= null; 
 
 	
 	public int maxrnodesize						= 0;
@@ -58,11 +57,6 @@ public abstract class Similarity{
 	
 	
 	
-	protected void setArgs(Namespace nes){
-		
-	}
-	
-	
 	
 	public SparseMatrix[] getSim(){
 		return sim;
@@ -89,16 +83,16 @@ public abstract class Similarity{
 	
 	@SuppressWarnings("unchecked")
 	public void initialize_effpairs(cm_data dat){
-		eff_pairs = new HashSet[dat.ntype][];
-		HashSet<Integer>[] lgroup = new HashSet[dat.ntype];
-		HashSet<Integer>[] rgroup = new HashSet[dat.ntype];
+		eff_pairs = new IntOpenHashSet[dat.ntype][];
+		IntOpenHashSet[] lgroup = new IntOpenHashSet[dat.ntype];
+		IntOpenHashSet[] rgroup = new IntOpenHashSet[dat.ntype];
 		
 		for(int t = 0; t<dat.ntype; t++){
-			lgroup[t] = new HashSet<Integer>();
-			rgroup[t] = new HashSet<Integer>();
-			eff_pairs[t] = new HashSet[dat.lnodes[t].size];
+			lgroup[t] = new IntOpenHashSet();
+			rgroup[t] = new IntOpenHashSet();
+			eff_pairs[t] = new IntOpenHashSet[dat.lnodes[t].size];
 			for(int i = 0; i<eff_pairs[t].length; i++){
-				eff_pairs[t][i] = new HashSet<Integer>();
+				eff_pairs[t][i] = new IntOpenHashSet();
 			}
 		}
 		
@@ -132,13 +126,13 @@ public abstract class Similarity{
 	
 	public void update_effpairs(QueryNode[] queries, cm_data dat){
 		
-		HashSet<Integer>[] lgroup = new HashSet[dat.ntype];
-		HashSet<Integer>[] rgroup = new HashSet[dat.ntype];
+		IntOpenHashSet[] lgroup = new IntOpenHashSet[dat.ntype];
+		IntOpenHashSet[] rgroup = new IntOpenHashSet[dat.ntype];
 		for(int t = 0; t<dat.ntype; t++){
-			lgroup[t] = new HashSet<Integer>();
-			rgroup[t] = new HashSet<Integer>();
+			lgroup[t] = new IntOpenHashSet();
+			rgroup[t] = new IntOpenHashSet();
 		}
-		Integer[] l_list,r_list;
+		int[] l_list,r_list;
 		for (QueryNode q : queries) {
 			if(q.matched_id >= 0){
 				eff_pairs[q.t][q.id].add(q.matched_id);
@@ -148,8 +142,8 @@ public abstract class Similarity{
 				sim_next[q.t].put(q.id, dat.lnodes[q.t].arr[q.id].label, 1.0);
 			}
 			
-			l_list = lgroup[q.t].toArray(new Integer[0]);
-			r_list = rgroup[q.t].toArray(new Integer[0]);
+			l_list = lgroup[q.t].toArray(new int[0]);
+			r_list = rgroup[q.t].toArray(new int[0]);
 			for(Integer x:l_list){
 				for(Integer y:r_list){
 					eff_pairs[q.t][x].add(y);
@@ -160,18 +154,19 @@ public abstract class Similarity{
 			rgroup[q.t].clear();
 			
 		}
-		smoothing();
+		
 	}
 	
-	private void smoothing(){
+	public void smoothing(){
 		for(int t = 0; t < dat.ntype; t++){
 			for (int i=0; i<dat.lnodes[t].size; i++) {
-				Iterator<Integer> iter_j = eff_pairs[t][i].iterator();
+				
+				IntIterator iter_j = eff_pairs[t][i].iterator();
 				int j;
 				double sm_f = .2/eff_pairs[t][i].size();
 				double sum = 0.0;
 				while(iter_j.hasNext()){
-					j = iter_j.next();
+					j = iter_j.nextInt();
 					sim_next[t].add(i, j, sm_f);
 					sum += sim_next[t].get(i, j);
 				}
@@ -179,7 +174,7 @@ public abstract class Similarity{
 				iter_j = eff_pairs[t][i].iterator();
 								
 				while(iter_j.hasNext()){
-					j = iter_j.next();
+					j = iter_j.nextInt();
 					sim_next[t].put(i, j, sim_next[t].get(i, j)/sum);
 				}
 				
@@ -187,7 +182,7 @@ public abstract class Similarity{
 		}
 		
 	}
-	private void register_node(HashSet<Integer>[] nodeset, node n, int type, int radius, boolean left){
+	private void register_node(IntOpenHashSet[] nodeset, node n, int type, int radius, boolean left){
 		if(radius==0){
 			return;
 		}

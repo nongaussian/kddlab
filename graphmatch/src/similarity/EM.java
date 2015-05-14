@@ -1,8 +1,8 @@
 package similarity;
 
-import java.io.FileOutputStream;
+import it.unimi.dsi.fastutil.ints.IntIterator;
+
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -22,20 +22,6 @@ public class EM extends Similarity{
 		super(nes);
 	}
 	
-	public void init_learner (cm_data dat, double mu) {
-		this.dat = dat;
-		this.mu = mu;
-		
-		c = new double[dat.ntype];
-		c_next = new double[dat.ntype];
-		
-		
-		temp_stat();
-		
-		alpha = new double[maxrnodesize];
-		
-		delta = new double[dat.ntype][maxlneighborsize][maxrneighborsize];
-	}
 	
 	
 	
@@ -75,6 +61,8 @@ public class EM extends Similarity{
 	@Override
 	public void initialize(cm_data dat) {
 		if (!firstrun ) return;
+		this.dat = dat;
+		
 		initSimMatrix();
 		initialize_effpairs(dat);
 		firstrun = false;
@@ -95,16 +83,24 @@ public class EM extends Similarity{
 		}
 		
 		// init c
+		c = new double[dat.ntype];
+		c_next = new double[dat.ntype];
 		for (int t=0; t<dat.ntype; t++) {
 			c_next[t] = 1. / (double)dat.ntype;
 		}
+		
+		
+		temp_stat();
+		//init variables
+		alpha = new double[maxrnodesize];
+		delta = new double[dat.ntype][maxlneighborsize][maxrneighborsize];
+		tmp_w = new double[maxrneighborsize];
 	}
 
 	@Override
 	public void run() throws IOException{
 		// open an output file stream for logging scores
-		PrintStream distance_file = new PrintStream(
-				new FileOutputStream("res/distance.dat"));
+		//PrintStream distance_file = new PrintStream(new FileOutputStream("res/distance.dat"));
 		
 		// initialize variational variables
 		initialize(dat);
@@ -141,7 +137,7 @@ public class EM extends Similarity{
 			distance_old = distance;
 
 			// output model and distance
-			distance_file.println(distance + "\t" + converged_ratio + "\t" + gap + "\t" + (t_finish_iter - t_start));
+			//distance_file.println(distance + "\t" + converged_ratio + "\t" + gap + "\t" + (t_finish_iter - t_start));
 			System.out.println("iteration (" + iter + ") distance: " + distance + "\t" + converged_ratio + " (" + gap + " ms)");
 
 			
@@ -149,8 +145,8 @@ public class EM extends Similarity{
 
 		t_finish = System.currentTimeMillis();
 		gap = t_finish - t_start;
-		distance_file.println("execution time: " + gap);
-		distance_file.close();
+		//distance_file.println("execution time: " + gap);
+		//distance_file.close();
 
 		// output the final model
 		//save_model("res/final");
@@ -160,14 +156,12 @@ public class EM extends Similarity{
 	public double compute_expected_model_change(int t, int i) {
 		double sum = 0;
 		
-		Iterator<Integer> iter_j = eff_pairs[t][i].iterator();
+		IntIterator iter_j = eff_pairs[t][i].iterator();
 		int j;
 		while(iter_j.hasNext()){
-			j = iter_j.next();
+			j = iter_j.nextInt();
 			double diff = 0;
 
-			// change of the node i//TODO: Log?????
-			//diff += -Math.log(sim[t].get(i, j)) / 2.;
 			
 			// change of the neighbors of i
 			for (int s=0; s<dat.ntype; s++) {
@@ -198,7 +192,6 @@ public class EM extends Similarity{
 	}
 
 	// estimate w[s].arr[u]
-	
 	private void estimate_w(double[] w, int t, int i, int j, int s, int x) {
 		int[] x_neighbors = dat.lnodes[s].arr[x].neighbors[t].arr;
 		int[] j_neighbors = dat.rnodes[t].arr[j].neighbors[s].arr;
@@ -231,10 +224,10 @@ public class EM extends Similarity{
 		// init w
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
-				Iterator<Integer> iter_j = eff_pairs[t][i].iterator();
+				IntIterator iter_j = eff_pairs[t][i].iterator();
 				int j;
 				while(iter_j.hasNext()){
-					j = iter_j.next();
+					j = iter_j.nextInt();
 					sim[t].put(i, j, sim_next[t].get(i, j));
 					sim_next[t].put(i, j, 0.0);
 				}
@@ -250,10 +243,10 @@ public class EM extends Similarity{
 				
 				// compute a w distribution
 				//*/
-				Iterator<Integer> iter_j = eff_pairs[t][i].iterator();
+				IntIterator iter_j = eff_pairs[t][i].iterator();
 				int j;
 				while(iter_j.hasNext()){
-					j = iter_j.next();
+					j = iter_j.nextInt();
 				/*/
 				for (int j=0; j<dat.lnodes[t].size; j++) {
 					
@@ -305,19 +298,19 @@ public class EM extends Similarity{
 		// normalize w
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
-				Iterator<Integer> iter_j = eff_pairs[t][i].iterator();
+				IntIterator iter_j = eff_pairs[t][i].iterator();
 				
 				z = 0;
 				int j;
 				while(iter_j.hasNext()){
-					j = iter_j.next();
+					j = iter_j.nextInt();
 					z += sim_next[t].get(i, j);
 				}
 				
 				if(z>0.0){
 					iter_j = eff_pairs[t][i].iterator();
 					while(iter_j.hasNext()){
-						j = iter_j.next();
+						j = iter_j.nextInt();
 						sim_next[t].put(i, j, sim_next[t].get(i, j)/z);
 					}
 				}
@@ -394,10 +387,10 @@ public class EM extends Similarity{
 	private void compute_alpha(int t, int i, double[] alpha) {
 		Arrays.fill(alpha, 0.0);
 		double z = 0;
-		Iterator<Integer> iter_j = eff_pairs[t][i].iterator();
+		IntIterator iter_j = eff_pairs[t][i].iterator();
 		int j;
 		while(iter_j.hasNext()){
-			j = iter_j.next();
+			j = iter_j.nextInt();
 			double tmp = 0;
 			for (int s=0; s<dat.ntype; s++) {
 				if (!dat.rel[t][s]) continue;
@@ -435,7 +428,7 @@ public class EM extends Similarity{
 		
 		iter_j = eff_pairs[t][i].iterator();
 		while(iter_j.hasNext()){
-			j = iter_j.next();
+			j = iter_j.nextInt();
 			alpha[j] /= z;
 			if(Double.isNaN(alpha[j])){
 				System.out.printf("alpha NaN  t:%d, i:%d, j:%d, z:%f, wij:%f\n",t,i,j, z, sim[t].get(i, j));
@@ -458,10 +451,10 @@ public class EM extends Similarity{
 
 	private double compute_bdistance(int t, int i) {
 		double sum1 = 0, sum2 = 0;
-		Iterator<Integer> iter_j = eff_pairs[t][i].iterator();
+		IntIterator iter_j = eff_pairs[t][i].iterator();
 		int j;
 		while(iter_j.hasNext()){
-			j = iter_j.next();
+			j = iter_j.nextInt();
 			double tmp = 0;
 			
 			for (int s=0; s<dat.ntype; s++) {
@@ -501,7 +494,7 @@ public class EM extends Similarity{
 			/*
 			iter_j = eff_pairs[t][i].iterator();
 			while(iter_j.hasNext()){
-				j = iter_j.next();
+				j = iter_j.nextInt();
 				
 				sum2 = Math.sqrt(sim_next[t].get(i, dat.lnodes[t].arr[i].label));
 				if(Double.isNaN(sum2)){

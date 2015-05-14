@@ -26,6 +26,17 @@ public class cm_data {
 	public nodelist[] lnodes = null;
 	public nodelist[] rnodes = null;
 	
+	
+	public static void main(String[] args){
+		cm_data dat = new cm_data("data/tiny", "data/tiny", 0);
+		
+	}
+	public void printStat(String dataname){
+		
+		
+	}
+	
+	
 	// dataname is the prefix to the files
 	
 	// <dataname>.actor
@@ -129,6 +140,7 @@ public class cm_data {
 				int ridx = Integer.parseInt(arr[1]);
 				
 				lnodes[t].arr[lidx].label = ridx;
+				rnodes[t].arr[ridx].label = lidx;
 			}
 
 			reader.close();

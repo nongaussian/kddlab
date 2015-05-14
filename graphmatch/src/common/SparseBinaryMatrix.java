@@ -1,15 +1,14 @@
 package common;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 
 public class SparseBinaryMatrix {
-	private HashSet<Integer>[] val;
+	private IntOpenHashSet[] val;
 	
 	public SparseBinaryMatrix(int size1){
-		val = new HashSet[size1];
+		val = new IntOpenHashSet[size1];
 		for(int i = 0; i< size1; i++){
-			val[i] = new HashSet<Integer>();
+			val[i] = new IntOpenHashSet();
 		}
 	}
 	
@@ -28,7 +27,16 @@ public class SparseBinaryMatrix {
 	}
 	
 
-	
+	public static void main(String[] args){
+		SparseBinaryMatrix sm = new SparseBinaryMatrix(100);
+		System.out.println(sm.get(1, 1));
+		sm.setTrue(1, 1);
+		System.out.println(sm.get(1, 1));
+		sm.setFalse(1, 1);
+		System.out.println(sm.get(1, 1));
+		sm.setTrue(2, 2);
+		System.out.println(sm.get(2, 2));
+	}
 }
 
 

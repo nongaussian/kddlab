@@ -1,14 +1,12 @@
 package similarity;
 
-import graph.node;
+import it.unimi.dsi.fastutil.ints.IntIterator;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Iterator;
 
-import cm.cm_data;
-
 import net.sourceforge.argparse4j.inf.Namespace;
+import cm.cm_data;
 
 import common.SparseMatrix;
 
@@ -49,7 +47,8 @@ public class SimRankD extends Similarity{
 	
 	public void initialize(cm_data dat){
 		if (!firstrun ) return;
-		
+		this.dat = dat;
+		initSimMatrix();
 		initialize_effpairs(dat);
 		firstrun = false;
 		
@@ -60,10 +59,10 @@ public class SimRankD extends Similarity{
 				}else{
 					int psize = eff_pairs[t][i].size();
 					if(psize>0){
-						Iterator<Integer> iter_j = eff_pairs[t][i].iterator();
+						IntIterator iter_j = eff_pairs[t][i].iterator();
 						int j;
 						while(iter_j.hasNext()){
-							j = iter_j.next();
+							j = iter_j.nextInt();
 							sim_next[t].put(i, j, 1.0/psize);
 						}
 					}
@@ -80,19 +79,27 @@ public class SimRankD extends Similarity{
 		//init simrank
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
-				Iterator<Integer> iter_j  = eff_pairs[t][i].iterator();
+				IntIterator iter_j  = eff_pairs[t][i].iterator();
 				int j;
 				while(iter_j.hasNext()){
-					j = iter_j.next();
+					j = iter_j.nextInt();
 					sim[t].put(i, j, sim_next[t].get(i, j));
 				}
 			}
 		}
 		int[] ntsi_s = new int[dat.ntype];
-		double cs = 0.5;
+		
 		for (int t=0; t<dat.ntype; t++) {
+			double ct = 0.0;
+			for (int s=0; s<dat.ntype; s++) {
+				if(!dat.rel[t][s])
+					continue;
+				ct+=1.0;
+			}
+			ct = 1.0/ct;
 			for (int i=0; i<dat.lnodes[t].size; i++) {
-				Iterator<Integer> iter_j  = eff_pairs[t][i].iterator();
+
+				IntIterator iter_j  = eff_pairs[t][i].iterator();
 				for (int s=0; s<dat.ntype; s++) {
 					if(!dat.rel[t][s])
 						continue;
@@ -100,11 +107,13 @@ public class SimRankD extends Similarity{
 				}
 				int j;
 				while(iter_j.hasNext()){
-					double sr_tmp;
+					double sr_tmp = 0.0;
 					double sum = 0.0;
-					j = iter_j.next();
+					j = iter_j.nextInt();
 					if(dat.lnodes[t].arr[i].label==j){
 						sum = 1.0;
+					}else if(dat.lnodes[t].arr[i].label>0||dat.rnodes[t].arr[j].label>0){
+						sum = 0.0;
 					}else{
 						for (int s=0; s<dat.ntype; s++) {
 							if(!dat.rel[t][s])
@@ -117,15 +126,21 @@ public class SimRankD extends Similarity{
 										sr_tmp += sim[s].get(x, y);
 									}
 								}
-								sum+=(cs*sr_tmp/ntsi_s[s]/ntsj);
+								sum+=(ct*sr_tmp/ntsi_s[s]/ntsj);
 							}
-						}	
+						}
+						if(sum>1.0){
+							System.out.println("sum>1");
+						}
 						sum *= C;
 					}
+
 					sim_sum += sum;
 					diff_sum += Math.abs(sum-sim[t].get(i, j));
 					sim_next[t].put(i, j, sum);
 				}
+				
+
 			}
 		}
 		System.out.printf("%d/%d iteration  sum:%f, diffsum:%f convergence ratio: :%f\n",(iter+1),max_iter,sim_sum,diff_sum,diff_sum/sim_sum);

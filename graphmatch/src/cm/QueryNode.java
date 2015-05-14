@@ -5,7 +5,13 @@ public class QueryNode implements Comparable<QueryNode> {
 	public int id;
 	public double diff;
 	
-	//public CandNode knownlink;
+	
+	//matching information
+	public int cost = 0;
+	public double matching_sim  = 0.0;	//Similarity of the query node and the matched node
+	public double max_sim		= 0.0;	//Maximum similarity
+	public double entropy		= 0.0;	//Entropy of similarity distribution
+	
 	public int matched_id = -1;
 	public QueryNode (int t, int i){
 		this.t = t;
@@ -15,12 +21,16 @@ public class QueryNode implements Comparable<QueryNode> {
 		this(t,i);
 		this.diff = diff;
 	}
-	public void setKnownLink(CandNode cn){
+	public void setKnownLink(int i, CandNode cn){
 		if(cn==null){
 			matched_id = -1;
+			cost = 0;
+			matching_sim = 0.0;
 			return;
 		}
 		matched_id = cn.id;
+		cost = i+1;
+		matching_sim = cn.w;
 	}
 	
 	@Override

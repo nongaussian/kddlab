@@ -1,26 +1,27 @@
 package common;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
+import it.unimi.dsi.fastutil.ints.Int2DoubleMap.Entry;
+import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
+
+
 
 public class SparseMatrix {
-	private HashMap<Integer,Double>[] val;
+	private Int2DoubleOpenHashMap[] val;
 	
 	public SparseMatrix(int size1){
-		val = new HashMap[size1];
+		val = new Int2DoubleOpenHashMap[size1];
 		for(int i = 0; i< size1; i++){
-			val[i] = new HashMap<Integer,Double>();
+			val[i] = new Int2DoubleOpenHashMap();
+			val[i].defaultReturnValue(0.0);
 		}
 	}
 	
 	public double get(int i, int j){
-		Double tmp = val[i].get(j);
-		return tmp!=null?tmp:0.0;
-
+		return val[i].get(j);
 	}
-	public Iterator<Entry<Integer,Double>> getEntryIterator(int i){
-		return val[i].entrySet().iterator();
+	public ObjectIterator<Entry> getEntryIterator(int i){
+		return val[i].int2DoubleEntrySet().fastIterator();
 	}
 	public void put(int i, int j, double v){
 		if(Double.isNaN(v)){
@@ -36,12 +37,9 @@ public class SparseMatrix {
 		if(Double.isNaN(v_add)){
 			System.out.printf("Nan (%d,%d)\n",i,j);
 		}
-		Double v = val[i].get(j);
-		if(v==null){
-			v = new Double(v_add);
-		}else{
-			v += v_add;
-		}
+		double v = val[i].get(j);
+		v += v_add;
+		
 		val[i].put(j, v);
 	}
 	

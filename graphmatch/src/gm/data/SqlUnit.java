@@ -18,7 +18,7 @@ public class SqlUnit {
 			this.dbname = dbname;
 			connect(dbname);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+
 			handlingSQLException(e);
 			System.exit(0);
 		}
@@ -29,7 +29,6 @@ public class SqlUnit {
 			this.dbname = dbname;
 			connect(dbname,username,pwd);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			handlingSQLException(e);
 			System.exit(0);
 		}
@@ -97,6 +96,7 @@ public class SqlUnit {
 			}
 		
 		} catch (SQLException e) {
+			System.out.println(query);
 			handlingSQLException(e);
 			System.exit(0);
 		}
