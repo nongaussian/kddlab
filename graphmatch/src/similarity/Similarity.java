@@ -5,7 +5,6 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import net.sourceforge.argparse4j.inf.Namespace;
 import cm.QueryNode;
@@ -81,7 +80,7 @@ public abstract class Similarity{
 	
 	public abstract void initialize(cm_data dat);
 	
-	@SuppressWarnings("unchecked")
+
 	public void initialize_effpairs(cm_data dat){
 		eff_pairs = new IntOpenHashSet[dat.ntype][];
 		IntOpenHashSet[] lgroup = new IntOpenHashSet[dat.ntype];

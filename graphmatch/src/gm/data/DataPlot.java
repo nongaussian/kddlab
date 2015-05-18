@@ -1,5 +1,8 @@
 package gm.data;
 
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntLists;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -10,7 +13,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import sim.Param;
-
 import cm.QueryNode;
 
 import com.panayotis.gnuplot.JavaPlot;
@@ -35,28 +37,33 @@ public class DataPlot {
 	static void plotAll(String dataname){
 		DataPlot dp = new DataPlot(dataname);
 		/**/
-		dp.plotCostAccuracy();
+		//dp.plotCostAccuracy();
 		dp.plotEarlyMatching(-1, -1);
-		dp.plotRmRCost(-1, -1);
+		//dp.plotRmRCost(-1, -1);
 		/**/
 		dp.plotIterCost(-1, -1);
-		dp.plotDiffCost();
-		//dp.plotWCost();
-		dp.plotSimCost(true);
-		dp.plotSimCost(false);
+		//dp.plotDiffCost();
+
+
+		PlotParam pp = new PlotParam();
+		pp.append(PlotParam.INFO_TYPE_ENTROPY);
+		pp.append(PlotParam.INFO_TYPE_MAX_SIM);
+		pp.append(PlotParam.INFO_TYPE_MATCHING_SIM);
+		dp.plotQueryInfoCost(pp, true);
+		dp.plotQueryInfoCost(pp, true);
 		for (int s = 1; s < Param.sim_str.length; s++){
 			/**/
-			dp.plotCostAccuracy(s,-1);
+			//dp.plotCostAccuracy(s,-1);
 			dp.plotEarlyMatching(s,-1);
-			dp.plotRmRCost(s, -1);
+			//dp.plotRmRCost(s, -1);
 			/**/
 			dp.plotIterCost(s, -1);
 		}
 		for (int q = 1; q< Param.query_str.length; q++){
 			/**/
-			dp.plotCostAccuracy(-1,q);
+			//dp.plotCostAccuracy(-1,q);
 			dp.plotEarlyMatching(-1,q);
-			dp.plotRmRCost(-1, q);
+			//dp.plotRmRCost(-1, q);
 			/**/
 			dp.plotIterCost(-1, q);
 		}
@@ -79,7 +86,7 @@ public class DataPlot {
 	
 	public DataPlot(String dataname){
 		this.dataname = dataname;
-		sqlunit = new SqlUnit("graphmatching");
+		//sqlunit = new SqlUnit("graphmatching");
 	
 	}
 	
@@ -125,6 +132,8 @@ public class DataPlot {
 		
 	}
 	public double[] getRmrlist(){
+		double[] rmr_list = {0.0, 0.05, 0.1, 0.2};
+		return rmr_list;/*
 		String qry = String.format("select distinct (rmr) from experiment where data = '%s';",dataname);
 		ResultSet rs = sqlunit.executeQuery(qry);
 		
@@ -143,7 +152,7 @@ public class DataPlot {
 		for(int l = 0; l < list.length; l++){
 			list[l] = rmr_list.get(l);
 		}
-		return list;
+		return list;*/
 	}
 	
 	public void plotCostAccuracy(){
@@ -272,16 +281,17 @@ public class DataPlot {
 				switch(sc){
 				case 'i':
 					continue;
-					
-				case '(':
-					earlymatching_ratio.add(computeEarlyMatchingRatio(line,th_em));
-					break;
-				default:
+				case 'E':
 					v_continue = false;
 					break;
+				default:
+					earlymatching_ratio.add(computeEarlyMatchingRatio(line,th_em));
+					break;
+				
 				}
 			}
 			if(earlymatching_ratio.size()==0){
+				br.close();
 				return null;
 			}
 			double[][] data = new double[earlymatching_ratio.size()][2];
@@ -289,6 +299,7 @@ public class DataPlot {
 				data[i][0] = i;
 				data[i][1] = earlymatching_ratio.get(i);
 			}
+			br.close();
 			return data;
 		} catch (IOException e) {
 			return null;
@@ -301,10 +312,12 @@ public class DataPlot {
 		String[] queries = line.split("\\|");
 		for(String query: queries){
 			try{
-				String[] query_tmp = query.split("\\(|\\)|,");
-				QueryNode qn = new QueryNode(Integer.parseInt(query_tmp[1]), Integer.parseInt(query_tmp[2]));
-				qn.diff = Double.parseDouble(query_tmp[4]);
-				qn.matching_sim = Double.parseDouble(query_tmp[5]);
+				String[] query_tmp = query.split(":|,");
+				QueryNode qn = new QueryNode(Integer.parseInt(query_tmp[0]), Integer.parseInt(query_tmp[1]));
+				qn.diff = Double.parseDouble(query_tmp[2]);
+				qn.max_sim = Double.parseDouble(query_tmp[3]);
+				qn.matching_sim = Double.parseDouble(query_tmp[4]);
+				qn.entropy = Double.parseDouble(query_tmp[5]);
 				qn.cost = Integer.parseInt(query_tmp[6]);
 				qn_list.add(qn);
 			}catch(NumberFormatException e){
@@ -424,49 +437,52 @@ public class DataPlot {
 	
 	
 	
-	private void plotSimCost(boolean avg){
+	private void plotQueryInfoCost(PlotParam pp, boolean avg){
 		double[] rmr_list = getRmrlist();
-		
-		for( double rmr:rmr_list){
-			for(int q = 1; q < Param.query_str.length; q++){
-			
-				String opt = Param.query_str[q];
+		for(int infotype: pp.infotypes){
+			for( double rmr:rmr_list){
+				for(int q = 1; q < Param.query_str.length; q++){
 				
-				PostscriptTerminal eps = new PostscriptTerminal(String.format("plots/%sSimCost%s%s_rmr%s.eps",dataname,opt,avg?"Avg":"",Double.toString(rmr).replace(".","_")));
-				
-				eps.setColor(true);
-				eps.setEPS(true);
-				JavaPlot p = new JavaPlot();
-				PlotStyle pStyle = new PlotStyle();
-				pStyle.setStyle(Style.LINESPOINTS);
-				p.newGraph();
-				p.getAxis("x").setLabel("Similarity");
-				p.getAxis("y").setLabel("Cost");
-				p.getAxis("y").setLogScale(true);
-				
-				p.setTerminal(eps);
-				p.setPersist(false);
-				p.set("size ratio", "1");
-				p.set("lmargin at screen", "0.15");
-				p.set("rmargin at screen", "0.9");
-				p.set("bmargin at screen", "0.1");
-				p.set("tmargin at screen", "0.95");
-				
-				p.set("terminal wxt size", "640,640");
-				
-				for(int sim = 1; sim < Param.sim_str.length; sim++){
-					double [][] points = getWCost(q, sim, rmr, 100,avg);
-					if(points !=null && points.length>0){
-						AbstractPlot data = new DataSetPlot(points);
-						data.setTitle(getAbb(Param.query_str[q])+"+"+getAbb(Param.sim_str[sim]));
-						data.setPlotStyle(pStyle);
-						p.addPlot(data);
-					}
+					String opt = Param.query_str[q];
 					
-				}	
-				p.plot();
-			}		
+					PostscriptTerminal eps = new PostscriptTerminal(String.format("plots/%s%sCost%s%s_rmr%s.eps",dataname,opt,PlotParam.info_str[infotype],avg?"Avg":"",Double.toString(rmr).replace(".","_")));
+					
+					eps.setColor(true);
+					eps.setEPS(true);
+					JavaPlot p = new JavaPlot();
+					PlotStyle pStyle = new PlotStyle();
+					pStyle.setStyle(Style.LINESPOINTS);
+					p.newGraph();
+					
+					p.getAxis("x").setLabel(PlotParam.label(infotype));
+					p.getAxis("y").setLabel("Cost");
+					p.getAxis("y").setLogScale(true);
+					
+					p.setTerminal(eps);
+					p.setPersist(false);
+					p.set("size ratio", "1");
+					p.set("lmargin at screen", "0.15");
+					p.set("rmargin at screen", "0.9");
+					p.set("bmargin at screen", "0.1");
+					p.set("tmargin at screen", "0.95");
+					
+					p.set("terminal wxt size", "640,640");
+					
+					for(int sim = 1; sim < Param.sim_str.length; sim++){
+						double [][] points = getInfoCost(infotype, q, sim, rmr, 100,avg,infotype==PlotParam.INFO_TYPE_ENTROPY?5.0:1.0);
+						if(points !=null && points.length>0){
+							AbstractPlot data = new DataSetPlot(points);
+							data.setTitle(getAbb(Param.query_str[q])+"+"+getAbb(Param.sim_str[sim]));
+							data.setPlotStyle(pStyle);
+							p.addPlot(data);
+						}
+						
+					}	
+					p.plot();
+				}		
+			}
 		}
+	
 	}
 	private void plotWCost(){
 		double[] rmr_list = getRmrlist();
@@ -517,9 +533,12 @@ public class DataPlot {
 	
 
 	private double[][] getWCost(int query, int sim, double rm_ratio, int nquery) {
-		return getWCost(query, sim, rm_ratio, nquery, false);
+		return getInfoCost(PlotParam.INFO_TYPE_MATCHING_SIM, query, sim, rm_ratio, nquery, false);
 	}
-	private double[][] getWCost(int query, int sim, double rm_ratio, int nquery, boolean avg) {
+	private double[][] getInfoCost(int infotype, int query, int sim, double rm_ratio, int nquery, boolean avg) {
+		return getInfoCost(infotype, query, sim, rm_ratio, nquery, avg, 1.0);
+	}
+	private double[][] getInfoCost(int infotype, int query, int sim, double rm_ratio, int nquery, boolean avg, double max) {
 		String filename = Param.logFilePath(dataname, sim, query, rm_ratio, nquery);
 		String line = null;
 		double[][] data = null;
@@ -527,6 +546,7 @@ public class DataPlot {
 		int nBucket = 100;
 		ArrayList<Double> cost = null;
 		ArrayList<Double> w_list = null;
+		
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
 			
@@ -534,7 +554,7 @@ public class DataPlot {
 				data = new double[nBucket][2];
 				count = new int[nBucket];
 				for(int b = 0; b <nBucket; b++){
-					data[b][0] = (b+0.5)/nBucket;
+					data[b][0] = max*(b+0.5)/nBucket;
 				}
 				
 			}else{
@@ -554,24 +574,39 @@ public class DataPlot {
 				switch(sc){
 				case 'i':
 					continue;
-				case '(':
+				case 'E':
+					v_continue = false;
+					break;
+				default:
 					QueryNode[] qn_list = getQueryList(line);
 					for(QueryNode qn: qn_list){
+						double val = 0.0;
+						switch(infotype){
+						case PlotParam.INFO_TYPE_DIFF:
+							val = qn.diff;
+							break;
+						case PlotParam.INFO_TYPE_MATCHING_SIM:
+							val = qn.matching_sim;
+							break;
+						case PlotParam.INFO_TYPE_MAX_SIM:
+							val = qn.max_sim;
+							break;
+						case PlotParam.INFO_TYPE_ENTROPY:
+							val = qn.entropy;
+						}
 						if(avg){
-							int b = (int) (qn.matching_sim*nBucket);
-							if(b == nBucket){b--;}
+							int b = (int) (val*nBucket/max);
+							b = Math.min(b, nBucket-1);
 							
 							data[b][1]+= qn.cost;
 							count[b]++;
 						}else{
 							cost.add((double) qn.cost);
-							w_list.add(qn.matching_sim);
+							w_list.add(val);
 						}
 					}
 					break;
-				default:
-					v_continue = false;
-					break;
+				
 				}
 			}
 			
@@ -583,6 +618,7 @@ public class DataPlot {
 				}
 			}else{
 				if(cost.size()==0){
+					br.close();
 					return null;
 				}
 				data = new double[cost.size()][2];
@@ -591,6 +627,7 @@ public class DataPlot {
 					data[i][1] = cost.get(i);
 				}
 			}
+			br.close();
 			return data;
 		}catch(FileNotFoundException e){
 			return null;
@@ -665,19 +702,21 @@ public class DataPlot {
 				switch(sc){
 				case 'i':
 					continue;
-				case '(':
+				case 'E':
+					v_continue = false;
+					break;
+				default:
 					QueryNode[] qn_list = getQueryList(line);
 					for(QueryNode qn: qn_list){
 						cost.add((double) qn.cost);
 						diff_list.add(qn.diff);
 					}
 					break;
-				default:
-					v_continue = false;
-					break;
+
 				}
 			}
 			if(cost.size()==0){
+				br.close();
 				return null;
 			}
 			double[][] data = new double[cost.size()][2];
@@ -685,6 +724,7 @@ public class DataPlot {
 				data[i][0] = diff_list.get(i);
 				data[i][1] = cost.get(i);
 			}
+			br.close();
 			return data;
 		}catch(FileNotFoundException e){
 			return null;
@@ -769,7 +809,10 @@ public class DataPlot {
 				case 'i':
 					iteration = Integer.parseInt(line.split(":")[1].trim());
 					continue;
-				case '(':
+				case 'E':
+					v_continue = false;
+					break;
+				default:
 					QueryNode[] qn_list = getQueryList(line);
 					double avg = 0.0;
 					for(QueryNode qn: qn_list){
@@ -781,12 +824,10 @@ public class DataPlot {
 					cost.add(avg);
 					iter_list.add(iteration);
 					break;
-				default:
-					v_continue = false;
-					break;
 				}
 			}
 			if(cost.size()==0){
+				br.close();
 				return null;
 			}
 			double[][] data = new double[cost.size()][2];
@@ -794,6 +835,7 @@ public class DataPlot {
 				data[i][0] = iter_list.get(i);
 				data[i][1] = cost.get(i);
 			}
+			br.close();
 			return data;
 		}catch(FileNotFoundException e){
 			return null;
@@ -806,5 +848,25 @@ public class DataPlot {
 	
 }
 
-
+class PlotParam{
+	static final int INFO_TYPE_DIFF 		= 1;
+	static final int INFO_TYPE_MAX_SIM 		= 2;
+	static final int INFO_TYPE_MATCHING_SIM = 3;
+	static final int INFO_TYPE_ENTROPY 		= 4; 
+	
+	static final String[] info_str = {"","DIFF","MAX_SIM","MATCHING_SIM","ENTROPY"};
+	static final String[] info_label = {"","Diff","Max Similarity","Matching Similarity","Entropy"};
+	
+	
+	ArrayList<Integer> infotypes = new ArrayList<Integer>();
+	
+	void append(int i){
+		infotypes.add(i);
+	}
+	
+	static String label(int t){
+		return info_label[t];
+	}
+	
+}
 
