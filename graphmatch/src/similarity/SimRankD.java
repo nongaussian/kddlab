@@ -54,8 +54,8 @@ public class SimRankD extends Similarity{
 		
 		for(int t = 0; t<dat.ntype; t++){
 			for(int i = 0; i<dat.lnodes[t].size; i++){
-				if(dat.lnodes[t].arr[i].label>=0){
-					sim[t].put(i, dat.lnodes[t].arr[i].label, 1.0);
+				if(dat.lnodes[t].arr[i].getNAnnotatios()>0){
+					sim[t].put(i, dat.lnodes[t].arr[i].getLastLabel(), 1.0);
 				}else{
 					int psize = eff_pairs[t][i].size();
 					if(psize>0){
@@ -110,10 +110,8 @@ public class SimRankD extends Similarity{
 					double sr_tmp = 0.0;
 					double sum = 0.0;
 					j = iter_j.nextInt();
-					if(dat.lnodes[t].arr[i].label==j){
-						sum = 1.0;
-					}else if(dat.lnodes[t].arr[i].label>0||dat.rnodes[t].arr[j].label>0){
-						sum = 0.0;
+					if(dat.lnodes[t].arr[i].getNAnnotatios()>0){
+						sum = dat.lnodes[t].arr[i].getWbar(j);
 					}else{
 						for (int s=0; s<dat.ntype; s++) {
 							if(!dat.rel[t][s])

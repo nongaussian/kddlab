@@ -46,20 +46,20 @@ public class cm_data {
 	//           .movie_director
 	public cm_data (String ldataname, String rdataname, double rm_ratio) {
 		// XXX: meta files of left graph and right graph must be the same
-		read_meta_file (ldataname + ".meta");
+		read_meta_file (ldataname + "/meta");
 		
 		// read left graph
 		totallnode = 0;
 		for (int i=0; i<ntype; i++) {
 			read_node_file (lnodes, 
 					i, 
-					ldataname + "." + nodetypes[i]);
+					ldataname + "/" + nodetypes[i]);
 			totallnode += lnodes[i].size;
 		}
 		
 		for (int i=0; i<nrel; i++) {
 			read_relation_file (lnodes,
-					ldataname + "." + nodetypes[relations[i][0]] + "_" + nodetypes[relations[i][1]],
+					ldataname + "/" + nodetypes[relations[i][0]] + "_" + nodetypes[relations[i][1]],
 					relations[i][0], relations[i][1]);
 		}
 		
@@ -68,20 +68,20 @@ public class cm_data {
 		for (int i=0; i<ntype; i++) {
 			read_node_file (rnodes, 
 					i, 
-					rdataname + "." + nodetypes[i]);
+					rdataname + "/" + nodetypes[i]);
 			totalrnode += rnodes[i].size;
 		}
 		
 		for (int i=0; i<nrel; i++) {
 			read_relation_file (rnodes,
-					rdataname + "." + nodetypes[relations[i][0]] + "_" + nodetypes[relations[i][1]],
+					rdataname + "/" + nodetypes[relations[i][0]] + "_" + nodetypes[relations[i][1]],
 					relations[i][0], relations[i][1]);
 		}
 		
 		// read label file
 		for (int i=0; i<ntype; i++) {
 			read_label_file(i,
-					ldataname + ".label." + nodetypes[i]);
+					ldataname + "/label." + nodetypes[i]);
 		}
 		
 		if(rm_ratio>0){
@@ -139,8 +139,8 @@ public class cm_data {
 				int lidx = Integer.parseInt(arr[0]);
 				int ridx = Integer.parseInt(arr[1]);
 				
-				lnodes[t].arr[lidx].label = ridx;
-				rnodes[t].arr[ridx].label = lidx;
+				lnodes[t].arr[lidx].annotate(ridx);
+				rnodes[t].arr[ridx].annotate(lidx);
 			}
 
 			reader.close();
@@ -338,8 +338,9 @@ public class cm_data {
 				}
 				totalline += nodes[type1].arr[j].neighbors[type2].size;
 				
-				if (nodes[type1].arr[j].label >= 0) {
-					System.out.println("" + node1 + " -> " + nodes[type1].arr[j].label);
+				if (nodes[type1].arr[j].getNAnnotatios() >= 0) {
+					//TODO print all annotations?
+					System.out.println("" + node1 + " -> " + nodes[type1].arr[j].getLastLabel());
 				}
 			}
 			

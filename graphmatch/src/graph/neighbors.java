@@ -18,7 +18,7 @@ public class neighbors {
 		size++;
 	}
 	public void alloc () {
-		if (size == 0) return;
+		//if (size == 0) return;
 		arr = new int[size];
 		tmp = 0;
 	}

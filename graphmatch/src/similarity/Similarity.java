@@ -1,12 +1,19 @@
 package similarity;
 
 import graph.node;
+import it.unimi.dsi.fastutil.ints.Int2DoubleMap.Entry;
 import it.unimi.dsi.fastutil.ints.IntIterator;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import net.sourceforge.argparse4j.inf.Namespace;
+import sim.Param;
 import cm.QueryNode;
 import cm.cm_data;
 
@@ -28,10 +35,14 @@ public abstract class Similarity{
 	public int maxlneighborsize					= 0;
 	public int maxrneighborsize					= 0;
 	
+	
+	
+	
 	public Similarity(Namespace nes) {
 		radius = nes.getInt("radius");
 		max_iter					= nes.getInt("niter");
 		th_convergence				= nes.getDouble("thres");
+		
 	}
 	
 	
@@ -39,9 +50,9 @@ public abstract class Similarity{
 	public SparseMatrix[] sim_next;
 	
 	public void set_dat (cm_data dat) {
-		this.dat = dat;
-		
+		this.dat = dat;	
 	}
+	
 	protected void initSimMatrix(){
 		sim = new SparseMatrix[dat.ntype];
 		sim_next = new SparseMatrix[dat.ntype];	
@@ -71,13 +82,6 @@ public abstract class Similarity{
 		this.radius = radius;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
 	public abstract void initialize(cm_data dat);
 	
 
@@ -98,10 +102,10 @@ public abstract class Similarity{
 
 		for(int t = 0; t<dat.ntype; t++){
 			for(int i = 0; i<eff_pairs[t].length; i++){
-				if(dat.lnodes[t].arr[i].label>=0){
-					eff_pairs[t][i].add(dat.lnodes[t].arr[i].label);
+				if(dat.lnodes[t].arr[i].getNAnnotatios()>0){
+					eff_pairs[t][i].add(dat.lnodes[t].arr[i].getLastLabel());
 					register_node(lgroup, dat.lnodes[t].arr[i], t, radius, true);
-					register_node(rgroup, dat.rnodes[t].arr[dat.lnodes[t].arr[i].label], t, radius, false);
+					register_node(rgroup, dat.rnodes[t].arr[dat.lnodes[t].arr[i].getLastLabel()], t, radius, false);
 				}
 
 
@@ -123,8 +127,7 @@ public abstract class Similarity{
 		}
 	}
 	
-	public void update_effpairs(QueryNode[] queries, cm_data dat){
-		
+	public void update_effpairs(QueryNode[] queries, cm_data dat, Param param){
 		IntOpenHashSet[] lgroup = new IntOpenHashSet[dat.ntype];
 		IntOpenHashSet[] rgroup = new IntOpenHashSet[dat.ntype];
 		for(int t = 0; t<dat.ntype; t++){
@@ -137,8 +140,11 @@ public abstract class Similarity{
 				eff_pairs[q.t][q.id].add(q.matched_id);
 				register_node(lgroup, dat.lnodes[q.t].arr[q.id], q.t, radius, true);
 				register_node(rgroup, dat.rnodes[q.t].arr[q.matched_id], q.t, radius, false);
-				
-				sim_next[q.t].put(q.id, dat.lnodes[q.t].arr[q.id].label, 1.0);
+				if(param.perfect_ann){
+					sim_next[q.t].put(q.id, q.matched_id, 1.0);
+				}else{
+					sim_next[q.t].put(q.id, q.matched_id, (1.0+sim_next[q.t].get(q.id, q.matched_id))/2.0);
+				}
 			}
 			
 			l_list = lgroup[q.t].toArray(new int[0]);
@@ -195,4 +201,47 @@ public abstract class Similarity{
 	}
 	
 	public abstract void run() throws IOException;
+	
+	
+	public void saveSimilarity(Param param, String dataname, double rm_ratio, int nquery, int iteration){
+		String dir = "model";
+		File f = new File(dir);
+		f.mkdir();
+		dir += ("/"+dataname);
+		f = new File(dir);
+		f.mkdir();
+		
+		String filename = String.format("%s/%s_%s_rmr%s_nq%d", dir, param.getQueryString(), param.getSimString(),Param.double2String_filename(rm_ratio),nquery);
+		
+		if(iteration>0){
+			filename += ("."+iteration);
+		}
+		try {
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(filename)));
+			for(int t = 0; t < sim_next.length; t++){
+				pw.printf("type %d\n", t);
+				
+				for(int i = 0; i < dat.lnodes[t].size; i++){
+					pw.printf("%d-", i);
+					ObjectIterator<Entry> oiter = sim_next[t].getEntryIterator(i);
+					if(oiter.hasNext()){
+						while(true){
+							Entry e = oiter.next();
+								pw.printf("%d,%f", e.getIntKey(),e.getDoubleValue());
+							if(oiter.hasNext()){
+								pw.printf("|");
+							}else{
+								break;
+							}
+						}
+					}
+					pw.println();
+				}
+			}
+			pw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
 }

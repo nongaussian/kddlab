@@ -16,6 +16,11 @@ public class Param{
 	public int sim = 0;
 	public int query 	= 0;
 	
+	public boolean runtoy 		= false;
+	public boolean perfect_ann 	= true;
+	public double err_ann		= 0.0;	
+	
+	
 	public Namespace nes;
 	
 	
@@ -33,6 +38,11 @@ public class Param{
 			}
 		}
 		this.nes = nes;
+		
+		runtoy = nes.getBoolean("runtoy");
+		perfect_ann = nes.getBoolean("perfect_ann");
+		err_ann	= nes.getDouble("err_ann");
+		
 	}
 	
 	public String getSimString(){
@@ -46,10 +56,13 @@ public class Param{
 		return logFilePath(dataname, sim, query, rm_ratio, nquery);
 	}
 	public static String logFilePath(String dataname, int sim, int query, double rm_ratio, int nquery){
-		return String.format("log/%s_%s_%s_rmr%s_nq%d.log",
-				dataname,sim_str[sim],query_str[query],Double.toString(rm_ratio).replace(".","_"),nquery);
+		return String.format("log/%s/%s_%s_rmr%s_nq%d.log",
+				dataname,sim_str[sim],query_str[query],double2String_filename(rm_ratio),nquery);
 	}
 
+	public static String double2String_filename(double d){
+		return Double.toString(d).replace(".", "_");
+	}
 }
 
 

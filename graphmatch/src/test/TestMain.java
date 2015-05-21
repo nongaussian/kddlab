@@ -1,9 +1,14 @@
 package test;
 
+import it.unimi.dsi.fastutil.ints.Int2DoubleMap.Entry;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
+
 import java.io.IOException;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import common.SparseMatrix;
 
 import cm.CandNode;
 import cm.QueryNode;
@@ -12,7 +17,8 @@ public class TestMain {
 	
 	public static void main(String[] args) throws IOException{
 		//testArrayAddAll();
-		testEntropy();
+		//testEntropy();
+		testEditSparseEntry();
 	}
 	public static void testArrayAddAll(){
 		String[] a   = {"a"};
@@ -56,5 +62,38 @@ public class TestMain {
 			}
 		}
 		System.out.println(q.entropy);
+	}
+	public static void testEditSparseEntry(){
+		
+		int[] j_list = {0,2,3,5};
+		SparseMatrix sm = new SparseMatrix(10);
+		for(int j: j_list){
+			System.out.printf("(%d,%f)", j,sm.get(5, j));
+		}
+		System.out.println("\n===============================");
+		
+		sm.put(5, 2, 0.2);
+		sm.put(5, 3, 0.3);
+		sm.put(5, 5, 0.5);
+		
+		for(int j: j_list){
+			System.out.printf("(%d,%f)", j,sm.get(5, j));
+		}
+
+		System.out.println("\n===============================");
+		ObjectIterator<Entry> simiter = sm.getEntryIterator(5);
+		while (simiter.hasNext()){
+			Entry entry = simiter.next();
+			entry.setValue(0.33);
+		}
+		
+		
+		for(int j: j_list){
+			System.out.printf("(%d,%f)", j,sm.get(5, j));
+		}
+		System.out.println("\n===============================");
+		
+		
+		
 	}
 }

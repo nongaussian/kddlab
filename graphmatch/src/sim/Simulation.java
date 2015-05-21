@@ -3,6 +3,7 @@ package sim;
 import gm.data.SqlUnit;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Random;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
@@ -53,7 +54,7 @@ public abstract class Simulation {
 		
 		if(outputfile.equals("null")){
 			outputfile = dataname 
-					+ "_rmr"+Double.toString(rm_ratio).replace(".", "_")
+					+ "_rmr"+Param.double2String_filename(rm_ratio)
 					+".out";
 		}
 		
@@ -98,8 +99,12 @@ public abstract class Simulation {
 	
 	public abstract void init();
 	public void initDB(){
-		sqlunit = new SqlUnit("graphmatching","graphmatching","graphmatching");
-		regiExp();
+		try{
+			sqlunit = new SqlUnit("graphmatching","graphmatching","graphmatching");
+			regiExp();
+		}catch(Exception e){
+			sqlunit = null;
+		}
 	}
 	public abstract void regiExp();
 	public abstract void run() throws IOException;
@@ -107,36 +112,20 @@ public abstract class Simulation {
 	public void finalize(){
 		sqlunit.exit();
 	}
-	protected int match(QueryNode q, CandNode[] cand, int nc) {
-		q.setKnownLink(-1, null);
+	static final double P_GEOMETRIC_DIST_BAD_ANNOTATOR = 0.2;
+
+	public void regiResult(int iteration, int cost, int nmatched, int ntrue, int nfalse, int count_miss){
 		
-		int i=0;
-		while(cand[i].w>0.0) {
-			if (q.id == cand[i].id) {
-				q.setKnownLink(i,cand[i]);
-				return (i+1);
-			}
-			i++;
-		}
-		
-		//Return expected cost if the similarity is zero
-		int cost =  i+(int)Math.ceil((nc-i)/2.0);
-		while (i<nc) {
-			if (q.id == cand[i].id) {
-				q.setKnownLink(i,cand[i]);
-				break;
-			}
-			i++;
-		}
-		return cost;
-	}
-	
-	public void regiResult(int iteration, int cost, int nmatched, int ntrue, int nfalse){
 		sqlunit.executeUpdate(
 				String.format("insert into results " +
-						"(exp_id,iteration, cost, nmatched, ntrue, nfalse) " +
+						"(exp_id,iteration, cost, nmatched, ntrue, nfalse, miss) " +
 						"values (%d,%d,%d,%d,%d,%d);"
-						,expid, iteration, cost, nmatched, ntrue, nfalse));
+						,expid, iteration, cost, nmatched, ntrue, nfalse,count_miss));
+		
+		String log = String.format("" +
+				"iteration: %d, matched: %d, true:%d, false:%d, miss:%d, accuracy:%f ", 
+				iteration, nmatched, ntrue, nfalse, count_miss, ((double)ntrue)/(ntrue+nfalse));
+		System.out.println(log);
 	}
 
 }

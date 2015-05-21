@@ -33,13 +33,8 @@ public class SparseIntMatrix {
 		return val[i].keySet().iterator();
 	}
 	
-	
 	public void add(int i, int j, int v_add){
-		int v = val[i].get(j);
-		
-		v += v_add;
-		
-		val[i].put(j, v);
+		val[i].addTo(j, v_add);
 	}
 	
 	

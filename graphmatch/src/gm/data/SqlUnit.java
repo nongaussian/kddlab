@@ -19,8 +19,9 @@ public class SqlUnit {
 			connect(dbname);
 		} catch (SQLException e) {
 
-			handlingSQLException(e);
-			System.exit(0);
+			//handlingSQLException(e);
+			//System.exit(0);
+			usedb = false;
 		}
 		
 	}
@@ -29,8 +30,7 @@ public class SqlUnit {
 			this.dbname = dbname;
 			connect(dbname,username,pwd);
 		} catch (SQLException e) {
-			handlingSQLException(e);
-			System.exit(0);
+			usedb = false;
 		}
 	}
 	public SqlUnit() {}
