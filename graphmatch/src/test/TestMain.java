@@ -8,6 +8,8 @@ import java.io.IOException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import sim.GraphMatching;
+
 import common.SparseMatrix;
 
 import cm.CandNode;
@@ -16,9 +18,12 @@ import cm.QueryNode;
 public class TestMain {
 	
 	public static void main(String[] args) throws IOException{
-		//testArrayAddAll();
-		//testEntropy();
-		testEditSparseEntry();
+		GraphMatching gm = new GraphMatching(args);
+		gm.init();
+		gm.initDB();
+		gm.run();
+		gm.close();
+		
 	}
 	public static void testArrayAddAll(){
 		String[] a   = {"a"};

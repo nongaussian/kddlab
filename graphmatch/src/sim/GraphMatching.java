@@ -48,6 +48,7 @@ public class GraphMatching  extends Simulation{
 	long time;
 	public static void main(String[] args) throws IOException{
 		//runall("tiny",-1,-1);
+		
 		runtoy("ex_3",Param.SIM_PROPOSED,Param.QUERY_EMC);
 		//runtoy("ex_3",Param.SIM_PROPOSED,Param.QUERY_NEIGHBORPAIR);
 		//runtoy("ex_3",-1, -1);
@@ -61,7 +62,9 @@ public class GraphMatching  extends Simulation{
 				"-nq", "1",				
 				"-runtoy","true",
 				"-thres", "1.0e-5",
-				"-perfect_ann","false"};
+				"-perfect_ann","false"
+				};
+	
 			
 		String[] sim_list = null;
 		if(sim>0){
