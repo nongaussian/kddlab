@@ -26,7 +26,12 @@ public class SparseIntMatrix {
 		return val[i].size();
 	}
 	public void put(int i, int j, int v){
-		val[i].put(j, v);
+		if(v==0){
+			val[i].remove(j);
+		}else{
+			val[i].put(j, v);
+		}
+		
 	}
 	
 	public IntIterator keyiterator(int i){

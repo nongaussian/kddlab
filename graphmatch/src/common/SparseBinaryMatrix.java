@@ -31,11 +31,50 @@ public class SparseBinaryMatrix {
 		SparseBinaryMatrix sm = new SparseBinaryMatrix(100);
 		System.out.println(sm.get(1, 1));
 		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
+		sm.setTrue(1, 1);
 		System.out.println(sm.get(1, 1));
 		sm.setFalse(1, 1);
 		System.out.println(sm.get(1, 1));
 		sm.setTrue(2, 2);
 		System.out.println(sm.get(2, 2));
+		
+		
 	}
 }
 

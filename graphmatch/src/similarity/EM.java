@@ -2,6 +2,8 @@ package similarity;
 
 import graph.node;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap.Entry;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntMap.FastEntrySet;
 import it.unimi.dsi.fastutil.ints.IntIterator;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
@@ -19,14 +21,14 @@ public class EM extends Similarity{
 	public double[] c				= null;
 	public double[] c_next			= null;
 	double[] tmp_w					= null;
+	double[] tmp_wbar				= null;
 	
 	
 	public EM(Namespace nes) {
 		super(nes);
+		
+		mu = nes.getDouble("mu");
 	}
-	
-	
-	
 	
 	private void temp_stat() {
 		maxrnodesize = 0;
@@ -99,6 +101,7 @@ public class EM extends Similarity{
 		beta = new double[maxrnodesize];
 		delta = new double[dat.ntype][maxlneighborsize][maxrneighborsize];
 		tmp_w = new double[maxrnodesize];
+		tmp_wbar = new double[maxrnodesize];
 	}
 
 	@Override
@@ -159,51 +162,56 @@ public class EM extends Similarity{
 	// compute the (approximate) expected model change when we ask to annotate for node i of type t
 	public double compute_expected_model_change(int t, int i) {
 		double sum = 0;
+		node n_ti = dat.lnodes[t].arr[i];
 		
 		IntIterator iter_j = eff_pairs[t][i].iterator();
 		int j;
 		while(iter_j.hasNext()){
 			j = iter_j.nextInt();
-			double diff = 0;
-
+			if(sim_next[t].get(i, j)==0.0)
+				continue;
+			estimate_wnext(tmp_wbar, n_ti, t, i, j);
 			
+			double delta_tij = tmp_wbar[j]- sim_next[t].get(i, j);
+			
+			double diff = 0;
 			// change of the neighbors of i
 			for (int s=0; s<dat.ntype; s++) {
-				if (!dat.rel[t][s]){
-					if (t==s){
-						if(sim_next[t].get(i, j)>0.0){
-							diff += -Math.log(Math.sqrt(sim_next[t].get(i, j)*1.0));
-						}
-					}
-					continue;
-				}
-				
-				for (int n_x=0; n_x<dat.lnodes[t].arr[i].neighbors[s].size; n_x++) {
-					int x = dat.lnodes[t].arr[i].neighbors[s].arr[n_x];
+				if( t == s ){
+					int x = i;
 					double tmp = 0;
-					
-					estimate_w(tmp_w, t, i, j, s, x);
-					//*/
-					IntIterator iter_y = eff_pairs[s][x].iterator();
+					IntIterator iter_y = dat.lnodes[s].arr[x].getAnnotations().keySet().iterator();
+					//IntIterator iter_y = eff_pairs[s][x].iterator();
 					int y;
-					
 					while(iter_y.hasNext()){
 						y = iter_y.nextInt();
-						tmp += Math.sqrt(sim_next[s].get(x, y)*tmp_w[y]);
+						tmp += Math.sqrt(sim_next[s].get(x, y)*tmp_wbar[y]);
 					}
-					/*/
-					
-					for (int n_y=0; n_y<dat.rnodes[t].arr[j].neighbors[s].size; n_y++) {
-						int y = dat.rnodes[t].arr[j].neighbors[s].arr[n_y];
-						tmp += Math.sqrt(sim_next[s].get(x, y) * tmp_w[n_y]);
-					}
-					//*/
-					
 					if(tmp>0.0){
 						diff += -Math.log(tmp);
 					}
-					if(Double.isNaN(diff)||Double.isInfinite(diff)){
-						System.out.printf("diff: %f, tmp:%f\n",diff,tmp);
+					
+				}
+				if(dat.rel[t][s]){
+					for (int n_x=0; n_x<n_ti.neighbors[s].size; n_x++) {
+						int x = n_ti.neighbors[s].arr[n_x];
+						double tmp = 0;
+						
+						estimate_w(tmp_w, t, i, j, s, x, delta_tij);
+						//*/
+						IntIterator iter_y = eff_pairs[s][x].iterator();
+						int y;
+						
+						while(iter_y.hasNext()){
+							y = iter_y.nextInt();
+							tmp += Math.sqrt(sim_next[s].get(x, y)*tmp_w[y]);
+						}
+						if(tmp>0.0){
+							diff += -Math.log(tmp);
+						}
+						if(Double.isNaN(diff)||Double.isInfinite(diff)){
+							System.out.printf("diff: %f, tmp:%f\n",diff,tmp);
+						}
 					}
 				}
 			}
@@ -212,12 +220,43 @@ public class EM extends Similarity{
 		
 		return sum;
 	}
-
-	// estimate w[s].arr[u]
-	private void estimate_w(double[] w, int t, int i, int j, int s, int x) {
-		Arrays.fill(w, 0.0);
+	private void estimate_wnext(double[] w_next, node n_ti, int t, int i, int j){
+		Arrays.fill(w_next, 0,dat.lnodes[t].size, 0.0);
+		if(n_ti.getNAnnotatios()==0){
+			w_next[j] = 1.0; 
+			return;
+		}
+		FastEntrySet es = n_ti.getAnnotations().int2IntEntrySet();
 		
-		double w_tij = sim_next[t].get(i, j);
+		boolean j_ann = false;
+		double sum = 1.0;
+		ObjectIterator<Int2IntMap.Entry> iter = es.iterator();
+		Int2IntMap.Entry entry;
+		while(iter.hasNext()){
+			entry = iter.next();
+			w_next[entry.getIntKey()] = entry.getIntValue();
+			sum +=w_next[entry.getIntKey()];
+			if(entry.getIntKey()==j){
+				j_ann = true;
+			}
+		}
+		w_next[j]++;
+		
+		
+		iter = es.iterator();
+		while(iter.hasNext()){
+			entry = iter.next();
+			w_next[entry.getIntKey()] /= sum;
+		}
+		
+		if(!j_ann){
+			w_next[j]/=sum;
+		}
+	}
+	// estimate w[s].arr[u]
+	private void estimate_w(double[] w, int t, int i, int j, int s, int x, double delta_tij) {
+		Arrays.fill(w, 0.0);
+
 		double sum = 0.0;
 		IntIterator iter_y = eff_pairs[s][x].iterator();
 		int y;
@@ -232,10 +271,10 @@ public class EM extends Similarity{
 		//Add increments of similarity 
 		int[] x_neighbors = dat.lnodes[s].arr[x].neighbors[t].arr;
 		int[] j_neighbors = dat.rnodes[t].arr[j].neighbors[s].arr;
-		if(x_neighbors.length>0&& j_neighbors.length>0){
+		if(x_neighbors.length > 0 && j_neighbors.length > 0){
 			double nst_x = (double) x_neighbors.length;
 			double nts_j = (double) j_neighbors.length;
-			double tmp = (1.0-w_tij)/nst_x;
+			double tmp = c[t]*delta_tij/nst_x;
 			
 			if(tmp>0.0){
 				for (int idx_y=0; idx_y< j_neighbors.length; idx_y++){
@@ -289,17 +328,13 @@ public class EM extends Similarity{
 		// init w
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
-				//IntIterator iter_j = eff_pairs[t][i].iterator();
 				ObjectIterator<Entry> sim_iter = sim_next[t].getEntryIterator(i);
-				//int j;
+
 				while(sim_iter.hasNext()){
 					Entry entry = sim_iter.next();
 					sim[t].put(i,entry.getIntKey(),entry.getDoubleValue());
 					entry.setValue(0.0);
-				//while(iter_j.hasNext()){
-					//j = iter_j.nextInt();
-					//sim[t].put(i, j, sim_next[t].get(i, j));
-					//sim_next[t].put(i, j, 0.0);
+
 				}
 				
 			}
@@ -310,50 +345,58 @@ public class EM extends Similarity{
 			for (int i=0; i<dat.lnodes[t].size; i++) {
 				// compute variables use in this iteration only
 				compute_alpha(t, i, alpha);	//alpha^t_i*
-				compute_beta(t, i, beta);		//beta^t_i*
+				
+				if(dat.lnodes[t].arr[i].getNAnnotatios() > 0){
+					compute_beta(t, i, beta);	//beta^t_i*
+				}
 				// compute a w distribution
 				//*/
 				
 				int j;
+				/*/
 				Entry entry;
+				
 				ObjectIterator<Entry> sim_iter = sim_next[t].getEntryIterator(i);
 				while(sim_iter.hasNext()){
 					entry = sim_iter.next();
 					j = entry.getIntKey();
-				//IntIterator iter_j = eff_pairs[t][i].iterator();
-				//while(iter_j.hasNext()){
-					//j = iter_j.nextInt();
-
-					compute_delta(t, i, j, delta);//delta^ts_ij**
+				/*/
+				IntIterator iter_j = eff_pairs[t][i].iterator();
+				while(iter_j.hasNext()){
+					j = iter_j.nextInt();
+				//*/
 					
-					// add alpha
-					entry.setValue(alpha[j]);
-					//sim_next[t].add(i, j, alpha[j]);
-					
-					
-					// distribute delta
-					for (int s=0; s<dat.ntype; s++) {
-						if (!dat.rel[t][s]) continue;
-						int n_i = dat.lnodes[t].arr[i].neighbors[s].size;
-						int n_j = dat.rnodes[t].arr[j].neighbors[s].size;
+					if(alpha[j]>0.0){
+						compute_delta(t, i, j, delta);//delta^ts_ij**
 						
-						for (int x=0; x<n_i; x++) {
-							int u = dat.lnodes[t].arr[i].neighbors[s].arr[x];
-							for (int y=0; y<n_j; y++) {
-								int v = dat.rnodes[t].arr[j].neighbors[s].arr[y];
-								boolean suv_eff = eff_pairs[s][u].contains(v);
-								if(suv_eff){
+						// add alpha
+						//entry.setValue(alpha[j]);
+						sim_next[t].add(i, j, alpha[j]);
+						
+						
+						// distribute delta
+					
+						for (int s=0; s<dat.ntype; s++) {
+							if (!dat.rel[t][s]) continue;
+							int n_i = dat.lnodes[t].arr[i].neighbors[s].size;
+							int n_j = dat.rnodes[t].arr[j].neighbors[s].size;
+							
+							for (int x=0; x<n_i; x++) {
+								int u = dat.lnodes[t].arr[i].neighbors[s].arr[x];
+								for (int y=0; y<n_j; y++) {
+									int v = dat.rnodes[t].arr[j].neighbors[s].arr[y];
 									double tmp = alpha[j] * delta[s][x][y];
-									if(Double.isNaN(tmp)){
-										System.out.printf("NaN w_%d(%d,%d)   alpha[%d]=%f delta[%d][%d][%d]=%f:\n",t,i,j,j,alpha[j],s,x,y,delta[s][x][y]);
+									if(tmp > 0.0){
+										if(Double.isNaN(tmp)){
+											System.out.printf("NaN w_%d(%d,%d)   alpha[%d]=%f delta[%d][%d][%d]=%f:\n",t,i,j,j,alpha[j],s,x,y,delta[s][x][y]);
+										}
+										sim_next[s].add(u, v, tmp);
+										c_next[s] += tmp;
 									}
-									sim_next[s].add(u, v, tmp);
-									c_next[s] += tmp;
 								}
 							}
 						}
 					}
-					
 					//add beta
 					if (dat.lnodes[t].arr[i].getNAnnotatios() > 0) {
 						sim_next[t].add(i, j, beta[j]*mu);
@@ -428,7 +471,7 @@ public class EM extends Similarity{
 				for (int y=0; y<n_j; y++) {
 					int v = dat.rnodes[t].arr[j].neighbors[s].arr[y];
 					//if (dat.rnodes[s].arr[v].neighbors[t].size == 0) continue; //it cannot be zero
-					//if(!eff_pairs[t][u].contains(v)) continue;
+					//if(!eff_pairs[s][u].contains(v)) continue;
 						
 					
 					delta[s][x][y] = 
@@ -481,7 +524,8 @@ public class EM extends Similarity{
 					for (int y=0; y<n_j; y++) {
 						int v = dat.rnodes[t].arr[j].neighbors[s].arr[y];
 						
-						if (dat.rnodes[s].arr[v].neighbors[t].size == 0) continue;
+						//Impossible condition
+						//if (dat.rnodes[s].arr[v].neighbors[t].size == 0) continue;
 						
 						sum += sim[s].get(u, v)
 								/ (double) dat.rnodes[s].arr[v].neighbors[t].size;
@@ -514,15 +558,25 @@ public class EM extends Similarity{
 	private void compute_beta(int t, int i, double[] beta) {
 		Arrays.fill(beta, 0.0);
 		
-		ObjectIterator<Entry> sim_iter = sim[t].getEntryIterator(i);
+		ObjectIterator<Int2IntMap.Entry> iter = dat.lnodes[t].arr[i].getAnnotations().int2IntEntrySet().iterator();
 		
+		while(iter.hasNext()){
+			Int2IntMap.Entry entry = iter.next();
+			
+			beta[entry.getIntKey()] = Math.sqrt(sim[t].get(i, entry.getIntKey()) * dat.lnodes[t].arr[i].getWbar(entry.getIntKey()));
+			
+		}
+		
+		/*
+		ObjectIterator<Entry> sim_iter = sim[t].getEntryIterator(i);
 		while(sim_iter.hasNext()){
 			Entry entry = sim_iter.next();
 			if(entry.getDoubleValue()>0.0){
 				beta[entry.getIntKey()] = 
 						Math.sqrt(entry.getDoubleValue() * dat.lnodes[t].arr[i].getWbar(entry.getIntKey())); 
 			}
-		}	
+		}
+		*/	
 	}
 	
 	
@@ -611,4 +665,6 @@ public class EM extends Similarity{
 		
 		return -(sum1 + mu * sum2);
 	}
+	
+	
 }

@@ -70,4 +70,7 @@ public class node {
 	public Int2IntOpenHashMap getAnnotations(){
 		return annotations;
 	}
+	public int getNAnnotatios(int j) {
+		return annotations.get(j);
+	}
 }

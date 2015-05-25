@@ -38,6 +38,8 @@ public class GraphMatching  extends Simulation{
 	Similarity model;
 	EM em;
 	
+	
+	@Deprecated
 	public SparseIntMatrix[] neighbor_pairs		= null;
 	
 	Param param;
@@ -46,127 +48,7 @@ public class GraphMatching  extends Simulation{
 	
 	
 	long time;
-	public static void main(String[] args) throws IOException{
-		//runall("tiny",-1,-1);
-		
-		runtoy("ex_3",Param.SIM_PROPOSED,Param.QUERY_EMC);
-		//runtoy("ex_3",Param.SIM_PROPOSED,Param.QUERY_NEIGHBORPAIR);
-		//runtoy("ex_3",-1, -1);
-	}
-	
-	
-	public static void runtoy(String dataname,int sim,int query) throws IOException{
-		String[] basic_args = {
-				"-maxacc", "0.9",
-				"-data", dataname,
-				"-nq", "1",				
-				"-runtoy","true",
-				"-thres", "1.0e-5",
-				"-perfect_ann","false"
-				};
-	
-			
-		String[] sim_list = null;
-		if(sim>0){
-			sim_list = new String[1];
-			sim_list[0] = Param.sim_str[sim];
-		}else{
-			sim_list = Arrays.copyOfRange(Param.sim_str, 1, Param.sim_str.length);
-		}
-		String[] query_list = null;
-		if(query>0){
-			query_list = new String[1];
-			query_list[0] = Param.query_str[query];
-		}else{
-			query_list = Arrays.copyOfRange(Param.query_str, 1, Param.query_str.length);
-		}
-		
-		
-		String[] r_list ={"2"};
-		String[] rmr_list = {"0.0"};
 
-		int i = 0;
-		for(String rmr:rmr_list){
-			String[] cmd_rmr = {"-rmr",rmr};
-			String[] cmd0 = ArrayUtils.addAll(basic_args, cmd_rmr);
-			for(String sim_str: sim_list){
-				String[] cmd_sim = {"-sim", sim_str};
-				String[] cmd1 = ArrayUtils.addAll(cmd0, cmd_sim);
-				for(String query_str: query_list){
-					String[] cmd_qry = {"-query",query_str};
-					String[] cmd2 = ArrayUtils.addAll(cmd1, cmd_qry);
-					for(String r:r_list){
-						String[] cmd_r = {"-radius",r};
-						String[] cmd = ArrayUtils.addAll(cmd2, cmd_r);
-					
-						System.out.println((++i)+"  "+StringUtils.join(cmd," "));
-						GraphMatching gm = new GraphMatching(cmd);
-						gm.init();
-						//gm.initDB();
-						gm.run();
-						gm.close();
-						
-						
-					}
-				}
-			}
-		}
-	}
-	public static void runall(String dataname,int sim,int query) throws IOException{
-		String[] basic_args = {
-				"-maxacc", "0.6",
-				//"-maxacc", "0.02",
-				"-data", dataname,
-				"-nq", "100",
-				"-thres", "1.0e-5"};
-				//"-thres", "1.0e-3"};
-			
-			String[] sim_list = null;
-			if(sim>0){
-				sim_list = new String[1];
-				sim_list[0] = Param.sim_str[sim];
-			}else{
-				sim_list = Arrays.copyOfRange(Param.sim_str, 1, Param.sim_str.length);
-			}
-			String[] query_list = null;
-			if(query>0){
-				query_list = new String[1];
-				query_list[0] = Param.query_str[query];
-			}else{
-				query_list = Arrays.copyOfRange(Param.query_str, 1, Param.query_str.length);
-			}
-			
-			
-			String[] r_list ={"2"};
-			String[] rmr_list = {/*"0.0","0.05","0.1",*/"0.2"};
-
-			int i = 0;
-			for(String rmr:rmr_list){
-				String[] cmd_rmr = {"-rmr",rmr};
-				String[] cmd0 = ArrayUtils.addAll(basic_args, cmd_rmr);
-				for(String sim_str: sim_list){
-					String[] cmd_sim = {"-sim", sim_str};
-					String[] cmd1 = ArrayUtils.addAll(cmd0, cmd_sim);
-					for(String query_str: query_list){
-						String[] cmd_qry = {"-query",query_str};
-						String[] cmd2 = ArrayUtils.addAll(cmd1, cmd_qry);
-						for(String r:r_list){
-							String[] cmd_r = {"-radius",r};
-							String[] cmd = ArrayUtils.addAll(cmd2, cmd_r);
-						
-							System.out.println((++i)+"  "+StringUtils.join(cmd," "));
-							GraphMatching gm = new GraphMatching(cmd);
-							gm.init();
-							//gm.initDB();
-							gm.run();
-							gm.close();
-							
-							
-						}
-					}
-				}
-			}
-	}
 	
 	
 	public GraphMatching(Namespace nes) {
@@ -221,6 +103,9 @@ public class GraphMatching  extends Simulation{
 			.setDefault(0.0)
 			.help("Annotator error ratio\n" +
 					"Disable -perfect_ann if you want to simulate annotator error");
+		parser.addArgument("-mu")
+		.type(Double.class)
+		.setDefault(1.0);
 		return parser;
 	}
 
@@ -251,7 +136,11 @@ public class GraphMatching  extends Simulation{
 				em = new EM(param.nes);
 			}
 			break;
+		case Param.QUERY_MAXVAR:
+		case Param.QUERY_MINVAR:
+			break;
 		case Param.QUERY_NEIGHBORPAIR:
+		case Param.QUERY_NEIGHBORPAIR_OVERLAP:
 			break;
 		case Param.QUERY_RANDOM:
 			break;
@@ -264,13 +153,14 @@ public class GraphMatching  extends Simulation{
 		expid = sqlunit.executeUpdateGetAutoKey(
 			String.format(
 				"insert into Experiment" +
-				"(data,sim, query, nq, radius, rmr)" +
-				"values ('%s','%s', '%s', %d, %d, %f );"
-				,dataname, param.getSimString(), param.getQueryString(), nquery, model.getRadius(), rm_ratio));
+				"(data,sim, query, nq, radius, rmr,err,mu)" +
+				"values ('%s','%s', '%s', %d, %d, %f ,%f,%f);"
+				,dataname, param.getSimString(), param.getQueryString(), nquery, model.getRadius(), rm_ratio,param.err_ann,param.nes.getDouble("mu")));
 	}
 	
 	
 	
+	@Deprecated
 	void initialize_neighbor_pairs(){
 		neighbor_pairs = new SparseIntMatrix[dat.ntype];
 		for (int t=0; t<dat.ntype; t++) {
@@ -317,7 +207,7 @@ public class GraphMatching  extends Simulation{
 			em.initialize(dat);
 		}
 		
-		if(param.query == Param.QUERY_NEIGHBORPAIR){
+		if(param.query == Param.QUERY_NEIGHBORPAIR||param.query == Param.QUERY_NEIGHBORPAIR_OVERLAP){
 			initialize_neighbor_pairs();
 		}
 		
@@ -334,6 +224,14 @@ public class GraphMatching  extends Simulation{
 			if(param.runtoy){
 				model.saveSimilarity(param, dataname, rm_ratio, nquery, iteration);
 			}
+			
+			
+			accuracy = computeAccuracy(iteration, totalcost, nmatch);
+			System.out.printf("Accuracy:  %f\n", accuracy);
+			if (accuracy>max_accuracy){
+				break;
+			}
+			
 			// select a query & candidates
 			int nq = select_query (nquery, queries,iteration);
 			
@@ -376,8 +274,7 @@ public class GraphMatching  extends Simulation{
 			}
 			update_after_matching(queries);
 			
-			accuracy = computeAccuracy(iteration, totalcost, nmatch);
-			System.out.printf("Accuracy:  %f\n", accuracy);
+			
 		}
 		
 		out.close();
@@ -391,7 +288,7 @@ public class GraphMatching  extends Simulation{
 
 	
 	private void update_after_matching(QueryNode[] queries) {
-		if(param.query == Param.QUERY_NEIGHBORPAIR){
+		if(param.query == Param.QUERY_NEIGHBORPAIR||param.query ==Param.QUERY_NEIGHBORPAIR_OVERLAP){
 			update_neighbor_pairs(queries);
 		}
 	}
@@ -441,7 +338,7 @@ public class GraphMatching  extends Simulation{
 					node n_ti = dat.lnodes[t].arr[i];
 					if(n_ti.getNAnnotatios()>0){
 						if(n_ti.getWbar(n_ti.getLastLabel())==1.0){
-							flag_lmatched[n_ti.getLastLabel()] = true;
+							flag_lmatched[i] = true;
 							flag_rmatched[n_ti.getLastLabel()] = true;
 							if(n_ti.getLastLabel()==i){
 								count_correct++;
@@ -461,20 +358,20 @@ public class GraphMatching  extends Simulation{
 				Collections.sort(links, new Comparator<EntryWrapper>() {
 					@Override
 					public int compare(EntryWrapper o1, EntryWrapper o2) {
-						double comp = o1.entry.getDoubleValue()-o2.entry.getDoubleValue();
+						double comp = o2.w-o1.w;
 						if(comp==0.0)return 0;
 						return comp>0.0?1:-1;
 					}
 				});
 				for(EntryWrapper ew: links){
-					if(flag_lmatched[ew.id]||flag_rmatched[ew.entry.getIntKey()])
+					if(flag_lmatched[ew.id]||flag_rmatched[ew.j])
 						continue;
-					if(ew.id==ew.entry.getIntKey()){
+					if(ew.id==ew.j){
 						count_correct++;
 					}
 					count_pass--;
 					flag_lmatched[ew.id] = true;
-					flag_rmatched[ew.entry.getIntKey()] = true;
+					flag_rmatched[ew.j] = true;
 				}
 			}
 			count_pass+=count_tot;
@@ -494,22 +391,56 @@ public class GraphMatching  extends Simulation{
 		
 		PriorityQueue<QueryNode> topk  = new PriorityQueue<QueryNode> (n, comp);
 		double val = 0.0;
+		//int tie_count = 0;
 		StringBuilder qry_sb = new StringBuilder();
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
-				if (param.perfect_ann&&dat.lnodes[t].arr[i].getNAnnotatios() > 0) continue;
+				if (dat.lnodes[t].arr[i].getNAnnotatios() > 0){
+					if(param.perfect_ann){
+						continue;
+					}
+					
+										
+					boolean b_cont = false;
+					switch (param.query){
+					case Param.QUERY_MAXVAR:
+					case Param.QUERY_MINVAR:
+					case Param.QUERY_NEIGHBORPAIR:
+						b_cont = true;
+						break;
+					
+					}
+					if (b_cont){
+						continue;
+					}
+				}
 				
+
 				switch (param.query){
 					case Param.QUERY_EMC:
 						val = em.compute_expected_model_change(t, i);
 						break;
+					case Param.QUERY_MAXVAR:
+					case Param.QUERY_MINVAR:
+						if(model.eff_pairs[t][i].size()==0){
+							continue;
+						}else{
+							val = model.similarity_variance(t, i);
+							if (param.query ==Param.QUERY_MINVAR){
+								val = -val;
+							}
+						}
+						break;
 					case Param.QUERY_NEIGHBORPAIR:
+					case Param.QUERY_NEIGHBORPAIR_OVERLAP:
 						val = (double) neighbor_pairs[t].size(i);
 						break;
 					case Param.QUERY_RANDOM:
 						val = rand.nextDouble();
 						break;
 				}
+				
+				
 				
 				if(param.runtoy){
 					if(i==0&&t==0){
@@ -528,7 +459,8 @@ public class GraphMatching  extends Simulation{
 					tmp.id = i;
 					tmp.diff = val;
 					topk.add(tmp);
-				
+				}else if(topk.peek().diff == val){
+					
 				}
 			}
 		}
@@ -601,6 +533,8 @@ public class GraphMatching  extends Simulation{
 		return n_cand;
 	}
 	
+	
+	@Deprecated
 	void update_neighbor_pairs(QueryNode[] queries){
 		for (QueryNode q : queries) {
 			if(q.matched_id >= 0){
@@ -640,8 +574,8 @@ public class GraphMatching  extends Simulation{
 			if(q>0){
 				pw.print("|");
 			}
-			pw.printf("%d,%d:%f,%f,%f,%f,%d",
-					qn.t, qn.id,qn.diff, qn.max_sim, qn.matching_sim, qn.entropy, qn.cost);
+			pw.printf("%d,%d:%f,%f,%f,%f,%d,%d",
+					qn.t, qn.id,qn.diff, qn.max_sim, qn.matching_sim, qn.entropy, qn.cost,qn.n_annotates);
 			
 		}
 		pw.println();
@@ -667,7 +601,7 @@ public class GraphMatching  extends Simulation{
 		f = new File(dir);
 		f.mkdir();
 		
-		String filename = String.format("%s/%s_%s_rmr%s_nq%d", dir, param.getQueryString(), param.getSimString(),Param.double2String_filename(rm_ratio),nquery);
+		String filename = String.format("%s/%s_%s_rmr%s_nq%d%s", dir, param.getQueryString(), param.getSimString(),Param.double2String_filename(rm_ratio),nquery,param.optAnn());
 		
 		if(iteration>0){
 			filename += ("."+iteration);
@@ -690,12 +624,12 @@ public class GraphMatching  extends Simulation{
 	
 	
 	protected int match(QueryNode q, CandNode[] cand, int nc, Param param) {
-		q.setKnownLink(-1, null);
+		q.initKnownLink();
 		if(param.perfect_ann||rand.nextDouble()>param.err_ann){
 			int i=0;
 			while(cand[i].w>0.0) {
 				if (q.id == cand[i].id) {
-					q.setKnownLink(i,cand[i]);
+					q.setKnownLink(i,cand[i],dat.lnodes[q.t].arr[q.id].getNAnnotatios());
 					return (i+1);
 				}
 				i++;
@@ -705,17 +639,24 @@ public class GraphMatching  extends Simulation{
 			int cost =  i+(int)Math.ceil((nc-i)/2.0);
 			while (i<nc) {
 				if (q.id == cand[i].id) {
-					q.setKnownLink(i,cand[i]);
+					q.setKnownLink(i,cand[i],dat.lnodes[q.t].arr[q.id].getNAnnotatios());
 					break;
 				}
 				i++;
 			}
 			return cost;
 		}
+		
+		int i = 0;
+		if(q.id==cand[i].id){
+			i++;
+		}
+		q.setKnownLink(i, cand[i],dat.lnodes[q.t].arr[q.id].getNAnnotatios());
+		/*
 		//Geometric distribution
 		int i = Math.min(nc-1, (int)Math.floor(Math.log(rand.nextDouble())/Math.log((1.0-P_GEOMETRIC_DIST_BAD_ANNOTATOR))));
 		q.setKnownLink(i, cand[i]);
-		
+		*/
 		return i+1;
 	}
 	
@@ -724,10 +665,12 @@ public class GraphMatching  extends Simulation{
 
 class EntryWrapper{
 	int id;
-	Entry entry;
+	int j;
+	double w;
 	public EntryWrapper(int id,Entry e){
 		this.id = id;
-		entry = e;
+		this.j = e.getIntKey();
+		this.w = e.getDoubleValue();
 	}
 }
 

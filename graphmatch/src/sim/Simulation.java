@@ -49,15 +49,19 @@ public abstract class Simulation {
 		rm_ratio					= nes.getDouble("rmr");
 		
 		dataname 					= nes.getString("data");
+		String dataname_r			= nes.getString("rprefix");
 		lprefix						= "data/"+dataname;
 		rprefix						= "data/"+dataname;
+		
+		if(dataname_r!=null){
+			rprefix = "data/"+dataname_r;
+		}
 		
 		if(outputfile.equals("null")){
 			outputfile = dataname 
 					+ "_rmr"+Param.double2String_filename(rm_ratio)
 					+".out";
 		}
-		
 		
 	}
 	
@@ -69,6 +73,10 @@ public abstract class Simulation {
 				.type(String.class)
 				.required(true)
 				.help("Prefix name of the data");
+		parser.addArgument("-rprefix")
+			.type(String.class)
+			.setDefault((String)null)
+			.help("Prefix name of model the right side graph");
 		parser.addArgument("-wprefix")
 					.type(String.class)
 					.help("Prefix name of model parameters to use for initialization");
@@ -119,11 +127,11 @@ public abstract class Simulation {
 		sqlunit.executeUpdate(
 				String.format("insert into results " +
 						"(exp_id,iteration, cost, nmatched, ntrue, nfalse, miss) " +
-						"values (%d,%d,%d,%d,%d,%d);"
+						"values (%d,%d,%d,%d,%d,%d,%d);"
 						,expid, iteration, cost, nmatched, ntrue, nfalse,count_miss));
 		
 		String log = String.format("" +
-				"iteration: %d, matched: %d, true:%d, false:%d, miss:%d, accuracy:%f ", 
+				"iteration: %d, matched: %d, true:%d, false:%d, miss:%d, recall:%f ", 
 				iteration, nmatched, ntrue, nfalse, count_miss, ((double)ntrue)/(ntrue+nfalse));
 		System.out.println(log);
 	}

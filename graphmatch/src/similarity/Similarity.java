@@ -22,8 +22,8 @@ import common.SparseMatrix;
 public abstract class Similarity{
 	boolean firstrun = true;
 	
-	protected cm_data dat					= null;
-	protected double th_convergence	= 1.0e-5;
+	protected cm_data dat				= null;
+	protected double th_convergence		= 1.0e-5;
 	protected int 	max_iter			= 100;
 	protected int 	min_iter			= 5;
 	protected int 	radius				= -1;
@@ -34,6 +34,10 @@ public abstract class Similarity{
 	public int maxrnodesize						= 0;
 	public int maxlneighborsize					= 0;
 	public int maxrneighborsize					= 0;
+	
+	
+	IntOpenHashSet[] lgroup;
+	IntOpenHashSet[] rgroup;
 	
 	
 	
@@ -87,8 +91,8 @@ public abstract class Similarity{
 
 	public void initialize_effpairs(cm_data dat){
 		eff_pairs = new IntOpenHashSet[dat.ntype][];
-		IntOpenHashSet[] lgroup = new IntOpenHashSet[dat.ntype];
-		IntOpenHashSet[] rgroup = new IntOpenHashSet[dat.ntype];
+		lgroup = new IntOpenHashSet[dat.ntype];
+		rgroup = new IntOpenHashSet[dat.ntype];
 		
 		for(int t = 0; t<dat.ntype; t++){
 			lgroup[t] = new IntOpenHashSet();
@@ -128,36 +132,43 @@ public abstract class Similarity{
 	}
 	
 	public void update_effpairs(QueryNode[] queries, cm_data dat, Param param){
-		IntOpenHashSet[] lgroup = new IntOpenHashSet[dat.ntype];
-		IntOpenHashSet[] rgroup = new IntOpenHashSet[dat.ntype];
 		for(int t = 0; t<dat.ntype; t++){
-			lgroup[t] = new IntOpenHashSet();
-			rgroup[t] = new IntOpenHashSet();
+			lgroup[t].clear();
+			rgroup[t].clear();
 		}
 		int[] l_list,r_list;
 		for (QueryNode q : queries) {
+			if(dat.lnodes[q.t].arr[q.id].getNAnnotatios(q.matched_id)>1){ 
+				continue;
+			}
 			if(q.matched_id >= 0){
-				eff_pairs[q.t][q.id].add(q.matched_id);
+				if(!eff_pairs[q.t][q.id].contains(q.matched_id)){
+					eff_pairs[q.t][q.id].add(q.matched_id);
+				}
+				
 				register_node(lgroup, dat.lnodes[q.t].arr[q.id], q.t, radius, true);
 				register_node(rgroup, dat.rnodes[q.t].arr[q.matched_id], q.t, radius, false);
 				if(param.perfect_ann){
 					sim_next[q.t].put(q.id, q.matched_id, 1.0);
 				}else{
-					sim_next[q.t].put(q.id, q.matched_id, (1.0+sim_next[q.t].get(q.id, q.matched_id))/2.0);
+					sim_next[q.t].put(q.id, q.matched_id, (dat.lnodes[q.t].arr[q.id].getWbar(q.matched_id)+sim_next[q.t].get(q.id, q.matched_id))/2.0);
 				}
 			}
 			
-			l_list = lgroup[q.t].toArray(new int[0]);
-			r_list = rgroup[q.t].toArray(new int[0]);
-			for(Integer x:l_list){
-				for(Integer y:r_list){
-					eff_pairs[q.t][x].add(y);
+			for(int t = 0; t < dat.ntype; t++){
+				l_list = lgroup[t].toArray(new int[0]);
+				r_list = rgroup[t].toArray(new int[0]);
+				for(Integer x:l_list){
+					for(Integer y:r_list){
+						if(!eff_pairs[t][x].contains(y)){
+							eff_pairs[t][x].add(y);
+						}
+					}
 				}
+				
+				lgroup[t].clear();
+				rgroup[t].clear();
 			}
-			
-			lgroup[q.t].clear();
-			rgroup[q.t].clear();
-			
 		}
 		
 	}
@@ -211,7 +222,7 @@ public abstract class Similarity{
 		f = new File(dir);
 		f.mkdir();
 		
-		String filename = String.format("%s/%s_%s_rmr%s_nq%d", dir, param.getQueryString(), param.getSimString(),Param.double2String_filename(rm_ratio),nquery);
+		String filename = String.format("%s/%s_%s_rmr%s_nq%d%s", dir, param.getQueryString(), param.getSimString(),Param.double2String_filename(rm_ratio),nquery,param.optAnn());
 		
 		if(iteration>0){
 			filename += ("."+iteration);
@@ -219,7 +230,7 @@ public abstract class Similarity{
 		try {
 			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(filename)));
 			for(int t = 0; t < sim_next.length; t++){
-				pw.printf("type %d\n", t);
+				pw.printf("type %d\t%s\n", t,dat.nodetypes[t]);
 				
 				for(int i = 0; i < dat.lnodes[t].size; i++){
 					pw.printf("%d-", i);
@@ -243,5 +254,21 @@ public abstract class Similarity{
 			e.printStackTrace();
 		}
 		
+	}
+	public double similarity_variance(int t, int i){
+		double ex_2 = 0.0;
+		double e_x2 = 0.0;
+		ObjectIterator<Entry> sim_iter = sim_next[t].getEntryIterator(i);
+		while(sim_iter.hasNext()){
+			Entry entry = sim_iter.next();
+			e_x2 += Math.pow(entry.getDoubleValue(), 2.0);
+			ex_2 += entry.getDoubleValue();
+		}
+		e_x2 /= dat.rnodes[t].size;
+		ex_2 /= dat.rnodes[t].size;
+		
+		
+		ex_2 *= ex_2;
+		return e_x2-ex_2;
 	}
 }

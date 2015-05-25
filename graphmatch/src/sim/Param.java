@@ -6,19 +6,24 @@ public class Param{
 	public static final int SIM_PROPOSED	= 1;
 	public static final int SIM_SIMRANK 	= 2;
 	
-	public static final int QUERY_EMC			= 1;
-	public static final int QUERY_RANDOM		= 2;
-	public static final int QUERY_NEIGHBORPAIR	= 3;
+	public static final int QUERY_EMC		= 1;
+	public static final int QUERY_RANDOM	= 2;
+	public static final int QUERY_MAXVAR	= 3;
+	public static final int QUERY_MINVAR	= 4;
+	
+	
+	public static final int QUERY_NEIGHBORPAIR	= 5;
+	public static final int QUERY_NEIGHBORPAIR_OVERLAP	= 6;
 	
 	public static final String[] sim_str = {"","PROPOSED","SIMRANK"};
-	public static final String[] query_str = {"","EMC","RANDOM", "NEIGHBORPAIR"};
+	public static final String[] query_str = {"","EMC","RANDOM", "MAXVAR","MINVAR"};
 	
-	public int sim = 0;
-	public int query 	= 0;
+	public int 		sim = 0;
+	public int 		query 	= 0;
 	
 	public boolean runtoy 		= false;
 	public boolean perfect_ann 	= true;
-	public double err_ann		= 0.0;	
+	public double  err_ann		= 0.0;	
 	
 	
 	public Namespace nes;
@@ -53,11 +58,25 @@ public class Param{
 	}
 	
 	public String logFilePath(String dataname, double rm_ratio, int nquery){
-		return logFilePath(dataname, sim, query, rm_ratio, nquery);
+		return logFilePath(dataname, sim, query, rm_ratio, nquery,perfect_ann,err_ann);
 	}
-	public static String logFilePath(String dataname, int sim, int query, double rm_ratio, int nquery){
-		return String.format("log/%s/%s_%s_rmr%s_nq%d.log",
-				dataname,sim_str[sim],query_str[query],double2String_filename(rm_ratio),nquery);
+	
+	public String optAnn(){
+		return optAnn(perfect_ann,err_ann);
+	}
+	public static String optAnn(boolean perfect_ann, double err_ann){
+		String annopt = "";
+		if(!perfect_ann){
+			annopt = "_ann";
+			annopt +=double2String_filename(err_ann);
+		}
+		return annopt;
+	}
+	public static String logFilePath(String dataname, int sim, int query, double rm_ratio, int nquery, boolean perfectann, double ann_err){
+		String annopt =optAnn(perfectann, ann_err);
+		
+		return String.format("log/%s/%s_%s_rmr%s_nq%d%s.log",
+				dataname,sim_str[sim],query_str[query],double2String_filename(rm_ratio),nquery,annopt);
 	}
 
 	public static String double2String_filename(double d){

@@ -27,9 +27,13 @@ public class SparseMatrix {
 		return val[i].int2DoubleEntrySet().fastIterator();
 	}
 	public void put(int i, int j, double v){
-		if(Double.isNaN(v)){
+		/*if(Double.isNaN(v)){
 			System.out.printf("Nan (%d,%d)\n",i,j);
-		}
+		}*/
+		/*if(v==0.0){
+			val[i].remove(j);
+			return;
+		}*/
 		
 		val[i].put(j, v);
 	}
