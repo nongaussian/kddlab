@@ -7,6 +7,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class SqlUnit {
+	public static String DEFUALT_ID = "graphmatching";
+	public static String DEFUALT_PWD = "graphmatching";
+	public static String DEFUALT_IP = "147.46.143.245";
+	
+	
 	private boolean usedb = false;
 	public Connection con = null;
 	private Statement st = null;
@@ -16,7 +21,7 @@ public class SqlUnit {
 	public SqlUnit(String dbname){
 		try {
 			this.dbname = dbname;
-			connect(dbname);
+			connect(dbname, DEFUALT_ID, DEFUALT_PWD);
 		} catch (SQLException e) {
 
 			//handlingSQLException(e);
@@ -48,11 +53,9 @@ public class SqlUnit {
 	}
 	
 	
-	private void connect(String dbname) throws SQLException{
-		connect(dbname, "graphmatching", "graphmatching");
-	}
+	
 	private void connect(String dbname, String username, String pwd) throws SQLException{
-		con = DriverManager.getConnection("jdbc:mysql://147.46.143.245/?useUnicode=true&characterEncoding=utf8",username, pwd);
+		con = DriverManager.getConnection("jdbc:mysql://"+DEFUALT_IP+"/?useUnicode=true&characterEncoding=utf8",username, pwd);
 		st = con.createStatement();
 		st.execute("use "+dbname);
 		usedb = true;

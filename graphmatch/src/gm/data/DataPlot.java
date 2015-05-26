@@ -32,6 +32,16 @@ public class DataPlot {
 		
 	}
 	
+	public DataPlot(String dataname){
+		File dir = new File("plots");
+		dir.mkdir();
+		File subdir = new File("plots/"+dataname);
+		subdir.mkdir();
+		this.dataname = dataname;
+		sqlunit = new  SqlUnit("graphmatching");
+	
+	}
+	
 	
 	static void plotSynthetic(int n_node){
 		DataPlot dp0_01 = new DataPlot("Syn"+n_node+"_0_01");
@@ -102,11 +112,7 @@ public class DataPlot {
 	}
 	
 	
-	public DataPlot(String dataname){
-		this.dataname = dataname;
-		sqlunit = new SqlUnit("graphmatching");
 	
-	}
 	
 	/*
 	private double[][][] getCostAccuracy_WO_outlier(int query, int sim, double rmr,double mu, boolean perfect_ann, double err_ann, int th_outlier,int id){
