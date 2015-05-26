@@ -35,6 +35,11 @@ import cm.cm_data;
 import common.SparseIntMatrix;
 
 public class GraphMatching  extends Simulation{
+	static final int 	CROWDSOURCING_MAX_COST = 1000;
+	static final double BEGIN_CUT_CROWDSOURCING_RECALL = .15; 
+	
+	int id = 0;
+	
 	Similarity model;
 	EM em;
 	
@@ -49,7 +54,7 @@ public class GraphMatching  extends Simulation{
 	
 	long time;
 
-	
+	double recall;
 	
 	public GraphMatching(Namespace nes) {
 		super(nes);
@@ -105,7 +110,7 @@ public class GraphMatching  extends Simulation{
 					"Disable -perfect_ann if you want to simulate annotator error");
 		parser.addArgument("-mu")
 		.type(Double.class)
-		.setDefault(1.0);
+		.setDefault(10.0);
 		return parser;
 	}
 
@@ -130,13 +135,15 @@ public class GraphMatching  extends Simulation{
 		}
 		switch(param.query){
 		case Param.QUERY_EMC:
+		case Param.QUERY_MAXENTROPY:
 			if(param.sim == Param.SIM_PROPOSED){
 				em = (EM)model;
 			}else{
 				em = new EM(param.nes);
 			}
 			break;
-		case Param.QUERY_MAXVAR:
+		
+
 		case Param.QUERY_MINVAR:
 			break;
 		case Param.QUERY_NEIGHBORPAIR:
@@ -212,29 +219,34 @@ public class GraphMatching  extends Simulation{
 		}
 		
 		int iteration = 0;
-		double accuracy = 0.0;
-		while ((accuracy<max_accuracy)&&(nmaxquery == -1 || cnt < nmaxquery) && (cnt < dat.totallnode)) {
+		
+		while ((recall<max_accuracy)&&(nmaxquery == -1 || cnt < nmaxquery) && (cnt < dat.totallnode)) {
 			iteration++;
 			// run model
+			long t_start = System.currentTimeMillis();
 			model.run();
 			if(em!=null && param.sim != Param.SIM_PROPOSED){
 				em.run();
 			}
-			
+			long model_end = System.currentTimeMillis();
+			System.out.printf("Model learning: %d ms\n",model_end-t_start);
 			if(param.runtoy){
 				model.saveSimilarity(param, dataname, rm_ratio, nquery, iteration);
 			}
 			
 			
-			accuracy = computeAccuracy(iteration, totalcost, nmatch);
-			System.out.printf("Accuracy:  %f\n", accuracy);
-			if (accuracy>max_accuracy){
+			recall = computeAccuracy(iteration, totalcost, nmatch);
+			long matching_end = System.currentTimeMillis();
+			System.out.printf("Recall computation: %d ms\n",matching_end-model_end);
+			System.out.printf("Recall:  %f\n", recall);
+			if (recall>max_accuracy){
 				break;
 			}
 			
 			// select a query & candidates
 			int nq = select_query (nquery, queries,iteration);
-			
+			long sq_end = System.currentTimeMillis();
+			System.out.printf("Select query: %d ms\n",sq_end-matching_end);
 			int tmpcnt = 0;
 			for (int i=0; i<nq; i++) {
 				QueryNode q = queries[i];
@@ -248,7 +260,8 @@ public class GraphMatching  extends Simulation{
 				
 				tmpcnt++;
 			}
-
+			long sc_end = System.currentTimeMillis();
+			System.out.printf("Select candidates: %d ms\n",sc_end-sq_end);
 			//model.save_label("res/test");
 			
 			cnt += queries.length;
@@ -274,6 +287,9 @@ public class GraphMatching  extends Simulation{
 			}
 			update_after_matching(queries);
 			
+			long pp_end = System.currentTimeMillis();
+			System.out.printf("Update pairs: %d ms\n",pp_end-sq_end);
+			System.out.printf("Round total: %d ms\n",pp_end-t_start);
 			
 		}
 		
@@ -298,8 +314,6 @@ public class GraphMatching  extends Simulation{
 		int count_correct 	= 0;
 		int count_tot		= 0;
 		int count_pass	= 0;
-		//TODO non overlapping matching
-		
 		
 		if(param.perfect_ann){
 			for (int t=0; t<dat.ntype; t++) {
@@ -335,18 +349,6 @@ public class GraphMatching  extends Simulation{
 				Arrays.fill(flag_lmatched, false);
 				Arrays.fill(flag_rmatched, false);
 				for (int i=0; i<dat.lnodes[t].size; i++) {
-					node n_ti = dat.lnodes[t].arr[i];
-					if(n_ti.getNAnnotatios()>0){
-						if(n_ti.getWbar(n_ti.getLastLabel())==1.0){
-							flag_lmatched[i] = true;
-							flag_rmatched[n_ti.getLastLabel()] = true;
-							if(n_ti.getLastLabel()==i){
-								count_correct++;
-								count_pass--;
-							}
-							continue;
-						}
-					}
 					ObjectIterator<Entry> iter = model.sim_next[t].getEntryIterator(i);
 					while(iter.hasNext()){
 						Entry entry = iter.next();
@@ -399,18 +401,7 @@ public class GraphMatching  extends Simulation{
 					if(param.perfect_ann){
 						continue;
 					}
-					
-										
-					boolean b_cont = false;
-					switch (param.query){
-					case Param.QUERY_MAXVAR:
-					case Param.QUERY_MINVAR:
-					case Param.QUERY_NEIGHBORPAIR:
-						b_cont = true;
-						break;
-					
-					}
-					if (b_cont){
+					if(param.query != Param.QUERY_RANDOM){
 						continue;
 					}
 				}
@@ -418,18 +409,20 @@ public class GraphMatching  extends Simulation{
 
 				switch (param.query){
 					case Param.QUERY_EMC:
+						if(model.eff_pairs[t][i].size()==0)
+							continue;
 						val = em.compute_expected_model_change(t, i);
 						break;
-					case Param.QUERY_MAXVAR:
-					case Param.QUERY_MINVAR:
-						if(model.eff_pairs[t][i].size()==0){
+					case Param.QUERY_MAXENTROPY:
+						if(model.eff_pairs[t][i].size()==0)
 							continue;
-						}else{
-							val = model.similarity_variance(t, i);
-							if (param.query ==Param.QUERY_MINVAR){
-								val = -val;
-							}
-						}
+						val = em.compute_entropy(t,i); 
+						
+					case Param.QUERY_MINVAR:
+						if(model.eff_pairs[t][i].size()==0)
+							continue;
+						val = -model.similarity_variance(t, i);
+						
 						break;
 					case Param.QUERY_NEIGHBORPAIR:
 					case Param.QUERY_NEIGHBORPAIR_OVERLAP:
@@ -557,7 +550,16 @@ public class GraphMatching  extends Simulation{
 	public void loadWriter(){
 		File dir  = new File("log/"+dataname);
 		dir.mkdir();
-		String filename = param.logFilePath(dataname, rm_ratio, nquery);
+		String filename = null;
+		while(true){
+			filename = param.logFilePath(dataname, rm_ratio, nquery,id);
+			File f = new File(filename);
+			if(f.exists()){
+				id++;
+			}else{
+				break;
+			}
+		}
 		try {
 			bw = new BufferedWriter(new FileWriter(filename));
 			pw = new PrintWriter(bw);
@@ -628,21 +630,40 @@ public class GraphMatching  extends Simulation{
 		if(param.perfect_ann||rand.nextDouble()>param.err_ann){
 			int i=0;
 			while(cand[i].w>0.0) {
+				
 				if (q.id == cand[i].id) {
 					q.setKnownLink(i,cand[i],dat.lnodes[q.t].arr[q.id].getNAnnotatios());
 					return (i+1);
 				}
 				i++;
+				if(i>=CROWDSOURCING_MAX_COST){
+					if(recall>=BEGIN_CUT_CROWDSOURCING_RECALL){
+						q.setKnownLink(i, null, 0);
+					}
+				}
 			}
 			
-			//Return expected cost if the similarity is zero
-			int cost =  i+(int)Math.ceil((nc-i)/2.0);
-			while (i<nc) {
-				if (q.id == cand[i].id) {
-					q.setKnownLink(i,cand[i],dat.lnodes[q.t].arr[q.id].getNAnnotatios());
-					break;
+			//randomly pick cost
+			//int cost =  i+(int)Math.ceil((nc-i)/2.0);
+			int cost = i + 1 + rand.nextInt(nc-i);
+			boolean match_success = true;
+			if(recall>=BEGIN_CUT_CROWDSOURCING_RECALL){
+				if(cost>CROWDSOURCING_MAX_COST){
+					cost = CROWDSOURCING_MAX_COST;
+					match_success = false;
 				}
-				i++;
+			}
+			
+			if(match_success){
+				while (i<nc) {
+					if (q.id == cand[i].id) {
+						q.setKnownLink(cost,cand[i],dat.lnodes[q.t].arr[q.id].getNAnnotatios());
+						break;
+					}
+					i++;
+				}
+			}else{
+				q.setKnownLink(cost, null, 0);
 			}
 			return cost;
 		}

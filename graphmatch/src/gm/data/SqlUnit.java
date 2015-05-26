@@ -68,6 +68,7 @@ public class SqlUnit {
 		try {
 			return st.executeQuery(query);
 		} catch (SQLException e) {
+			System.out.println(query);
 			handlingSQLException(e);
 		}
 		return null;

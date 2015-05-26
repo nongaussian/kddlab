@@ -23,12 +23,14 @@ public class QueryNode implements Comparable<QueryNode> {
 		this.diff = diff;
 	}
 	public void initKnownLink(){
-		setKnownLink(0, null, 0);
+		matched_id = -1;
+		cost = 0;
+		matching_sim = 0.0;
 	}
 	public void setKnownLink(int i, CandNode cn, int n_annotates){
 		if(cn==null){
 			matched_id = -1;
-			cost = 0;
+			cost = i+1;
 			matching_sim = 0.0;
 			return;
 		}

@@ -20,9 +20,11 @@ public class EM extends Similarity{
 	public double[][][] delta		= null;
 	public double[] c				= null;
 	public double[] c_next			= null;
+	
 	double[] tmp_w					= null;
 	double[] tmp_wbar				= null;
 	
+	private double[] delta_w_par				= null;
 	
 	public EM(Namespace nes) {
 		super(nes);
@@ -102,6 +104,7 @@ public class EM extends Similarity{
 		delta = new double[dat.ntype][maxlneighborsize][maxrneighborsize];
 		tmp_w = new double[maxrnodesize];
 		tmp_wbar = new double[maxrnodesize];
+		delta_w_par = new double[maxrnodesize];
 	}
 
 	@Override
@@ -129,7 +132,8 @@ public class EM extends Similarity{
 
 			/* 3) m-step : update model parameters (w) */
 			em_mle(iter);
-
+			
+			
 			distance = compute_distance(); 
 
 			/* 4) now, finalize this iteration */
@@ -159,7 +163,30 @@ public class EM extends Similarity{
 		//save_model("res/final");
 	}
 	
+	/*
+	public void compute_delta_w_par(int t, int i, int j, int s){
+		Arrays.fill(delta_w_par, 0.0);
+		double sum = 0.0;
+		for(int y = 0; y < dat.rnodes[s].size;y++){
+			for (int sigma: dat.rnodes[s].arr[y].neighbors[t].arr){
+				if(sigma==j){
+					delta_w_par[y] += ((1-sim_next[t].get(i, j))/dat.rnodes[t].arr[sigma].neighbors[s].size);
+				}else{
+					delta_w_par[y] += (-sim_next[t].get(i, sigma)/dat.rnodes[t].arr[sigma].neighbors[s].size);
+				}
+				
+			}
+			//sum += delta_w_par[y];
+		}
+		//System.out.println(sum);
+	}
+	*/
+	
+	
+	
+	
 	// compute the (approximate) expected model change when we ask to annotate for node i of type t
+	
 	public double compute_expected_model_change(int t, int i) {
 		double sum = 0;
 		node n_ti = dat.lnodes[t].arr[i];
@@ -193,19 +220,42 @@ public class EM extends Similarity{
 					
 				}
 				if(dat.rel[t][s]){
-					for (int n_x=0; n_x<n_ti.neighbors[s].size; n_x++) {
+					//2
+					computeDeltaWpar(t, i, j, s, delta_tij);
+					for (int n_x=0; n_x<n_ti.neighbors[s].size; n_x++) {	
 						int x = n_ti.neighbors[s].arr[n_x];
+						IntIterator iter_y= null;
+						int y;
 						double tmp = 0;
 						
-						estimate_w(tmp_w, t, i, j, s, x, delta_tij);
-						//*/
-						IntIterator iter_y = eff_pairs[s][x].iterator();
-						int y;
+						//2
+						double x_const = c[t]/dat.lnodes[s].arr[x].neighbors[t].size;
+						double sum_tmp_w = 0.0;
+						iter_y = eff_pairs[s][x].iterator();
+						while(iter_y.hasNext()){
+							y = iter_y.nextInt();
+							tmp_w[y] += (sim_next[s].get(x, y)+x_const*delta_w_par[y]);
+							sum_tmp_w += tmp_w[y];
+						}
+						iter_y = eff_pairs[s][x].iterator();
+						while(iter_y.hasNext()){
+							y = iter_y.nextInt();
+							
+							//Multiply normalized conditional similarity
+							tmp += Math.sqrt(sim_next[s].get(x, y)*tmp_w[y]/sum_tmp_w);
+						}
 						
+						
+						/*/1
+						//estimate_w(tmp_w, t, i, j, s, x, delta_tij);
+						
+						iter_y = eff_pairs[s][x].iterator();
 						while(iter_y.hasNext()){
 							y = iter_y.nextInt();
 							tmp += Math.sqrt(sim_next[s].get(x, y)*tmp_w[y]);
 						}
+						*/
+						
 						if(tmp>0.0){
 							diff += -Math.log(tmp);
 						}
@@ -220,6 +270,59 @@ public class EM extends Similarity{
 		
 		return sum;
 	}
+	
+	/*
+	public double compute_expected_model_change(int t, int i) {
+		double sum = 0;
+		node n_ti = dat.lnodes[t].arr[i];
+		
+		IntIterator iter_j = eff_pairs[t][i].iterator();
+		int j;
+		while(iter_j.hasNext()){
+			j = iter_j.nextInt();
+			if(sim_next[t].get(i, j)==0.0)
+				continue;
+			
+			double diff = 0;
+			
+			// change of i
+			diff -= Math.log(Math.pow(sim_next[t].get(i, j),0.5));
+			
+			// change of the neighbors of i
+			for (int s=0; s<dat.ntype; s++) {
+				if(dat.rel[t][s]){
+					compute_delta_w_par(t, i, j, s);
+					for (int n_x=0; n_x<n_ti.neighbors[s].size; n_x++) {
+						int x = n_ti.neighbors[s].arr[n_x];
+						double x_const = c[t]/dat.lnodes[s].arr[x].neighbors[t].size;
+						
+						double tmp = 0;
+						
+						IntIterator iter_y = eff_pairs[s][x].iterator();
+						int y;
+						while(iter_y.hasNext()){
+							y = iter_y.nextInt();
+							double delta_w = x_const * delta_w_par[y]; 
+							tmp += Math.sqrt(sim_next[s].get(x, y)*(sim_next[s].get(x, y)+delta_w));
+						}
+						
+						if(tmp>0.0){
+							diff += -Math.log(tmp);
+						}
+						if(Double.isNaN(diff)||Double.isInfinite(diff)){
+							System.out.printf("diff: %f, tmp:%f\n",diff,tmp);
+						}
+					}
+				}
+			}
+			
+			sum += diff * sim_next[t].get(i, j);
+		}
+		
+		return sum;
+	}*/
+	
+	
 	private void estimate_wnext(double[] w_next, node n_ti, int t, int i, int j){
 		Arrays.fill(w_next, 0,dat.lnodes[t].size, 0.0);
 		if(n_ti.getNAnnotatios()==0){
@@ -252,6 +355,19 @@ public class EM extends Similarity{
 		if(!j_ann){
 			w_next[j]/=sum;
 		}
+	}
+	
+	
+	private void computeDeltaWpar(int t, int i, int j,int s, double delta_tij){
+		Arrays.fill(delta_w_par, 0.0);
+		int[] j_neighbors = dat.rnodes[t].arr[j].neighbors[s].arr;
+		if(j_neighbors.length > 0 && delta_tij>0.0){
+			double nts_j = (double) j_neighbors.length;
+			for (int idx_y=0; idx_y< j_neighbors.length; idx_y++){
+				delta_w_par[j_neighbors[idx_y]] = delta_tij/nts_j;
+			}
+		}
+		
 	}
 	// estimate w[s].arr[u]
 	private void estimate_w(double[] w, int t, int i, int j, int s, int x, double delta_tij) {
@@ -316,6 +432,8 @@ public class EM extends Similarity{
 		*/	
 		
 	}
+	
+	
 	private void em_mle(int iter) {
 		double z = 0;
 		
@@ -664,6 +782,21 @@ public class EM extends Similarity{
 		
 		
 		return -(sum1 + mu * sum2);
+	}
+
+	public double compute_entropy(int t, int i) {
+		double entropy = 0.0;
+		
+		ObjectIterator<Entry> sim_iter = sim_next[t].getEntryIterator(i);
+		while(sim_iter.hasNext()){
+			Entry entry = sim_iter.next();
+			if(entry.getDoubleValue()>0.0){
+				entropy += (entry.getDoubleValue()*Math.log(entry.getDoubleValue()));
+			}
+		}
+		
+		
+		return -entropy;
 	}
 	
 	

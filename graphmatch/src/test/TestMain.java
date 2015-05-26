@@ -156,7 +156,7 @@ public class TestMain {
 	public static void sw(int val){
 		boolean b_cont = false;
 		switch (val){
-		case Param.QUERY_MAXVAR:
+
 		case Param.QUERY_MINVAR:
 		case Param.QUERY_NEIGHBORPAIR:
 			b_cont = true;

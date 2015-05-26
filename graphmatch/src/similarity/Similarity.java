@@ -256,6 +256,10 @@ public abstract class Similarity{
 		
 	}
 	public double similarity_variance(int t, int i){
+		if(eff_pairs[t][i].size()==0)
+		{
+			return 0.0;
+		}
 		double ex_2 = 0.0;
 		double e_x2 = 0.0;
 		ObjectIterator<Entry> sim_iter = sim_next[t].getEntryIterator(i);
@@ -268,7 +272,7 @@ public abstract class Similarity{
 		ex_2 /= dat.rnodes[t].size;
 		
 		
-		ex_2 *= ex_2;
+		ex_2 = Math.pow(ex_2,2.0);
 		return e_x2-ex_2;
 	}
 }
