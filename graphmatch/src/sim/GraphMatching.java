@@ -36,7 +36,7 @@ import common.SparseIntMatrix;
 
 public class GraphMatching  extends Simulation{
 	static final int 	CROWDSOURCING_MAX_COST = 1000;
-	static final double BEGIN_CUT_CROWDSOURCING_RECALL = .15; 
+	static final double BEGIN_CUT_CROWDSOURCING_RECALL = 1.0; 
 	
 	int id = 0;
 	

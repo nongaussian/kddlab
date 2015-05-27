@@ -1,9 +1,11 @@
 package gm.data;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,8 +23,21 @@ import com.panayotis.gnuplot.style.Style;
 import com.panayotis.gnuplot.terminal.PostscriptTerminal;
 
 public class DataPlot {
+	static final String PLOT_DIR_STRING = "plots";
+	static final String SCRIPT_DIR_STRING = "gnuplot_script";
+	
+	static double[] mu_list = {0.1,1.0,10.0};
+	static double default_mu = 1.0;
+	
+	static String default_font = "'Arial, 24'";
+	
+	
 	String dataname;
+	String plot_dir;
+	String script_dir;
 	SqlUnit sqlunit;
+	
+	
 	
 	public static HashMap<String, String> abb = new HashMap<String, String>();
 	public static void main(String[] args){
@@ -33,10 +48,19 @@ public class DataPlot {
 	}
 	
 	public DataPlot(String dataname){
-		File dir = new File("plots");
+		File dir 	= new File(PLOT_DIR_STRING);
 		dir.mkdir();
-		File subdir = new File("plots/"+dataname);
+		plot_dir = PLOT_DIR_STRING+"/"+dataname;
+		File subdir = new File(plot_dir);
 		subdir.mkdir();
+		
+		dir 		= new File(SCRIPT_DIR_STRING);
+		dir.mkdir();
+		script_dir=SCRIPT_DIR_STRING+"/"+dataname;
+		subdir = new File(script_dir);
+		subdir.mkdir();
+		
+		
 		this.dataname = dataname;
 		sqlunit = new  SqlUnit("graphmatching");
 	
@@ -59,37 +83,21 @@ public class DataPlot {
 	
 	static void plotAll(String dataname){
 		DataPlot dp = new DataPlot(dataname);
-		/**/
-		dp.plotCostAccuracy(10.0);
-		dp.plotCostAccuracy(1.0);
+		
+		for(double mu: mu_list){
+			dp.plotCostAccuracy(mu);
+		}
 		
 		dp.plotAnnMuAccuracy();
 		
-		dp.plotEarlyMatching(-1, -1,10.0);
-		dp.plotErrCost(-1, -1);
-
-
+		for(double mu: mu_list){
+			dp.plotEarlyMatching(-1, -1,mu);
+		}
 		
-
-		for (int s = 1; s < Param.sim_str.length; s++){
-			//dp.plotCostAccuracy(s,-1);
-			//dp.plotEarlyMatching(s,-1, 10.0);
-			
-			
-			//dp.plotErrCost(s, -1);
-			//dp.plotRmRCost(s, -1);
-			//dp.plotIterCost(s, -1);
-		}
-		for (int q = 1; q< Param.query_str.length; q++){
-			if(q==Param.QUERY_NEIGHBORPAIR_OVERLAP)
-				continue;
-			//dp.plotCostAccuracy(-1,q,10.0);
-			//dp.plotEarlyMatching(-1,q,10.0);
-			
-			//dp.plotErrCost(-1, q);
-			//dp.plotRmRCost(-1, q);
-			//dp.plotIterCost(-1, q);
-		}
+		dp.plotErrCost(-1, -1, 0.7);
+		dp.plotErrCost(-1, -1, 0.5);
+		dp.plotErrCost(-1, -1, 0.3);
+	
 	}
 	
 	static void initAbb(){
@@ -269,7 +277,8 @@ public class DataPlot {
 		//double[] rmr_list = {0.0};
 		//double[] rmr_list = {0.0, 0.05, 0.1, 0.2};
 		//return rmr_list;/*
-		String qry = String.format("select distinct (rmr) from experiment where data = '%s';",dataname);
+		String qry = String.format("select distinct (rmr) from experiment where data = '%s'" +
+				" order by rmr asc;",dataname);
 		ResultSet rs = sqlunit.executeQuery(qry);
 		
 		ArrayList<Double> rmr_list = new ArrayList<Double> ();
@@ -291,11 +300,9 @@ public class DataPlot {
 	}
 	
 	public void plotCostAccuracy(double mu){
-		plotCostAccuracy(-1, -1, mu);
+		plotCostAccuracy(-1, -1, mu, -1);
 	}
-	public void plotCostAccuracy(int sim, int query,double mu){
-		plotCostAccuracy(sim, query, mu, -1);
-	}
+	
 	public void plotCostAccuracy(int sim, int query,double mu,int th_outlier){
 		boolean except_outlier =  th_outlier>0;
 		double[] rmr_list = getRmrlist();
@@ -309,41 +316,48 @@ public class DataPlot {
 				}else if(query>0){
 					opt = Param.query_str[query];
 				}
-				String dirpath = String.format("plots/%s",dataname);
-				File dir = new File(dirpath);
-				String filename = String.format("plots/%s/CostRecall_%s_rmr%s%s_mu%s%s.eps"
-						,dataname
+				
+				String filename = String.format("CostRecall_%s_rmr%s%s_mu%s%s"
 						,opt
 						,Double.toString(rmr).replace(".","_")
 						,Param.optAnn(false, err_ann)
 						,Param.double2String_filename(mu)
 						,except_outlier?"eo"+th_outlier:""
 						);
-				dir.mkdir();
-				PostscriptTerminal eps = new PostscriptTerminal(filename);
 				
-				eps.setColor(true);
+				String plot_filename = String.format("%s/%s.eps"
+						,plot_dir
+						,filename);
+				PostscriptTerminal eps = new PostscriptTerminal(plot_filename);
+				
+				
 				eps.setEPS(true);
+				eps.set("font", default_font);
+				eps.set("enhanced");
+				eps.setColor(true);
+				
+				
 				JavaPlot p = new JavaPlot();
 				PlotStyle pStyle = new PlotStyle();
 				pStyle.setStyle(Style.LINESPOINTS);
+				pStyle.setLineWidth(3);
+				pStyle.setPointSize(3);
 				p.newGraph();
 				p.getAxis("x").setLabel("Recall");
 				p.getAxis("y").setLabel("Cost");
-				
+				p.getAxis("y").setLogScale(true);
 				p.setTerminal(eps);
 				
 				p.setPersist(false);
 				
-				p.set("size ratio", "1");
-				p.set("lmargin at screen", "0.15");
+				p.set("size ratio", "0.75");
+				p.set("lmargin at screen", "0.25");
 				p.set("rmargin at screen", "0.9");
-				p.set("bmargin at screen", "0.1");
+				p.set("bmargin at screen", "0.2");
 				p.set("tmargin at screen", "0.95");
 				
-				p.getAxis("y").setLogScale(true);
-				
-				p.set("terminal wxt size", "640, 640");
+				p.set("key", "right bottom");
+
 				
 				boolean b_plot = false;
 				for (int s = 1; s < Param.sim_str.length; s++){
@@ -356,7 +370,7 @@ public class DataPlot {
 						}
 						
 						double[][][] points = null;
-						int gmid = 0;
+						
 						if(except_outlier){
 							//points = getCostAccuracy_WO_outlier(q, s, rmr, mu, false, err_ann, th_outlier,gmid);
 						}else{
@@ -377,6 +391,8 @@ public class DataPlot {
 				}	
 				if(b_plot){
 					p.plot();
+					saveGnuplotScript(p,filename);
+					//System.out.println(p.getCommands());
 				}
 				
 			}
@@ -388,24 +404,22 @@ public class DataPlot {
 	public void plotAnnMuAccuracy(){
 		double[] rmr_list = getRmrlist();
 		double[] err_list = getErrList();
-		double[] mu_list = {1.0,10.0,50.0};
 		
 		
 		for( double rmr:rmr_list){
 			for(double err_ann:err_list){
-				
-				String dirpath = String.format("plots/%s",dataname);
-				File dir = new File(dirpath);
-				String filename = String.format("plots/%s/CostRecallMu_rmr%s_Ann%s.eps"
-						,dataname
+				String filename = String.format("CostRecall_varingMu_rmr%s_Ann%s"
 						,Double.toString(rmr).replace(".","_")
 						,Param.optAnn(false, err_ann));
-				dir.mkdir();
-				PostscriptTerminal eps = new PostscriptTerminal(filename);
+				String plot_filename = String.format("%s/%s.eps"
+						,plot_dir
+						,filename);
+				
+				PostscriptTerminal eps = new PostscriptTerminal(plot_filename);
 				
 				
 				eps.setEPS(true);
-				eps.set("size", "2.6,2.4");
+				eps.set("font", default_font);
 				eps.set("enhanced");
 				eps.setColor(true);
 				
@@ -413,20 +427,18 @@ public class DataPlot {
 				JavaPlot p = new JavaPlot();
 				PlotStyle pStyle = new PlotStyle();
 				pStyle.setStyle(Style.LINESPOINTS);
+				pStyle.setLineWidth(3);
+				pStyle.setPointSize(3);
 				p.newGraph();
 				p.setTerminal(eps);
 				p.set("encoding","utf8");
 				
-				
-				
 				p.getAxis("x").setLabel("Recall");
 				p.getAxis("y").setLabel("Cost");
 				
-				
-				
 				p.setPersist(false);
 				
-				p.set("size ratio", "1");
+				p.set("size ratio", "0.75");
 				p.set("lmargin at screen", "0.25");
 				p.set("rmargin at screen", "0.9");
 				p.set("bmargin at screen", "0.2");
@@ -434,6 +446,7 @@ public class DataPlot {
 				
 				p.getAxis("y").setLogScale(true);
 				
+				p.set("key", "right bottom");
 				
 				
 				boolean b_plot = false;
@@ -459,6 +472,7 @@ public class DataPlot {
 					
 				if(b_plot){
 					p.plot();
+					saveGnuplotScript(p,filename);
 				}
 			}
 		}
@@ -476,29 +490,43 @@ public class DataPlot {
 				}else if(query>0){
 					opt = Param.query_str[query];
 				}
-				PostscriptTerminal eps = new PostscriptTerminal(String.format("plots/%s/" +
-						"earlymatching_%s_rmr%s_ann%s.eps",
-						dataname,opt,Param.double2String_filename(rmr),Param.double2String_filename(err_ann)));
 				
-				eps.setColor(true);
+				String filename = String.format(
+						"earlymatching_%s_rmr%s_ann%s_mu%s",
+						opt,
+						Param.double2String_filename(rmr),
+						Param.double2String_filename(err_ann),
+						Param.double2String_filename(mu));
+				
+				String plot_filename = String.format("%s/%s.eps"
+						,plot_dir
+						,filename);
+				PostscriptTerminal eps = new PostscriptTerminal(plot_filename);
 				eps.setEPS(true);
+				eps.set("font", default_font);
+				eps.set("enhanced");
+				eps.setColor(true);
+				
+				
 				JavaPlot p = new JavaPlot();
 				PlotStyle pStyle = new PlotStyle();
 				pStyle.setStyle(Style.LINESPOINTS);
+				pStyle.setLineWidth(3);
+				pStyle.setPointSize(3);
 				p.newGraph();
 				p.getAxis("x").setLabel("Round");
 				p.getAxis("y").setLabel("EarlyMatchingRatio");
 				
 				p.setTerminal(eps);
 				p.setPersist(false);
-				p.set("size ratio", "1");
-				p.set("lmargin at screen", "0.15");
+				p.set("size ratio", "0.75");
+				p.set("lmargin at screen", "0.25");
 				p.set("rmargin at screen", "0.9");
-				p.set("bmargin at screen", "0.1");
+				p.set("bmargin at screen", "0.2");
 				p.set("tmargin at screen", "0.95");
 				
-				p.set("terminal wxt size", "640,640");
-				
+				p.set("key", "right bottom");
+								
 				boolean b_plot = false;
 				for (int s = 1; s < Param.sim_str.length; s++){
 					if(sim>0 && sim!=s){
@@ -508,9 +536,12 @@ public class DataPlot {
 						if(query>0 &&query!=q){
 							continue;
 						}
+						if(!Param.compatible(q, s))
+							continue;
 						int TH_EARLY_MATCHING = 10;
 						int gmid = 0;
-						double [][] points = getEarlyMatchings(q, s, rmr, 100,TH_EARLY_MATCHING,false,0.0,mu,gmid);
+						double [][] points = getEarlyMatchings(q, s, rmr, 100,TH_EARLY_MATCHING,false,err_ann,
+								(s==Param.SIM_PROPOSED?mu:default_mu),gmid);
 						if(points !=null && points.length>0){
 							AbstractPlot data = new DataSetPlot(points);
 							data.setTitle(getAbb(Param.query_str[q])+"+"+getAbb(Param.sim_str[s]));
@@ -522,6 +553,7 @@ public class DataPlot {
 				}	
 				if(b_plot){
 					p.plot();
+					saveGnuplotScript(p,filename);
 				}
 
 			}
@@ -635,9 +667,8 @@ public class DataPlot {
 		return ((double)nEarly)/(nEarly+nLate);		
 	}
 	
-	private void plotErrCost(int sim, int query){
+	private void plotErrCost(int sim, int query,double th){
 		double[] err_list = getErrList();
-		double[] mu_list = {1.0,10.0,50.0};
 		
 		String opt = "";
 		if(sim>0){
@@ -646,27 +677,36 @@ public class DataPlot {
 			opt = Param.query_str[query];
 		}
 		for(double mu:mu_list){
-		
-			PostscriptTerminal eps = new PostscriptTerminal(String.format("plots/%s/ErrCost_%s_Mu%s.eps",dataname,opt,Param.double2String_filename(mu)));
+			String filename = String.format("ErrCost_%s_Mu%s_th%s"
+					,opt,Param.double2String_filename(mu),Param.double2String_filename(th));
+			String plot_filename = String.format("%s/%s.eps", plot_dir,filename);
+			PostscriptTerminal eps = new PostscriptTerminal(plot_filename);
 			
 			eps.setColor(true);
+			eps.set("font", default_font);
+			eps.set("enhanced");
 			eps.setEPS(true);
 			JavaPlot p = new JavaPlot();
 			PlotStyle pStyle = new PlotStyle();
 			pStyle.setStyle(Style.LINESPOINTS);
+			pStyle.setLineWidth(3);
+			pStyle.setPointSize(3);
 			p.newGraph();
+			p.setTerminal(eps);
+			p.setPersist(false);
 			p.getAxis("x").setLabel("Annotation Error");
 			p.getAxis("y").setLabel("Cost");
 			p.getAxis("y").setLogScale(true);
-			p.set("size ratio", "1");
-			
-			p.set("lmargin at screen", "0.15");
+
+			p.set("size ratio", "0.75");
+			p.set("lmargin at screen", "0.25");
 			p.set("rmargin at screen", "0.9");
-			p.set("bmargin at screen", "0.1");
+			p.set("bmargin at screen", "0.2");
 			p.set("tmargin at screen", "0.95");
-			//p.set("terminal wxt size", "640,640");
-			p.setTerminal(eps);
-			p.setPersist(false);
+			p.set("xrange", String.format("[%f:%f]", 0.0, err_list[err_list.length-1]+0.01));
+			p.set("key", "right bottom");
+			
+			
 			
 			for (int s = 1; s < Param.sim_str.length; s++){
 				if(sim>0 && sim!=s){
@@ -678,8 +718,8 @@ public class DataPlot {
 					}
 					if(q==Param.QUERY_NEIGHBORPAIR_OVERLAP||!Param.compatible(q, s))
 						continue;
-					double[][] points = getErrCost(Param.query_str[q], Param.sim_str[s],err_list,mu);
-					if(points.length>0){
+					double[][] points = getErrCost(Param.query_str[q], Param.sim_str[s],err_list,mu,th);
+					if(points!=null && points.length>0){
 						AbstractPlot data = new DataSetPlot(points);
 						data.setTitle(getAbb(Param.query_str[q])+"+"+getAbb(Param.sim_str[s]));
 						data.setPlotStyle(pStyle);
@@ -688,52 +728,96 @@ public class DataPlot {
 				}
 			}	
 			p.plot();
+			saveGnuplotScript(p,filename);
 		}
 	}
 
 	
-	private double[][] getErrCost(String query, String sim, double[] err_list,double mu) {
-		double[][] out = new double[err_list.length][2];
+	private double[][] getErrCost(String query, String sim, double[] err_list,double mu, double th) {
+		double[][] tmp = new double[err_list.length][2];
+		int idx = 0;
 		for(int i = 0; i<err_list.length; i++){
-			out[i][0] = err_list[i];
+			double mincost = (double)getMinCost(query, sim, err_list[i], mu, th);
+			if(mincost>-1.0){
+				tmp[idx][0] = err_list[i];
+				tmp[idx][1] = mincost;
+				idx++;
+			}
 		}
+		if(idx==0){
+			return null;
+		}
+		double[][] out = new double[idx][2];
+		for(int i = 0; i<idx; i++){
+			out[i][0] = tmp[i][0];
+			out[i][1] = tmp[i][1];
+		}
+		return out;
+	}
+	
+	private int getMinCost(String query, String sim, double err, double mu, double th){
 		try {
 			String mu_option = "";
 			if(sim.equals(Param.sim_str[Param.SIM_PROPOSED])){
 				mu_option = String.format("and mu > %f and mu <%f  ", mu-0.0001,mu+0.0001);
 			}
 			
-			String qry = String.format(
-					"select err, max(cost) "+
-					"from experiment, results " +
-					"where data = '%s' and experiment.id = results.exp_id and query = '%s' " +
-					"and sim = '%s'  " +
-					"%s " +
-					"group by err " +
-					"order by err asc;",
-					dataname, query, sim,mu_option);
 			
-		
+			String qry_where_common = 
+					String.format("data = '%s' and experiment.id = results.exp_id and query = '%s' " +
+							"and sim = '%s'  " +
+							"and err > %f and err < %f " +
+							"%s ",
+							dataname, query, sim,err-0.0001,err+0.0001,mu_option);
+			
+						
+			String qry =
+					"select ntrue/(ntrue+nfalse) as recall, cost "+
+							"from experiment, results " +
+							"where "+ qry_where_common+
+							"order by recall desc;";
+			
 			ResultSet rs = sqlunit.executeQuery(qry);
 			
 			rs.beforeFirst();
-			int i = 0;
-			while(i<out.length){
-				if(!rs.next()){
+			int cost = 0;
+			double recall;
+			boolean exist = false;
+			while(rs.next()){
+				recall = rs.getDouble(1);
+				if(recall < th){
 					break;
 				}
-				out[i][0] = rs.getDouble(1);
-				out[i][1] = (double) rs.getInt(2);
-				i++;
+				cost = rs.getInt(2);
+				exist = true;
 			}
 			
-			return out;
+			
+			if(exist){
+				return cost;
+			}
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.exit(0);
 		}
-		return out;
+		return -1;
 	}
+	
+	private void saveGnuplotScript(JavaPlot p, String name){
+		String filename = script_dir+"/"+name+".gp";
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
+			bw.write(p.getCommands());
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
 	/*
 	private void plotRmRCost(int sim, int query){
 		double[] rmr_list = getRmrlist();
@@ -930,7 +1014,8 @@ public class DataPlot {
 	private double[] getErrList() {
 		//double[] errlist = {0.0,0.01,0.05,0.1};
 		//return err_list;
-		String qry = String.format("select distinct (err) from experiment where data = '%s';",dataname);
+		String qry = String.format("select distinct (err) from experiment where data = '%s' " +
+				"order by err asc;",dataname);
 		ResultSet rs = sqlunit.executeQuery(qry);
 		
 		ArrayList<Double> err_list = new ArrayList<Double> ();
