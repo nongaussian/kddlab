@@ -21,11 +21,8 @@ public class SqlUnit {
 	public SqlUnit(String dbname){
 		try {
 			this.dbname = dbname;
-			connect(dbname, DEFUALT_ID, DEFUALT_PWD);
+			connect(DEFUALT_IP,dbname, DEFUALT_ID, DEFUALT_PWD);
 		} catch (SQLException e) {
-
-			//handlingSQLException(e);
-			//System.exit(0);
 			usedb = false;
 		}
 		
@@ -33,7 +30,7 @@ public class SqlUnit {
 	public SqlUnit(String dbname, String username, String pwd) {
 		try {
 			this.dbname = dbname;
-			connect(dbname,username,pwd);
+			connect(DEFUALT_IP,dbname,username,pwd);
 		} catch (SQLException e) {
 			usedb = false;
 		}
@@ -54,8 +51,8 @@ public class SqlUnit {
 	
 	
 	
-	private void connect(String dbname, String username, String pwd) throws SQLException{
-		con = DriverManager.getConnection("jdbc:mysql://"+DEFUALT_IP+"/?useUnicode=true&characterEncoding=utf8",username, pwd);
+	private void connect(String ip,String dbname, String username, String pwd) throws SQLException{
+		con = DriverManager.getConnection("jdbc:mysql://"+ip+"/?useUnicode=true&characterEncoding=utf8",username, pwd);
 		st = con.createStatement();
 		st.execute("use "+dbname);
 		usedb = true;

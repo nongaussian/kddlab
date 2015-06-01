@@ -163,26 +163,7 @@ public class EM extends Similarity{
 		//save_model("res/final");
 	}
 	
-	/*
-	public void compute_delta_w_par(int t, int i, int j, int s){
-		Arrays.fill(delta_w_par, 0.0);
-		double sum = 0.0;
-		for(int y = 0; y < dat.rnodes[s].size;y++){
-			for (int sigma: dat.rnodes[s].arr[y].neighbors[t].arr){
-				if(sigma==j){
-					delta_w_par[y] += ((1-sim_next[t].get(i, j))/dat.rnodes[t].arr[sigma].neighbors[s].size);
-				}else{
-					delta_w_par[y] += (-sim_next[t].get(i, sigma)/dat.rnodes[t].arr[sigma].neighbors[s].size);
-				}
-				
-			}
-			//sum += delta_w_par[y];
-		}
-		//System.out.println(sum);
-	}
-	*/
-	
-	
+
 	
 	
 	// compute the (approximate) expected model change when we ask to annotate for node i of type t
@@ -271,56 +252,7 @@ public class EM extends Similarity{
 		return sum;
 	}
 	
-	/*
-	public double compute_expected_model_change(int t, int i) {
-		double sum = 0;
-		node n_ti = dat.lnodes[t].arr[i];
-		
-		IntIterator iter_j = eff_pairs[t][i].iterator();
-		int j;
-		while(iter_j.hasNext()){
-			j = iter_j.nextInt();
-			if(sim_next[t].get(i, j)==0.0)
-				continue;
-			
-			double diff = 0;
-			
-			// change of i
-			diff -= Math.log(Math.pow(sim_next[t].get(i, j),0.5));
-			
-			// change of the neighbors of i
-			for (int s=0; s<dat.ntype; s++) {
-				if(dat.rel[t][s]){
-					compute_delta_w_par(t, i, j, s);
-					for (int n_x=0; n_x<n_ti.neighbors[s].size; n_x++) {
-						int x = n_ti.neighbors[s].arr[n_x];
-						double x_const = c[t]/dat.lnodes[s].arr[x].neighbors[t].size;
-						
-						double tmp = 0;
-						
-						IntIterator iter_y = eff_pairs[s][x].iterator();
-						int y;
-						while(iter_y.hasNext()){
-							y = iter_y.nextInt();
-							double delta_w = x_const * delta_w_par[y]; 
-							tmp += Math.sqrt(sim_next[s].get(x, y)*(sim_next[s].get(x, y)+delta_w));
-						}
-						
-						if(tmp>0.0){
-							diff += -Math.log(tmp);
-						}
-						if(Double.isNaN(diff)||Double.isInfinite(diff)){
-							System.out.printf("diff: %f, tmp:%f\n",diff,tmp);
-						}
-					}
-				}
-			}
-			
-			sum += diff * sim_next[t].get(i, j);
-		}
-		
-		return sum;
-	}*/
+
 	
 	
 	private void estimate_wnext(double[] w_next, node n_ti, int t, int i, int j){
@@ -369,70 +301,7 @@ public class EM extends Similarity{
 		}
 		
 	}
-	// estimate w[s].arr[u]
-	private void estimate_w(double[] w, int t, int i, int j, int s, int x, double delta_tij) {
-		Arrays.fill(w, 0.0);
-
-		double sum = 0.0;
-		IntIterator iter_y = eff_pairs[s][x].iterator();
-		int y;
 		
-		//Set original similarities
-		while(iter_y.hasNext()){
-			y = iter_y.nextInt();
-			w[y] = sim_next[s].get(x, y);
-			sum += w[y];
-		}
-		
-		//Add increments of similarity 
-		int[] x_neighbors = dat.lnodes[s].arr[x].neighbors[t].arr;
-		int[] j_neighbors = dat.rnodes[t].arr[j].neighbors[s].arr;
-		if(x_neighbors.length > 0 && j_neighbors.length > 0){
-			double nst_x = (double) x_neighbors.length;
-			double nts_j = (double) j_neighbors.length;
-			double tmp = c[t]*delta_tij/nst_x;
-			
-			if(tmp>0.0){
-				for (int idx_y=0; idx_y< j_neighbors.length; idx_y++){
-					w[j_neighbors[idx_y]] += tmp/nts_j;
-					sum += tmp/nts_j;
-				}
-			}
-		}
-		
-		if(sum == 0.0){
-			return;
-		}
-		
-		//Normalize
-		//Skip non-effective node y because w_sxy = 0 
-		iter_y = eff_pairs[s][x].iterator();
-		while(iter_y.hasNext()){
-			y = iter_y.nextInt();
-			w[y] /= sum;
-		}
-		
-		/*
-		int[] x_neighbors = dat.lnodes[s].arr[x].neighbors[t].arr;
-		int[] j_neighbors = dat.rnodes[t].arr[j].neighbors[s].arr;
-		for (int idx_y=0; idx_y< j_neighbors.length; idx_y++){
-			int y = dat.rnodes[t].arr[j].neighbors[s].arr[idx_y];
-			w[idx_y] = sim_next[s].get(x, y);
-		}			
-		
-		if(x_neighbors.length>0&& j_neighbors.length>0){
-			double nst_x = (double) x_neighbors.length;
-			double nts_j = (double) j_neighbors.length;
-			double tmp = (1.0-sim_next[t].get(i, j))/nst_x;
-			
-			for (int idx_y=0; idx_y< j_neighbors.length; idx_y++){
-				w[idx_y] += tmp/nts_j;
-			}
-		}
-		*/	
-		
-	}
-	
 	
 	private void em_mle(int iter) {
 		double z = 0;

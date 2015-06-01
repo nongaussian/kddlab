@@ -1,5 +1,6 @@
 package graph;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class neighbors {
@@ -41,10 +42,10 @@ public class neighbors {
 		size--;
 		arr[size] = -1;
 	}
-	public int[] remove(double rm_ratio){
+	public int[] remove(double rm_ratio,int start){
 		tmp = size;
 		for(int i = 0; i < size; i++){
-			if(r.nextDouble()<rm_ratio){
+			if(arr[i]>=start&&r.nextDouble()<rm_ratio){
 				arr[i] = -1-arr[i];
 				tmp--;
 			}
@@ -68,5 +69,22 @@ public class neighbors {
 		}
 
 		return rm_list;
+	}
+	
+	public boolean join(neighbors n){
+		if(this.size!=n.size){
+			return false;
+		}
+		
+		Arrays.sort(this.arr);
+		Arrays.sort(n.arr);
+		
+		
+		for(int i = 0; i<arr.length;i++){
+			if(arr[i]!=n.arr[i]){
+				return false;
+			}
+		}
+		return true;
 	}
 }

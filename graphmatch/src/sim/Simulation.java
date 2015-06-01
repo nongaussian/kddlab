@@ -3,14 +3,11 @@ package sim;
 import gm.data.SqlUnit;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Random;
 
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.Namespace;
-import cm.CandNode;
-import cm.QueryNode;
 import cm.cm_data;
 
 public abstract class Simulation {
@@ -49,13 +46,10 @@ public abstract class Simulation {
 		rm_ratio					= nes.getDouble("rmr");
 		
 		dataname 					= nes.getString("data");
-		String dataname_r			= nes.getString("rprefix");
-		lprefix						= "data/"+dataname;
-		rprefix						= "data/"+dataname;
+		lprefix						= "data/"+dataname+"_"+((int)(rm_ratio*100))+"_l";
+		rprefix						= "data/"+dataname+"_"+((int)(rm_ratio*100))+"_r";
 		
-		if(dataname_r!=null){
-			rprefix = "data/"+dataname_r;
-		}
+		
 		
 		if(outputfile.equals("null")){
 			outputfile = dataname 
@@ -106,9 +100,9 @@ public abstract class Simulation {
 	}
 	
 	public abstract void init();
-	public void initDB(){
+	public void initDB(String dbname){
 		try{
-			sqlunit = new SqlUnit("graphmatching","graphmatching","graphmatching");
+			sqlunit = new SqlUnit(dbname,"graphmatching","graphmatching");
 			regiExp();
 		}catch(Exception e){
 			sqlunit = null;

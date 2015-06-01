@@ -1,8 +1,9 @@
 package sim;
 
 import graph.neighbors;
-import graph.node;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap.Entry;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
@@ -21,10 +22,6 @@ import java.util.PriorityQueue;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import similarity.EM;
 import similarity.SimRankD;
 import similarity.Similarity;
@@ -50,16 +47,24 @@ public class GraphMatching  extends Simulation{
 	Param param;
 	BufferedWriter bw;
 	PrintWriter pw;
-	
+	String logfile_path;
 	
 	long time;
 
 	double recall;
 	
+	public void main(String[] args) throws IOException{
+		GraphMatching gm = new GraphMatching(args);
+		gm.init();
+		gm.initDB(gm.param.nes.getString("dbname"));
+		gm.run();
+		gm.close();
+	}
+	
 	public GraphMatching(Namespace nes) {
 		super(nes);
 		param = new Param(nes);
-		loadWriter();
+		loadWriter(param.radius);
 	}
 	
 	public GraphMatching(String[] args) {
@@ -110,13 +115,18 @@ public class GraphMatching  extends Simulation{
 					"Disable -perfect_ann if you want to simulate annotator error");
 		parser.addArgument("-mu")
 		.type(Double.class)
-		.setDefault(10.0);
+		.setDefault(1.0);
+		parser.addArgument("-dbname")
+		.type(String.class)
+		.setDefault((String)null)
+		.help("Database name to store results");
 		return parser;
 	}
 
 	@Override
 	public void init() {
-		dat	= new cm_data(lprefix, rprefix,rm_ratio);
+		//int rm_num = (int) (rm_ratio*100);
+		dat	= new cm_data(lprefix, rprefix);
 		
 		maxrnodesize 				= 0;
 		for (int t=0; t<dat.ntype; t++) {
@@ -240,6 +250,7 @@ public class GraphMatching  extends Simulation{
 			System.out.printf("Recall computation: %d ms\n",matching_end-model_end);
 			System.out.printf("Recall:  %f\n", recall);
 			if (recall>max_accuracy){
+				saveDegreeDistribution();
 				break;
 			}
 			
@@ -268,7 +279,7 @@ public class GraphMatching  extends Simulation{
 
 			// set labels in dat.lnodes
 			for (QueryNode q : queries) {
-				if (q.matched_id >= 0){
+				if (q!=null && q.matched_id >= 0){
 					dat.lnodes[q.t].arr[q.id].annotate(q.matched_id);
 					dat.rnodes[q.t].arr[q.matched_id].annotate(q.id);
 					//System.out.printf("match node (t,i,j,w)=(%2d,%5d,%5d,%5f)\n",q.t,q.id,q.matched_id,model.w[q.t].get(q.id, q.matched_id));
@@ -317,8 +328,10 @@ public class GraphMatching  extends Simulation{
 		
 		if(param.perfect_ann){
 			for (int t=0; t<dat.ntype; t++) {
-				count_tot += dat.lnodes[t].size;
+				count_tot += dat.lnodes[t].size_real;
 				for (int i=0; i<dat.lnodes[t].size; i++) {
+					if(dat.lnodes[t].arr[i].no_neighbor)
+						continue;
 					if(dat.lnodes[t].arr[i].getNAnnotatios()>0){
 						count_correct++;
 						continue;
@@ -343,12 +356,14 @@ public class GraphMatching  extends Simulation{
 			ObjectArrayList<EntryWrapper> links = new ObjectArrayList<EntryWrapper>();
 			for (int t=0; t<dat.ntype; t++) {
 				links.clear();
-				count_tot+=dat.lnodes[t].size;
+				count_tot+=dat.lnodes[t].size_real;
 				boolean[] flag_lmatched = new boolean[dat.lnodes[t].size];
 				boolean[] flag_rmatched = new boolean[dat.rnodes[t].size];
 				Arrays.fill(flag_lmatched, false);
 				Arrays.fill(flag_rmatched, false);
 				for (int i=0; i<dat.lnodes[t].size; i++) {
+					if(dat.lnodes[t].arr[i].no_neighbor)
+						continue;
 					ObjectIterator<Entry> iter = model.sim_next[t].getEntryIterator(i);
 					while(iter.hasNext()){
 						Entry entry = iter.next();
@@ -397,6 +412,8 @@ public class GraphMatching  extends Simulation{
 		StringBuilder qry_sb = new StringBuilder();
 		for (int t=0; t<dat.ntype; t++) {
 			for (int i=0; i<dat.lnodes[t].size; i++) {
+				if(dat.lnodes[t].arr[i].no_neighbor)
+					continue;
 				if (dat.lnodes[t].arr[i].getNAnnotatios() > 0){
 					if(param.perfect_ann){
 						continue;
@@ -479,6 +496,8 @@ public class GraphMatching  extends Simulation{
 		//Set similarities
 		int rsize = dat.rnodes[q.t].size;
 		for(int j = 0; j<rsize; j++){
+			if(dat.rnodes[q.t].arr[j].no_neighbor)
+				continue;
 			if(param.perfect_ann&& dat.rnodes[q.t].arr[j].getNAnnotatios()>0)
 				continue;
 			cand[idx].id = j;
@@ -547,8 +566,8 @@ public class GraphMatching  extends Simulation{
 		}
 	}
 	
-	public void loadWriter(){
-		File dir  = new File("log/"+dataname);
+	public void loadWriter(int radius){
+		File dir  = new File("log_r"+radius+"/"+dataname);
 		dir.mkdir();
 		String filename = null;
 		while(true){
@@ -557,8 +576,10 @@ public class GraphMatching  extends Simulation{
 			if(f.exists()){
 				id++;
 			}else{
+				logfile_path = filename;
 				break;
 			}
+			logfile_path = filename;
 		}
 		try {
 			bw = new BufferedWriter(new FileWriter(filename));
@@ -570,9 +591,21 @@ public class GraphMatching  extends Simulation{
 	}
 	
 	private void logging(int iter, QueryNode[] queries){
-		pw.printf("iteration: %d\n",iter);
+		int n_covered = 0;
+		for (int t=0; t<dat.ntype; t++) {
+			for (int i=0; i<dat.lnodes[t].size; i++) {
+				if(dat.lnodes[t].arr[i].no_neighbor)
+					continue;
+				if(model.eff_pairs[t][i].size()>0){
+					n_covered++;
+				}
+			}
+		}
+		pw.printf("iteration: %d, covered:%d\n",iter,n_covered);
 		for(int q = 0; q <queries.length; q++){
 			QueryNode qn = queries[q];
+			if(qn==null)
+				continue;
 			if(q>0){
 				pw.print("|");
 			}
@@ -672,15 +705,97 @@ public class GraphMatching  extends Simulation{
 		if(q.id==cand[i].id){
 			i++;
 		}
+
 		q.setKnownLink(i, cand[i],dat.lnodes[q.t].arr[q.id].getNAnnotatios());
-		/*
-		//Geometric distribution
-		int i = Math.min(nc-1, (int)Math.floor(Math.log(rand.nextDouble())/Math.log((1.0-P_GEOMETRIC_DIST_BAD_ANNOTATOR))));
-		q.setKnownLink(i, cand[i]);
-		*/
+		System.out.printf("False annotation q.id:%d, matched_id: %d\n", q.id,q.matched_id);
+		
 		return i+1;
 	}
-	
+	private void saveDegreeDistribution(){
+		String filename = logfile_path+"_dd";
+		try {
+			PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(filename)));
+			
+			
+			Int2IntOpenHashMap degree_count_correct = new Int2IntOpenHashMap();
+			Int2IntOpenHashMap degree_count_incorrect = new Int2IntOpenHashMap();
+
+			ObjectArrayList<EntryWrapper> links = new ObjectArrayList<EntryWrapper>();
+			for (int t=0; t<dat.ntype; t++) {
+				links.clear();
+				boolean[] flag_lmatched = new boolean[dat.lnodes[t].size];
+				boolean[] flag_rmatched = new boolean[dat.rnodes[t].size];
+				Arrays.fill(flag_lmatched, false);
+				Arrays.fill(flag_rmatched, false);
+				for (int i=0; i<dat.lnodes[t].size; i++) {
+					if(dat.lnodes[t].arr[i].no_neighbor)
+						continue;
+					ObjectIterator<Entry> iter = model.sim_next[t].getEntryIterator(i);
+					while(iter.hasNext()){
+						Entry entry = iter.next();
+						if(entry.getDoubleValue()>TH_SIM_MATCHING){
+							links.add(new EntryWrapper(i, entry));
+						}
+					}
+				}
+				Collections.sort(links, new Comparator<EntryWrapper>() {
+					@Override
+					public int compare(EntryWrapper o1, EntryWrapper o2) {
+						double comp = o2.w-o1.w;
+						if(comp==0.0)return 0;
+						return comp>0.0?1:-1;
+					}
+				});
+				for(EntryWrapper ew: links){
+					if(flag_lmatched[ew.id]||flag_rmatched[ew.j])
+						continue;
+					
+					int degree = 0;
+					for (int s=0; s<dat.ntype; s++) {
+						if(dat.rel[t][s]){
+							degree+=dat.lnodes[t].arr[ew.id].neighbors[s].size;
+						}
+					}
+					flag_lmatched[ew.id] = true;
+					flag_rmatched[ew.j] = true;
+					
+					if(ew.id==ew.j){
+						degree_count_correct.addTo(degree, 1);
+					}else{
+						degree_count_incorrect.addTo(degree, 1);
+					}
+				}
+				for (int i=0; i<dat.lnodes[t].size; i++) {
+					if(flag_lmatched[i]||dat.lnodes[t].arr[i].no_neighbor)
+						continue;
+					int degree = 0;
+					for (int s=0; s<dat.ntype; s++) {
+						if(dat.rel[t][s]){
+							degree+=dat.lnodes[t].arr[i].neighbors[s].size;
+						}
+					}
+					degree_count_incorrect.addTo(degree, 1);
+				}
+			}
+			
+			ObjectIterator<Int2IntMap.Entry> iter = degree_count_correct.int2IntEntrySet().fastIterator();
+			pw.println("correct_dd");
+			while(iter.hasNext()){
+				Int2IntMap.Entry entry = iter.next();
+				pw.printf("%d\t%d\n", entry.getIntKey(),entry.getIntValue());
+			}
+			iter = degree_count_incorrect.int2IntEntrySet().fastIterator();
+			pw.println("incorrect_dd");
+			while(iter.hasNext()){
+				Int2IntMap.Entry entry = iter.next();
+				pw.printf("%d\t%d\n", entry.getIntKey(),entry.getIntValue());
+			}
+			pw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
 
 

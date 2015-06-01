@@ -138,6 +138,8 @@ public abstract class Similarity{
 		}
 		int[] l_list,r_list;
 		for (QueryNode q : queries) {
+			if(q==null)
+				continue;
 			if(dat.lnodes[q.t].arr[q.id].getNAnnotatios(q.matched_id)>1){ 
 				continue;
 			}
@@ -222,7 +224,12 @@ public abstract class Similarity{
 		f = new File(dir);
 		f.mkdir();
 		
-		String filename = String.format("%s/%s_%s_rmr%s_nq%d%s", dir, param.getQueryString(), param.getSimString(),Param.double2String_filename(rm_ratio),nquery,param.optAnn());
+		String filename = String.format("%s/%s_%s_mu%s_err%s_rmr%s_nq%d%s", 
+				dir, param.getQueryString(), param.getSimString(),
+				Param.double2String_filename(param.mu),
+				Param.double2String_filename(param.err_ann),
+				Param.double2String_filename(rm_ratio),
+				nquery,param.optAnn());
 		
 		if(iteration>0){
 			filename += ("."+iteration);

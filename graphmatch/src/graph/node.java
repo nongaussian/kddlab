@@ -15,6 +15,8 @@ public class node {
 	
 	public neighbors[] neighbors = null;
 	
+	public boolean no_neighbor = true;
+	
 	public node (int id, int ntype, boolean[] rel) {
 		this.id = id;
 		this.neighbors = new neighbors[ntype];
@@ -72,5 +74,22 @@ public class node {
 	}
 	public int getNAnnotatios(int j) {
 		return annotations.get(j);
+	}
+	public void init(){
+		for(neighbors n:this.neighbors){
+			if(n!=null&&n.size>0){
+				no_neighbor = false;
+				break;
+			}
+		}
+	}
+	public int getNeighorCount(){
+		int count = 0;
+		for(neighbors n:this.neighbors){
+			if(n!=null){
+				count += n.size;
+			}
+		}
+		return count;
 	}
 }

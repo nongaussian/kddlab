@@ -1,5 +1,7 @@
 package sim;
 
+import java.io.File;
+
 import net.sourceforge.argparse4j.inf.Namespace;
 
 public class Param{
@@ -35,8 +37,8 @@ public class Param{
 	public boolean runtoy 		= false;
 	public boolean perfect_ann 	= true;
 	public double  err_ann		= 0.0;	
-	public double mu			=0.0;
-	
+	public double mu			= 0.0;
+	public int		radius		= 0;
 	public Namespace nes;
 	
 	
@@ -59,6 +61,9 @@ public class Param{
 		perfect_ann = nes.getBoolean("perfect_ann");
 		err_ann	= nes.getDouble("err_ann");
 		mu = nes.getDouble("mu");
+		radius = nes.getInt("radius");
+		File logdir = new File("log_r"+radius);
+		logdir.mkdir();
 	}
 	
 	public String getSimString(){
@@ -69,7 +74,7 @@ public class Param{
 	}
 	
 	public String logFilePath(String dataname, double rm_ratio, int nquery,int qmid){
-		return logFilePath(dataname, sim, query, rm_ratio, nquery,perfect_ann,err_ann,mu,qmid);
+		return logFilePath(dataname,radius, sim, query, rm_ratio, nquery,perfect_ann,err_ann,mu,qmid);
 	}
 	
 	public String optAnn(){
@@ -83,11 +88,11 @@ public class Param{
 		}
 		return annopt;
 	}
-	public static String logFilePath(String dataname, int sim, int query, double rm_ratio, int nquery, boolean perfectann, double ann_err,double mu,int qmid){
+	public static String logFilePath(String dataname,int radius, int sim, int query, double rm_ratio, int nquery, boolean perfectann, double ann_err,double mu,int qmid){
 		String annopt =optAnn(perfectann, ann_err);
 		
-		return String.format("log/%s/%s_%s_rmr%s_nq%d%s_mu%s.%d.log",
-				dataname,sim_str[sim],query_str[query],double2String_filename(rm_ratio),nquery,annopt,double2String_filename(mu),qmid);
+		return String.format("log_r%d/%s/%s_%s_rmr%s_nq%d%s_mu%s.%d.log",
+				radius,dataname,sim_str[sim],query_str[query],double2String_filename(rm_ratio),nquery,annopt,double2String_filename(mu),qmid);
 	}
 
 	public static String double2String_filename(double d){
