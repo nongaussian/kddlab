@@ -1123,7 +1123,7 @@ static double[][][] getCoverage(String dataname, int radius, int sim, int query,
 				p.set("rmargin at screen", "0.9");
 				p.set("bmargin at screen", "0.2");
 				p.set("tmargin at screen", "0.95");
-				
+				p.set("yrange","[0.0:1.0]");
 				p.set("key", "right bottom");
 								
 				boolean b_plot = false;
@@ -1500,7 +1500,7 @@ static double[][][] getCoverage(String dataname, int radius, int sim, int query,
 					}
 					if(!Param.compatible(q, s))
 						continue;
-					double[][] points = getRmRCost(radius, Param.query_str[q], Param.sim_str[s],rmr_list, err);
+					double[][] points = getRmRCost(radius, Param.query_str[q], Param.sim_str[s],rmr_list, err,mu);
 					if(points!=null && points.length>0){
 						AbstractPlot data = new DataSetPlot(points);
 						data.setTitle(getAbb(Param.query_str[q])+"+"+getAbb(Param.sim_str[s]));
@@ -1524,9 +1524,14 @@ static double[][][] getCoverage(String dataname, int radius, int sim, int query,
 		}
 	}
 	
-	private double[][] getRmRCost(int radius, String query, String sim, double[] rmr_list, double err) {
+	private double[][] getRmRCost(int radius, String query, String sim, double[] rmr_list, double err,double mu) {
 		double[][] out = new double[rmr_list.length][2];
 		try {
+			String muoption = "";
+			if(sim.equals(Param.sim_str[Param.SIM_PROPOSED])){
+				muoption = String.format("and mu < %f and mu > %f", mu+0.0001,mu-0.0001);
+			}
+			
 			String qry = String.format(
 					"select rmr, max(cost) "+
 					"from experiment, results " +
@@ -1535,10 +1540,11 @@ static double[][][] getCoverage(String dataname, int radius, int sim, int query,
 					"and query = '%s' " +
 					"and sim = '%s'  " +
 					"and err > %f and err < %f " +
+					"%s "+
 					"and radius =  %d " +
 					"group by rmr " +
 					"order by rmr asc;",
-					dataname, query, sim, err-0.00001,err+0.00001, radius);
+					dataname, query, sim, err-0.00001,err+0.00001, muoption, radius);
 			
 		
 			ResultSet rs = sqlunit.executeQuery(qry);
@@ -1920,6 +1926,8 @@ class PlotManager{
 			setErrCostOption(p);
 		}else if(filename.startsWith("CostAcc")){
 			setCostAccOption(p);
+		}else if(filename.startsWith("RmrCost")){
+			setRmrCostOption(p);
 		}
 		
 		for(PlotDataContainer pdc:pdc_list){
@@ -1967,6 +1975,10 @@ class PlotManager{
 	void setCostAccOption(JavaPlot p){
 		if(pdc_list.size()>3&&dataplot.dataname.startsWith("tiny")){
 			double yrange_min = 100;
+			double min_key = pdc_list.get(pdc_list.size()-1).key;
+			if(min_key<20000.0){
+				yrange_min = 10;
+			}
 			p.set("yrange",String.format("[%f:]",yrange_min));
 		}
 			//p.set("yrange",String.format("[%f:]",yrange_min));
@@ -1981,7 +1993,19 @@ class PlotManager{
 		else{
 			double min_key = pdc_list.get(pdc_list.size()-1).key;
 			double yrange_min = Math.pow(10, Math.floor(Math.log10(min_key)-1.0));
-			//p.set("yrange",String.format("[%f:]",yrange_min));
+			p.set("yrange",String.format("[%f:]",yrange_min));
+		}
+	}
+	void setRmrCostOption(JavaPlot p){
+		if(pdc_list.size()>3){
+			double min_key = pdc_list.get(pdc_list.size()-1).key;
+			double yrange_min = Math.pow(10, Math.floor(Math.log10(min_key)-1.5));
+			p.set("yrange",String.format("[%f:]",yrange_min));
+		}
+		else{
+			double min_key = pdc_list.get(pdc_list.size()-1).key;
+			double yrange_min = Math.pow(10, Math.floor(Math.log10(min_key)-1.0));
+			p.set("yrange",String.format("[%f:]",yrange_min));
 		}
 	}
 }
