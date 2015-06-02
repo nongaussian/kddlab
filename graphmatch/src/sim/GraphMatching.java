@@ -53,7 +53,7 @@ public class GraphMatching  extends Simulation{
 
 	double recall;
 	
-	public void main(String[] args) throws IOException{
+	public static void main(String[] args) throws IOException{
 		GraphMatching gm = new GraphMatching(args);
 		gm.init();
 		gm.initDB(gm.param.nes.getString("dbname"));
