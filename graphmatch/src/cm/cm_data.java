@@ -38,7 +38,7 @@ public class cm_data {
 	
 	public static void main(String[] args) throws IOException{
 		
-		cm_data dat = new cm_data("data/tiny_2_l", "data/tiny_2_r");
+		cm_data dat = new cm_data("data/tiny_5_l", "data/tiny_5_r");
 		dat.stat("data/tiny");
 		//cm_data dat = new cm_data("data/ex_4_l", "data/ex_4_r");
 		//dat.stat("data/ex_4");

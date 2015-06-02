@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class Test {
 	//static String[] mu_list = {"0.1","1.0","10.0"};
-	static String[] mu_list = {"0.1", "1.0","10.0","100.0"};
+	static String[] mu_list = {"1.0","10.0","100.0"};
 	public static String default_dbname = "graphmatching3";
 	
 	public static void main(String[] args) throws IOException{
@@ -264,7 +264,7 @@ public class Test {
 							String[] cmd3 = ArrayUtils.addAll(cmd2, cmd_r);
 						
 							for(int mu_idx = 0; mu_idx < mu_list.length; mu_idx++){
-								if(mu_idx==2||sim_str.equals(Param.sim_str[Param.SIM_PROPOSED])	){
+								if(mu_idx==1||sim_str.equals(Param.sim_str[Param.SIM_PROPOSED])	){
 									
 								}else{
 									continue;
@@ -309,7 +309,7 @@ public class Test {
 								
 								
 								
-								/*/
+								//*/
 								GraphMatching gm = new GraphMatching(cmd);
 								gm.init();
 								gm.initDB(default_dbname);

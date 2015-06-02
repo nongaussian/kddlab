@@ -106,13 +106,12 @@ public class GraphMatching  extends Simulation{
 			.help("Save the model (similarities) if enable this option");
 		parser.addArgument("-perfect_ann")
 			.type(Boolean.class)
-			.setDefault(true)
+			.setDefault(false)
 			.help("Enable the perfect annotator assumption");
 		parser.addArgument("-err_ann")
 			.type(Double.class)
 			.setDefault(0.0)
-			.help("Annotator error ratio\n" +
-					"Disable -perfect_ann if you want to simulate annotator error");
+			.help("Annotator error ratio");
 		parser.addArgument("-mu")
 		.type(Double.class)
 		.setDefault(1.0);
